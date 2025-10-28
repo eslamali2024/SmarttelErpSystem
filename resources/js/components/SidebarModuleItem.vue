@@ -25,12 +25,12 @@ defineProps<{ module: Module }>()
     <Collapsible v-if="module.children && module.children.length" v-slot="{ open }" defaultOpen
         class="group/collapsible">
         <SidebarMenuItem>
-            <SidebarMenuButton size="sm" as-child>
+            <SidebarMenuButton  as-child>
                 <CollapsibleTrigger asChild>
                     <SidebarMenuSubItem class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <i v-if="module.icon" :class="module.icon"></i>
-                            <span>{{ module.name }}</span>
+                            <span class="text-nowrap">{{ module.name }}</span>
                         </div>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200"
                             :class="{ 'rotate-90': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -49,7 +49,7 @@ defineProps<{ module: Module }>()
     </Collapsible>
 
     <SidebarMenuItem v-else>
-        <SidebarMenuButton size="md" as-child class="w-full">
+        <SidebarMenuButton  as-child class="w-full">
             <Link :href="module.path" class="flex items-center gap-2 w-full">
             <i v-if="module.icon" :class="module.icon"></i>
             {{ module.name }}
