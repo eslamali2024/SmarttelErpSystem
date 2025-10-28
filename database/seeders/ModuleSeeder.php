@@ -40,7 +40,7 @@ class ModuleSeeder extends Seeder
     {
         return [
             [
-                'name'              => 'Dashboard',
+                'name'              => 'dashboard',
                 'icon'              => 'ri-dashboard-line',
                 'path'              => 'dashboard',
                 'permission_title'  => 'dashboard_access',
@@ -48,7 +48,7 @@ class ModuleSeeder extends Seeder
             ],
             [
                 'key'               => 'hr',
-                'name'              => 'HR',
+                'name'              => 'hr',
                 'icon'              => 'ri-shield-user-fill',
                 'path'              => 'hr',
                 'permission_title'  => 'hr_access',
@@ -56,7 +56,7 @@ class ModuleSeeder extends Seeder
             ],
             [
                 'key'               => 'crm',
-                'name'              => 'CRM',
+                'name'              => 'crm',
                 'icon'              => 'ri-customer-service-line',
                 'path'              => 'crm',
                 'permission_title'  => 'crm_access',
@@ -64,7 +64,7 @@ class ModuleSeeder extends Seeder
             ],
             [
                 'key'               => 'sales',
-                'name'              => 'Sales',
+                'name'              => 'sales',
                 'icon'              => 'ri-phone-line',
                 'path'              => 'sales',
                 'permission_title'  => 'sales_access',
@@ -72,7 +72,7 @@ class ModuleSeeder extends Seeder
             ],
             [
                 'key'               => 'pre-sales',
-                'name'              => 'Pre Sales',
+                'name'              => 'pre_sales',
                 'icon'              => 'ri-phone-line',
                 'path'              => 'pre-sales',
                 'permission_title'  => 'pre_sales_access',
@@ -80,7 +80,7 @@ class ModuleSeeder extends Seeder
             ],
             [
                 'key'               => 'supply-chain',
-                'name'              => 'Supply Chain',
+                'name'              => 'supply_chain',
                 'icon'              => 'ri-user-fill',
                 'path'              => 'supply-chain',
                 'permission_title'  => 'supply_chain_access',
@@ -94,7 +94,7 @@ class ModuleSeeder extends Seeder
         return [
             [
                 'key'               => 'organization',
-                'name'              => 'Organization Management',
+                'name'              => 'organization',
                 'icon'              => 'ri-building-2-fill',
                 'path'              => 'hr/organization',
                 'permission_title'  => 'organization_access',
@@ -102,7 +102,7 @@ class ModuleSeeder extends Seeder
                 'parent_key'        => 'hr',
             ],
             [
-                'name'              => 'department',
+                'name'              => 'departments',
                 'icon'              => 'ri-building-2-fill',
                 'path'              => 'hr/organization/departments',
                 'permission_title'  => 'department_access',
