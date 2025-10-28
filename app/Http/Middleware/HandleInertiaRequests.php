@@ -2,9 +2,10 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Http\Request;
+use App\Models\Module;
 use Inertia\Middleware;
+use Illuminate\Http\Request;
+use Illuminate\Foundation\Inspiring;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -38,6 +39,12 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $modules = cache()->rememberForever('modules', function () {
+            $modules = Module::with('children')->whereNull('parent_key')->get();
+            return $modules->map(fn($module) => $this->formatModule($module));
+        });
+
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -46,6 +53,22 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'modules' => $modules,
+
+        ];
+    }
+
+    private  function formatModule($module)
+    {
+        return [
+            'name' => str($module->name)->limit(20),
+            'path' => $module->path,
+            'icon' => $module->icon,
+            'permission_title' => $module->permission_title,
+            'parent_key' => $module->parent_key,
+            'children' => $module->children->isNotEmpty()
+                ? $module->children->map(fn($child) => $this->formatModule($child))
+                : [],
         ];
     }
 }
