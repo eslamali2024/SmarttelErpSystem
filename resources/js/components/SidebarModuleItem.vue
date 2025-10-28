@@ -25,7 +25,7 @@ defineProps<{ module: Module }>()
     <Collapsible v-if="module.children && module.children.length" v-slot="{ open }" defaultOpen
         class="group/collapsible">
         <SidebarMenuItem>
-            <SidebarMenuButton size="md" as-child>
+            <SidebarMenuButton size="sm" as-child>
                 <CollapsibleTrigger asChild>
                     <SidebarMenuSubItem class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
