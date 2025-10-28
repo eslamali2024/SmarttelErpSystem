@@ -49,6 +49,7 @@ const footerNavItems: NavItem[] = [
 
 
 <template>
+
     <Sidebar collapsible="icon" variant="inset">
         <SidebarHeader>
             <SidebarMenu>

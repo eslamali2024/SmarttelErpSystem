@@ -61,7 +61,7 @@ class HandleInertiaRequests extends Middleware
     private  function formatModule($module)
     {
         return [
-            'name' => str($module->name)->limit(20),
+            'name' => str($module->name)->limit(15),
             'path' => $module->path,
             'icon' => $module->icon,
             'permission_title' => $module->permission_title,
