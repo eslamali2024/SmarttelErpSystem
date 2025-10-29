@@ -7,10 +7,11 @@ use App\Traits\ScopeFilter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Department extends Model
 {
-    use ScopeFilter;
+    use ScopeFilter, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

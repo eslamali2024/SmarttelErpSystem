@@ -25,6 +25,7 @@ class DepartmentController extends TransactionController
 
         return Inertia::render($this->path . 'DepartmentsListComponent', [
             'departments' => Department::with('manager')->filter($search ?? [])->paginate(10),
+            'managers'    => User::pluck('name', 'id'),
         ]);
     }
 

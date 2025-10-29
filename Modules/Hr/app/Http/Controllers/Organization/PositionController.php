@@ -24,7 +24,8 @@ class PositionController extends TransactionController
         unset($search['page']);
 
         return Inertia::render($this->path . 'PositionsListComponent', [
-            'positions' => Position::with('department')->filter($search ?? [])->paginate(10),
+            'positions'     => Position::with('department')->filter($search ?? [])->paginate(10),
+            'departments'   => Department::pluck('name', 'id'),
         ]);
     }
 
