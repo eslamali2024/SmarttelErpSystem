@@ -33,8 +33,8 @@ const submit = () => {
 
         <hr class="my-2 w-5/6 mx-auto">
         <div class="flex justify-end align-center gap-2">
-            <A :href="cancelRoute" class="bg-red-500/50 cursor-pointer text-white" size="sm">Cancel</A>
-            <Button class="bg-green-500/50 cursor-pointer text-white" size="sm" type="submit">
+            <A :href="cancelRoute" class="bg-red-500/50 cursor-pointer text-white hover:bg-red-600" size="sm">Cancel</A>
+            <Button class="bg-green-500/50 cursor-pointer text-white hover:bg-green-600" size="sm" type="submit">
                 Save
             </Button>
         </div>

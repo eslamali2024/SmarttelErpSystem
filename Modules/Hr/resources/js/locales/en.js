@@ -11,4 +11,10 @@ export default {
     please_select_a_manager: 'Please select a manager',
     please_enter_a_description: 'Please enter a description',
     description: 'Description',
+    positions: 'Positions',
+    add_position: 'Add Position',
+    department: 'Department',
+    code: 'Code',
+    please_select_a_department: 'Please select a department',
+    back: 'Back',
 }
