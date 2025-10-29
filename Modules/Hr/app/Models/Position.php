@@ -5,11 +5,12 @@ namespace Modules\Hr\Models;
 use App\Traits\ScopeFilter;
 use Modules\Hr\Models\Department;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Position extends Model
 {
-    use ScopeFilter;
+    use ScopeFilter, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

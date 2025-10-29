@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('employees_count')->default(0);
             $table->foreignId('department_id')->nullable()->constrained('departments')->noActionOnDelete();
             $table->text('description')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

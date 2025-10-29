@@ -22,6 +22,21 @@ import departmentsRoute from '@/routes/hr/organization/departments';
 import TableActions from '@/components/ui/table/TableActions.vue';
 import A from '@/components/ui/a/A.vue';
 import Card from '@/components/ui/Card.vue';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { ref } from 'vue';
+import Button from '@/components/ui/button/Button.vue';
+import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
+import DepartmentFormDialog from './DepartmentFormDialog.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: dashboard().url },
@@ -36,7 +51,8 @@ const props = defineProps<{
         total?: number,
         per_page?: number,
         current_page?: number
-    }
+    },
+    managers?: Array<{ value: any, label: string }>
 }>()
 
 // reactive search
@@ -56,9 +72,39 @@ watch(search, () => {
     })
 }, { deep: true });
 
-// delete department
-const deleteDepartment = (id: number) => {
-    router.delete(departmentsRoute.destroy(id).url);
+
+// Form Data
+const showFormDialog = ref(false)
+const currentItem = ref<any>(null)
+
+const method_type = ref("post");
+const action = ref(departmentsRoute.store().url);
+
+const toggleFormDialog = (item?: any) => {
+    showFormDialog.value = true;
+    currentItem.value = item;
+
+    if (item) {
+        method_type.value = "put";
+        action.value = departmentsRoute.update(item.id).url;
+    } else {
+        method_type.value = "post";
+        action.value = departmentsRoute.store().url;
+    }
+}
+
+
+// Delete Modal
+const showDeleteModal = ref(false)
+
+const toggleShowDeleteModal = (department: any) => {
+    currentItem.value = department
+    showDeleteModal.value = true
+}
+
+const deleteDepartment = () => {
+    router.delete(departmentsRoute.destroy(currentItem.value.id).url)
+    showDeleteModal.value = false
 }
 </script>
 
@@ -70,10 +116,10 @@ const deleteDepartment = (id: number) => {
         <Card>
             <template #header>
                 <h4>{{ $t('departments') }}</h4>
-                <A class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm"
-                    :href="departmentsRoute.create().url">
+                <Button v-on:click="toggleFormDialog(null)"
+                    class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
                     <i class="ri ri-add-line"></i> {{ $t("add_department") }}
-                </A>
+                </Button>
             </template>
 
             <template #body>
@@ -108,8 +154,20 @@ const deleteDepartment = (id: number) => {
                             <TableCell class="text-center">{{ department.code ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ department.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ department.manager?.name ?? '-' }}</TableCell>
-                            <TableActions :edit="departmentsRoute.edit(department.id).url"
-                                :delete="() => deleteDepartment(department.id)" />
+                            <TableCell class="text-center">
+                                <!-- Icon Edit:start -->
+                                <Button size="sm" v-on:click="toggleFormDialog(position)"
+                                    class="mr-2 bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600">
+                                    <i class="ri ri-pencil-line"></i>
+                                </Button>
+                                <!-- Icon Edit:end -->
+                                <!-- Icon Delete:start -->
+                                <Button size="sm" v-on:click="toggleShowDeleteModal(department)"
+                                    class="bg-red-500 cursor-pointer text-white hover:bg-red-600 ">
+                                    <i class="ri ri-delete-bin-line"></i>
+                                </Button>
+                                <!-- Icon Delete:end -->
+                            </TableCell>
                         </TableRow>
                     </TableBody>
 
@@ -128,4 +186,10 @@ const deleteDepartment = (id: number) => {
             </template>
         </Card>
     </AppLayout>
+
+    <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteDepartment" />
+
+    <DepartmentFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
+        :managers="props.managers" :item="currentItem" />
+
 </template>

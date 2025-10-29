@@ -17,4 +17,7 @@ export default {
     code: 'Code',
     please_select_a_department: 'Please select a department',
     back: 'Back',
+    update_position: 'Update Position',
+    cancel: 'Cancel',
+    save: 'Save',
 }

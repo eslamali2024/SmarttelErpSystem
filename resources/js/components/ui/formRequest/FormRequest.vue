@@ -11,20 +11,29 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const emit = defineEmits<{
+    (e: 'success'): void
+}>();
+
 const submit = () => {
     if (!props.form || !props.action || !props.method_type) {
         console.warn('Form, action, or method_type is missing.')
         return
     }
 
+    const onSuccess = () => {
+        emit('success')
+    }
+
     if (props.method_type === 'post') {
-        props.form.post(props.action)
+        props.form.post(props.action, { onSuccess })
     } else if (props.method_type === 'put') {
-        props.form.put(props.action)
+        props.form.put(props.action, { onSuccess })
     } else {
         console.warn(`Unsupported method_type: ${props.method_type}`)
     }
 }
+
 </script>
 
 <template>

@@ -22,7 +22,12 @@ import positionsRoute from '@/routes/hr/organization/positions';
 import TableActions from '@/components/ui/table/TableActions.vue';
 import A from '@/components/ui/a/A.vue';
 import Card from '@/components/ui/Card.vue';
+import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
+import { ref } from "vue";
+import Button from '@/components/ui/button/Button.vue';
+import PositionFormDialog from './PositionFormDialog.vue';
 
+// breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: dashboard().url },
     { title: 'Organization', href: null },
@@ -36,8 +41,30 @@ const props = defineProps<{
         total?: number,
         per_page?: number,
         current_page?: number
-    }
+    },
+    departments?: Array<{ value: any, label: string }>
 }>()
+
+// Form Data
+const showFormDialog = ref(false)
+const currentItem = ref<any>(null)
+
+const method_type = ref("post");
+const action = ref(positionsRoute.store().url);
+
+const toggleFormDialog = (item?: any) => {
+    showFormDialog.value = true;
+    currentItem.value = item;
+
+    if (item) {
+        method_type.value = "put";
+        action.value = positionsRoute.update(item.id).url;
+    } else {
+        method_type.value = "post";
+        action.value = positionsRoute.store().url;
+    }
+}
+
 
 // reactive search
 const urlParams = new URLSearchParams(window.location.search);
@@ -56,9 +83,17 @@ watch(search, () => {
     })
 }, { deep: true });
 
-// delete position
-const deletePosition = (id: number) => {
-    router.delete(positionsRoute.destroy(id).url);
+// Delete Modal
+const showDeleteModal = ref(false)
+
+const toggleShowDeleteModal = (poisiton: any) => {
+    currentItem.value = poisiton
+    showDeleteModal.value = true
+}
+
+const deletePosition = () => {
+    router.delete(positionsRoute.destroy(currentItem.value.id).url)
+    showDeleteModal.value = false
 }
 </script>
 
@@ -70,10 +105,10 @@ const deletePosition = (id: number) => {
         <Card>
             <template #header>
                 <h4>{{ $t('positions') }}</h4>
-                <A class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm"
-                    :href="positionsRoute.create().url">
+                <Button v-on:click="toggleFormDialog(null)"
+                    class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
                     <i class="ri ri-add-line"></i> {{ $t("add_position") }}
-                </A>
+                </Button>
             </template>
 
             <template #body>
@@ -108,8 +143,22 @@ const deletePosition = (id: number) => {
                             <TableCell class="text-center">{{ position.code ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ position.department?.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ position.name }}</TableCell>
-                            <TableActions :edit="positionsRoute.edit(position.id).url"
-                                :delete="() => deletePosition(position.id)" />
+                            <TableCell class="text-center">
+                                <!-- Icon Edit:start -->
+
+                                <Button size="sm" v-on:click="toggleFormDialog(position)"
+                                    class="mr-2 bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600">
+                                    <i class="ri ri-pencil-line"></i>
+                                </Button>
+
+                                <!-- Icon Edit:end -->
+                                <!-- Icon Delete:start -->
+                                <Button size="sm" v-on:click="toggleShowDeleteModal(position)"
+                                    class="bg-red-500 cursor-pointer text-white hover:bg-red-600 ">
+                                    <i class="ri ri-delete-bin-line"></i>
+                                </Button>
+                                <!-- Icon Delete:end -->
+                            </TableCell>
                         </TableRow>
                     </TableBody>
 
@@ -126,5 +175,11 @@ const deletePosition = (id: number) => {
                     :defaultPage="1" />
             </template>
         </Card>
+        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deletePosition" />
+
+        <PositionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
+            :departments="props.departments" :item="currentItem" />
+
     </AppLayout>
+
 </template>
