@@ -13,7 +13,10 @@ const props = defineProps<{
     method_type: string,
     action: string,
     item?: any,
-    departments?: Array<{ value: any, label: string }>
+    departments?: {
+        id: number
+        name: string
+    }
 }>();
 
 const emit = defineEmits(['update:show']);

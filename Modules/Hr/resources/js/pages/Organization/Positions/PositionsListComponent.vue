@@ -43,7 +43,10 @@ const props = defineProps<{
         per_page?: number,
         current_page?: number
     },
-    departments?: Array<{ value: any, label: string }>
+    departments?: {
+        id: number
+        name: string
+    }
 }>()
 
 // Form Data
