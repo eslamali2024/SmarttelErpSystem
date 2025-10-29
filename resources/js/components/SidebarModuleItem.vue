@@ -56,7 +56,7 @@ defineProps<{ module: Module }>()
         <SidebarMenuButton as-child class="w-full">
             <Link :href="module.path" :class="{
                 'flex items-center gap-2 w-full': true,
-                'bg-gray-600/50': page.url === module.path,
+                'bg-gray-600/50': page.url.includes(module.path),
 
             }">
             <i v-if="module.icon" :class="module.icon"></i>

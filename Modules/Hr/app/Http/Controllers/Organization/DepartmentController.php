@@ -5,12 +5,15 @@ namespace Modules\Hr\Http\Controllers\Organization;
 use App\Models\User;
 use Inertia\Inertia;
 use Modules\Hr\Models\Department;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\TransactionController;
+use Modules\Hr\Services\DepartmentService;
 use Modules\Hr\Http\Requests\DepartmentRequest;
 
-class DepartmentController extends Controller
+class DepartmentController extends TransactionController
 {
     private $path = 'Hr::Organization/Departments/';
+
+    public function __construct(private DepartmentService $departmentService) {}
 
     /**
      * Display a listing of the resource.
@@ -42,9 +45,10 @@ class DepartmentController extends Controller
      */
     public function store(DepartmentRequest $request)
     {
-        Department::create($request->validated());
-
-        return redirect()->route('hr.organization.departments.index');
+        return $this->withTransaction(function () use ($request) {
+            $this->departmentService->store($request->validated());
+            return redirect()->route('hr.organization.departments.index');
+        });
     }
 
     /**
@@ -74,8 +78,10 @@ class DepartmentController extends Controller
      */
     public function update(DepartmentRequest $request, Department $department)
     {
-        $department->update($request->validated());
-        return redirect()->route('hr.organization.departments.index');
+        return $this->withTransaction(function () use ($request, $department) {
+            $this->departmentService->update($department, $request->validated());
+            return redirect()->route('hr.organization.departments.index');
+        });
     }
 
     /**
@@ -83,7 +89,9 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department)
     {
-        $department->delete();
-        return redirect()->route('hr.organization.departments.index');
+        return $this->withTransaction(function () use ($department) {
+            $this->departmentService->destroy($department);
+            return redirect()->route('hr.organization.departments.index');
+        });
     }
 }

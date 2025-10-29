@@ -11,55 +11,49 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 
-interface Option {
-    key: string | number
-    option: string
-}
-
 interface Props {
     modelValue?: string
     modelValueError?: string
     label?: string
     placeholder?: string
-    options?: Option[]
+    options?: Record<string, string>
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits(['update:modelValue'])
 
-// Computed property to ensure modelValue is always a string
 const model = computed({
     get: () => String(props.modelValue ?? ''),
     set: (val: string) => emit('update:modelValue', String(val)),
 })
+
+const optionsArray = props.options
+    ? Object.entries(props.options).map(([value, label]) => ({ value, label }))
+    : []
 </script>
 
 <template>
     <div>
-        <!-- Label -->
-        <Label v-if="label">{{ label }}</Label>
+        <Label v-if="props.label">{{ props.label }}</Label>
 
-        <!-- Select component -->
         <Select v-model="model">
-            <SelectTrigger>
-                <SelectValue :placeholder="placeholder || 'Select an option'" />
+            <SelectTrigger class="bg-transpartent hover:bg-gray-600/50">
+                <SelectValue :placeholder="props.placeholder || 'Select an option'" />
             </SelectTrigger>
 
-            <SelectContent>
+            <SelectContent class="bg-white dark:bg-gray-800">
                 <SelectGroup>
-                    <SelectLabel v-if="label">{{ label }}</SelectLabel>
+                    <SelectLabel v-if="props.label">{{ props.label }}</SelectLabel>
 
-                    <!-- Render options safely -->
-                    <SelectItem v-for="item in options ?? []" :key="item.key" :value="String(item.key)">
-                        {{ item.option }}
+                    <SelectItem v-for="option in optionsArray" :key="option.value" :value="option.value">
+                        {{ option.label }}
                     </SelectItem>
                 </SelectGroup>
             </SelectContent>
         </Select>
 
-        <!-- Error message -->
-        <p v-if="modelValueError" class="text-sm text-red-500 mt-2">
-            {{ modelValueError }}
+        <p v-if="props.modelValueError" class="text-sm text-red-500 mt-2">
+            {{ props.modelValueError }}
         </p>
     </div>
 </template>

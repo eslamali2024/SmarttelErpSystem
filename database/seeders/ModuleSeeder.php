@@ -109,6 +109,14 @@ class ModuleSeeder extends Seeder
                 'status'            => true,
                 'parent_key'        => 'organization',
             ],
+            [
+                'name'              => 'positions',
+                'icon'              => 'ri-building-2-fill',
+                'path'              => 'hr/organization/positions',
+                'permission_title'  => 'position_access',
+                'status'            => true,
+                'parent_key'        => 'organization',
+            ],
         ];
     }
 }

@@ -9,34 +9,56 @@ import { createI18n } from 'vue-i18n';
 import en from './locales/en';
 import ar from './locales/ar';
 
-const messages = { en, ar };
+// Sit General Messages
+const generalMessages = { en, ar };
+const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 const i18n = createI18n({
+    legacy: false,
     locale: 'en',
     fallbackLocale: 'en',
-    messages
+    messages: generalMessages
 });
-
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
 
-    resolve: (name) => {
+    resolve: async (name) => {
         const [module, page] = name.includes('::') ? name.split('::') : [null, name];
 
-        if (module) {
-            const modulePath = `/Modules/${module}/resources/js/pages/${page}.vue`;
+        let moduleMessages = { en: {}, ar: {} };
 
-            return resolvePageComponent(
-                modulePath,
-                import.meta.glob<DefineComponent>('/Modules/**/resources/js/pages/**/*.vue')
-            );
+        if (module) {
+            // Load module-specific translations
+            try {
+                const enModule = await import(`/Modules/${module}/resources/js/locales/en.js`);
+                const arModule = await import(`/Modules/${module}/resources/js/locales/ar.js`);
+
+                moduleMessages = {
+                    en: enModule.default,
+                    ar: arModule.default
+                };
+            } catch (e) {
+                console.warn(`No module-specific languages found for module: ${module}`);
+            }
+
+            const mergedMessages = {
+                en: { ...generalMessages.en, ...moduleMessages.en },
+                ar: { ...generalMessages.ar, ...moduleMessages.ar }
+            };
+
+            i18n.global.setLocaleMessage('en', mergedMessages.en);
+            i18n.global.setLocaleMessage('ar', mergedMessages.ar);
+
+            i18n.global.locale.value = 'en';
         }
 
+        // Load page-specific Module Component
         return resolvePageComponent(
-            `/resources/js/pages/${name}.vue`,
-            import.meta.glob<DefineComponent>('/resources/js/pages/**/*.vue')
+            module
+                ? `/Modules/${module}/resources/js/pages/${page}.vue`
+                : `/resources/js/pages/${page}.vue`,
+            import.meta.glob<DefineComponent>('/{Modules/**/resources/js/pages,resources/js/pages}/**/*.vue')
         );
     },
 
@@ -46,6 +68,7 @@ createInertiaApp({
             .use(i18n)
             .mount(el);
     },
+
     progress: { color: '#4B5563' },
 });
 
