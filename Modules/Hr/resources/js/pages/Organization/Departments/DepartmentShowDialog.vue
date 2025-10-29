@@ -46,7 +46,6 @@ const confirmDelete = () => {
                         :placeholder="$t('please_enter_a_description')"
                         :placeholder_message="$t('please_enter_a_description')" />
                 </div>
-
             </AlertDialogDescription>
             <AlertDialogFooter>
                 <AlertDialogCancel class="cursor-pointer">{{ $t('close') }}</AlertDialogCancel>

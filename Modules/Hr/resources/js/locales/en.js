@@ -25,5 +25,6 @@ export default {
     close: 'Close',
     show_department: 'Show Department',
     please_enter_a_department: 'Please enter a department',
-    show_position: 'Show Position'
+    show_position: 'Show Position',
+    update_department_description: 'Update Department Description'
 }

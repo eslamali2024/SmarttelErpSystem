@@ -12,11 +12,11 @@ import {
 } from '@/components/ui/select'
 
 interface Props {
-    modelValue?: string
-    modelValueError?: string
-    label?: string
-    placeholder?: string
-    options?: Record<string, string>
+    modelValue?: string | number,
+    modelValueError?: string,
+    label?: string,
+    placeholder?: string,
+    options?: Record<string, string>,
 }
 
 const props = defineProps<Props>()

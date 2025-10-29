@@ -4,7 +4,7 @@ import { watch } from 'vue';
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import TextareaGroup from '@/components/ui/textarea-group/TextareaGroup.vue';
 import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import Button from '@/components/ui/button/Button.vue';
 import departmentsRoute from '@/routes/hr/organization/departments';
 
@@ -57,19 +57,20 @@ const submitForm = () => {
                     {{ props.method_type === 'post' ? $t('add_department') : $t('update_department') }}
                 </DialogTitle>
             </DialogHeader>
+            <DialogDescription>
+                <div class="grid grid-cols-1 gap-3 py-4">
+                    <InputGroup v-model="form.name" :modelValueError="form.errors.name" :label="$t('name')"
+                        :placeholder="$t('please_enter_a_name')" type="text" />
 
-            <div class="grid grid-cols-1 gap-3 py-4">
-                <InputGroup v-model="form.name" :modelValueError="form.errors.name" :label="$t('name')"
-                    :placeholder="$t('please_enter_a_name')" type="text" />
+                    <SelectGroup v-model="form.manager_id" :modelValueError="form.errors.manager_id"
+                        :label="$t('manager')" :placeholder="$t('please_select_a_manager')"
+                        :options="props.managers || []" />
 
-                <SelectGroup v-model="form.manager_id" :modelValueError="form.errors.manager_id" :label="$t('manager')"
-                    :placeholder="$t('please_select_a_manager')" :options="props.managers || []" />
-
-                <TextareaGroup v-model="form.description" :modelValueError="form.errors.description"
-                    :label="$t('description')" :placeholder="$t('please_enter_a_description')"
-                    :placeholder_message="$t('please_enter_a_description')" />
-            </div>
-
+                    <TextareaGroup v-model="form.description" :modelValueError="form.errors.description"
+                        :label="$t('description')" :placeholder="$t('please_enter_a_description')"
+                        :placeholder_message="$t('please_enter_a_description')" />
+                </div>
+            </DialogDescription>
             <DialogFooter>
                 <Button type="button" @click="emit('update:show', false)"
                     class="bg-red-500/50 cursor-pointer text-white hover:bg-red-600">
