@@ -13,7 +13,10 @@ const props = defineProps<{
     method_type: string,
     action: string,
     item?: any,
-    managers?: Array<{ value: any, label: string }>
+    managers?: {
+        id: number
+        name: string
+    }
 }>();
 
 

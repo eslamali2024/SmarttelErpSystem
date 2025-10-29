@@ -23,5 +23,7 @@ export default {
     show_position: 'Show Position',
     please_enter_a_code: 'Please enter a code',
     close: 'Close',
-    show_department: 'Show Department'
+    show_department: 'Show Department',
+    please_enter_a_department: 'Please enter a department',
+    show_position: 'Show Position'
 }

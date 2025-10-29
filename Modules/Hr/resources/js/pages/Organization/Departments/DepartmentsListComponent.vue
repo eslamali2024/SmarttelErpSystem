@@ -53,7 +53,10 @@ const props = defineProps<{
         per_page?: number,
         current_page?: number
     },
-    managers?: Array<{ value: any, label: string }>
+    managers?: {
+        id: number
+        name: string
+    }
 }>()
 
 // reactive search
