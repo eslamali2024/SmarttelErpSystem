@@ -20,4 +20,8 @@ export default {
     update_position: 'Update Position',
     cancel: 'Cancel',
     save: 'Save',
+    show_position: 'Show Position',
+    please_enter_a_code: 'Please enter a code',
+    close: 'Close',
+    show_department: 'Show Department'
 }

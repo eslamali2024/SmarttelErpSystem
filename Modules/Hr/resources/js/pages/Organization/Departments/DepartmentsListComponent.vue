@@ -37,6 +37,7 @@ import { ref } from 'vue';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import DepartmentFormDialog from './DepartmentFormDialog.vue';
+import DepartmentShowDialog from './DepartmentShowDialog.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: dashboard().url },
@@ -106,6 +107,13 @@ const deleteDepartment = () => {
     router.delete(departmentsRoute.destroy(currentItem.value.id).url)
     showDeleteModal.value = false
 }
+
+// Show Modal
+const showShowDialog = ref(false)
+const toggleShowDialog = (poisiton: any) => {
+    currentItem.value = poisiton
+    showShowDialog.value = true
+}
 </script>
 
 <template>
@@ -155,18 +163,18 @@ const deleteDepartment = () => {
                             <TableCell class="text-center">{{ department.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ department.manager?.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">
-                                <!-- Icon Edit:start -->
+                                <Button size="sm" v-on:click="toggleShowDialog(department)"
+                                    class="mr-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
+                                    <i class="ri ri-eye-line"></i>
+                                </Button>
                                 <Button size="sm" v-on:click="toggleFormDialog(position)"
                                     class="mr-2 bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600">
                                     <i class="ri ri-pencil-line"></i>
                                 </Button>
-                                <!-- Icon Edit:end -->
-                                <!-- Icon Delete:start -->
                                 <Button size="sm" v-on:click="toggleShowDeleteModal(department)"
                                     class="bg-red-500 cursor-pointer text-white hover:bg-red-600 ">
                                     <i class="ri ri-delete-bin-line"></i>
                                 </Button>
-                                <!-- Icon Delete:end -->
                             </TableCell>
                         </TableRow>
                     </TableBody>
@@ -188,6 +196,8 @@ const deleteDepartment = () => {
     </AppLayout>
 
     <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteDepartment" />
+
+    <DepartmentShowDialog v-model:show="showShowDialog" :item="currentItem" />
 
     <DepartmentFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
         :managers="props.managers" :item="currentItem" />
