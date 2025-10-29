@@ -21,11 +21,24 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) =>
-        resolvePageComponent(
-            `./pages/${name}.vue`,
-            import.meta.glob<DefineComponent>('./pages/**/*.vue')
-        ),
+
+    resolve: (name) => {
+        const [module, page] = name.includes('::') ? name.split('::') : [null, name];
+
+        if (module) {
+            const modulePath = `/Modules/${module}/resources/js/pages/${page}.vue`;
+            return resolvePageComponent(
+                modulePath,
+                import.meta.glob<DefineComponent>('/Modules/**/resources/js/pages/**/*.vue')
+            );
+        }
+
+        return resolvePageComponent(
+            `/resources/js/pages/${name}.vue`,
+            import.meta.glob<DefineComponent>('/resources/js/pages/**/*.vue')
+        );
+    },
+
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
             .use(plugin)
