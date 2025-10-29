@@ -26,6 +26,7 @@ import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import { ref } from "vue";
 import Button from '@/components/ui/button/Button.vue';
 import PositionFormDialog from './PositionFormDialog.vue';
+import PositionShowDialog from './PositionShowDialog.vue';
 
 // breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
@@ -65,7 +66,6 @@ const toggleFormDialog = (item?: any) => {
     }
 }
 
-
 // reactive search
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -86,14 +86,21 @@ watch(search, () => {
 // Delete Modal
 const showDeleteModal = ref(false)
 
-const toggleShowDeleteModal = (poisiton: any) => {
-    currentItem.value = poisiton
+const toggleShowDeleteModal = (position: any) => {
+    currentItem.value = position
     showDeleteModal.value = true
 }
 
 const deletePosition = () => {
     router.delete(positionsRoute.destroy(currentItem.value.id).url)
     showDeleteModal.value = false
+}
+
+// Show Modal
+const showShowDialog = ref(false)
+const toggleShowDialog = (position: any) => {
+    currentItem.value = position
+    showShowDialog.value = true
 }
 </script>
 
@@ -145,6 +152,10 @@ const deletePosition = () => {
                             <TableCell class="text-center">{{ position.name }}</TableCell>
                             <TableCell class="text-center">
                                 <!-- Icon Edit:start -->
+                                <Button size="sm" v-on:click="toggleShowDialog(position)"
+                                    class="mr-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
+                                    <i class="ri ri-eye-line"></i>
+                                </Button>
 
                                 <Button size="sm" v-on:click="toggleFormDialog(position)"
                                     class="mr-2 bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600">
@@ -175,11 +186,13 @@ const deletePosition = () => {
                     :defaultPage="1" />
             </template>
         </Card>
+
         <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deletePosition" />
+
+        <PositionShowDialog v-model:show="showShowDialog" :item="currentItem" />
 
         <PositionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
             :departments="props.departments" :item="currentItem" />
-
     </AppLayout>
 
 </template>

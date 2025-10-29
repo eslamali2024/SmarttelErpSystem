@@ -11,7 +11,8 @@ interface Props extends PrimitiveProps {
     label?: string,
     placeholder?: string
     type?: string,
-    placeholder_message?: string
+    placeholder_message?: string,
+    disabled?: boolean
 }
 
 const props = defineProps<Props>()
@@ -26,7 +27,7 @@ const model = computed({
 <template>
     <div class="w-full">
         <Label :for="model">{{ props.label }}</Label>
-        <Textarea :id="model" :placeholder="props.placeholder" v-model="model" />
+        <Textarea :id="model" :placeholder="props.placeholder" v-model="model" :disabled="props.disabled" />
         <p class="text-sm text-muted-foreground">
             {{ props.placeholder_message }}
         </p>

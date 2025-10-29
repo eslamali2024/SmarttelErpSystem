@@ -9,6 +9,7 @@ interface Props {
     label?: string
     placeholder?: string
     type?: string
+    disabled?: boolean
 }
 
 const props = defineProps<Props>()
@@ -23,7 +24,8 @@ const model = computed({
 <template>
     <div class="w-full">
         <Label>{{ props.label }}</Label>
-        <Input :type="props.type || 'text'" :placeholder="props.placeholder" v-model="model" />
+        <Input :type="props.type || 'text'" :placeholder="props.placeholder" v-model="model"
+            :disabled="props.disabled" />
         <p v-if="props.modelValueError" class="text-sm text-red-500 mt-2">
             {{ props.modelValueError }}
         </p>
