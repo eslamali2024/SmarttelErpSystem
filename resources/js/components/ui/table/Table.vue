@@ -3,14 +3,14 @@ import type { HTMLAttributes } from "vue"
 import { cn } from "@/lib/utils"
 
 const props = defineProps<{
-  class?: HTMLAttributes["class"]
+    class?: HTMLAttributes["class"]
 }>()
 </script>
 
 <template>
-  <div class="relative w-full overflow-auto">
-    <table :class="cn('w-full caption-bottom text-sm', props.class)">
-      <slot />
-    </table>
-  </div>
+    <div class="relative w-full overflow-auto">
+        <table :class="cn('w-full caption-bottom text-sm rounded-sm p-1 bg-transparent dark:bg-gray-500/50', props.class)">
+            <slot />
+        </table>
+    </div>
 </template>

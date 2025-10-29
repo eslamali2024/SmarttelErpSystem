@@ -6,7 +6,7 @@ import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import TextareaGroup from '@/components/ui/textarea-group/TextareaGroup.vue';
 import FormRequest from '@/components/ui/formRequest/FormRequest.vue';
 import { dashboard } from '@/routes';
-import departmentsRoute from '@/routes/hr/organization/departments';
+import positionsRoute from '@/routes/hr/organization/positions';
 import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
 import Card from '@/components/ui/Card.vue';
 import A from '@/components/ui/a/A.vue';
@@ -19,40 +19,41 @@ const breadcrumbs: BreadcrumbItem[] = [
 const props = defineProps<{
     method_type: string,
     action: string,
-    department?: any,
-    managers?: any
+    position?: any,
+    departments?: any
 }>()
 
 const form = useForm({
-    name: props.department?.name ?? '',
-    manager_id: props.department?.manager_id ?? '',
-    description: props.department?.description ?? '',
+    name: props.position?.name ?? '',
+    department_id: props.position?.department_id ?? '',
+    description: props.position?.description ?? '',
 });
 
 </script>
 
 <template>
 
-    <Head :title="props.method_type == 'post' ? $t('add_department') : $t('update_department')" />
+    <Head :title="props.method_type == 'post' ? $t('add_position') : $t('update_position')" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Card>
             <template #header>
-                <h4>{{ props.method_type == 'post' ? $t('add_department') : $t('update_department') }}</h4>
+                <h4>{{ props.method_type == 'post' ? $t('add_position') : $t('update_position') }}</h4>
                 <A class="bg-red-500/50 cursor-pointer hover:bg-red-600 text-white" size="sm"
-                    :href="departmentsRoute.index().url">
+                    :href="positionsRoute.index().url">
                     <i class="ri ri-arrow-left-line"></i> {{ $t("back") }}
                 </A>
             </template>
             <template #body>
                 <FormRequest :form="form" :action="props.action" :method_type="props.method_type"
-                    :cancelRoute="departmentsRoute.index().url">
+                    :cancelRoute="positionsRoute.index().url">
                     <div class="grid grid-cols-1 items-center gap-3">
                         <InputGroup v-model="form.name" :modelValueError="form.errors.name" :label="$t('name')"
                             :placeholder="$t('please_enter_a_name')" type="text" />
 
-                        <SelectGroup v-model="form.manager_id" :modelValueError="form.errors.manager_id"
-                            :label="$t('manager')" :placeholder="$t('please_select_a_manager')" :options="managers" />
+                        <SelectGroup v-model="form.department_id" :modelValueError="form.errors.department_id"
+                            :label="$t('department')" :placeholder="$t('please_select_a_department')"
+                            :options="departments" />
 
                         <div class="grid w-full col-span-2 gap-1.5">
                             <TextareaGroup v-model="form.description" :modelValueError="form.errors.description"
@@ -63,6 +64,5 @@ const form = useForm({
                 </FormRequest>
             </template>
         </Card>
-
     </AppLayout>
 </template>
