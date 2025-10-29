@@ -9,7 +9,9 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { Link } from '@inertiajs/vue3'
+import { usePage } from '@inertiajs/vue3'
 
+const page = usePage();
 
 type Module = {
     id: string | number
@@ -52,7 +54,11 @@ defineProps<{ module: Module }>()
 
     <SidebarMenuItem v-else>
         <SidebarMenuButton as-child class="w-full">
-            <Link :href="module.path" class="flex items-center gap-2 w-full">
+            <Link :href="module.path" :class="{
+                'flex items-center gap-2 w-full': true,
+                'bg-gray-600/50': page.url === module.path,
+
+            }">
             <i v-if="module.icon" :class="module.icon"></i>
             {{ $t(module.name) }}
             </Link>
