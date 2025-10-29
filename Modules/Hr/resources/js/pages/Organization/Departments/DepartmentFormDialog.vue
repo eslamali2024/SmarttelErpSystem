@@ -7,6 +7,7 @@ import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import Button from '@/components/ui/button/Button.vue';
 import departmentsRoute from '@/routes/hr/organization/departments';
+import ButtonSubmit from '@/components/ui/button/ButtonSubmit.vue';
 
 const props = defineProps<{
     show: boolean,
@@ -72,14 +73,10 @@ const submitForm = () => {
                 </div>
             </DialogDescription>
             <DialogFooter>
-                <Button type="button" @click="emit('update:show', false)"
-                    class="bg-red-500/50 cursor-pointer text-white hover:bg-red-600">
-                    {{ $t('cancel') }}
-                </Button>
-                <Button type="button" @click="submitForm"
-                    class="bg-green-500/50 cursor-pointer text-white hover:bg-green-600">
+                <ButtonSubmit :loading="form.processing" :submit="submitForm"
+                    :cancel="() => emit('update:show', false)">
                     {{ $t('save') }}
-                </Button>
+                </ButtonSubmit>
             </DialogFooter>
         </DialogContent>
     </Dialog>

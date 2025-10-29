@@ -100,6 +100,7 @@ const toggleFormDialog = (item?: any) => {
 
 // Delete Modal
 const showDeleteModal = ref(false)
+const isDeleting = ref(false)
 
 const toggleShowDeleteModal = (department: any) => {
     currentItem.value = department
@@ -107,9 +108,21 @@ const toggleShowDeleteModal = (department: any) => {
 }
 
 const deleteDepartment = () => {
-    router.delete(departmentsRoute.destroy(currentItem.value.id).url)
-    showDeleteModal.value = false
+    if (!currentItem.value) return
+    isDeleting.value = true
+
+    router.delete(departmentsRoute.destroy(currentItem.value.id).url, {
+        onFinish: () => {
+            showDeleteModal.value = false
+            currentItem.value = null
+            isDeleting.value = false
+        },
+        onError: () => {
+            isDeleting.value = false
+        }
+    })
 }
+
 
 // Show Modal
 const showShowDialog = ref(false)
@@ -198,7 +211,7 @@ const toggleShowDialog = (poisiton: any) => {
         </Card>
     </AppLayout>
 
-    <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteDepartment" />
+    <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteDepartment" :loading="isDeleting" />
 
     <DepartmentShowDialog v-model:show="showShowDialog" :item="currentItem" />
 

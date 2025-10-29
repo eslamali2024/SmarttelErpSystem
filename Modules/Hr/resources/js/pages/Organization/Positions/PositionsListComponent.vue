@@ -88,6 +88,7 @@ watch(search, () => {
 
 // Delete Modal
 const showDeleteModal = ref(false)
+const isDeleting = ref(false)
 
 const toggleShowDeleteModal = (position: any) => {
     currentItem.value = position
@@ -95,8 +96,19 @@ const toggleShowDeleteModal = (position: any) => {
 }
 
 const deletePosition = () => {
-    router.delete(positionsRoute.destroy(currentItem.value.id).url)
-    showDeleteModal.value = false
+    if (!currentItem.value) return
+    isDeleting.value = true
+
+    router.delete(positionsRoute.destroy(currentItem.value.id).url, {
+        onFinish: () => {
+            showDeleteModal.value = false
+            currentItem.value = null
+            isDeleting.value = false
+        },
+        onError: () => {
+            isDeleting.value = false
+        }
+    })
 }
 
 // Show Modal
@@ -190,7 +202,8 @@ const toggleShowDialog = (position: any) => {
             </template>
         </Card>
 
-        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deletePosition" />
+        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deletePosition"
+            :loading="isDeleting" />
 
         <PositionShowDialog v-model:show="showShowDialog" :item="currentItem" />
 
