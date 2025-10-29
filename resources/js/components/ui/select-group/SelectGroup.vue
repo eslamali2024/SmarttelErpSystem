@@ -43,8 +43,6 @@ const optionsArray = props.options
 
             <SelectContent class="bg-white dark:bg-gray-800">
                 <SelectGroup>
-                    <SelectLabel v-if="props.label">{{ props.label }}</SelectLabel>
-
                     <SelectItem v-for="option in optionsArray" :key="option.value" :value="option.value">
                         {{ option.label }}
                     </SelectItem>
