@@ -170,7 +170,7 @@ const toggleShowDialog = (poisiton: any) => {
                                     class="mr-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
                                     <i class="ri ri-eye-line"></i>
                                 </Button>
-                                <Button size="sm" v-on:click="toggleFormDialog(position)"
+                                <Button size="sm" v-on:click="toggleFormDialog(department)"
                                     class="mr-2 bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600">
                                     <i class="ri ri-pencil-line"></i>
                                 </Button>
