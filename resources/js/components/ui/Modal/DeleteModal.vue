@@ -9,17 +9,18 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from '@/components/ui/alert-dialog'
+import { Loader2 } from "lucide-vue-next";
 
 const props = defineProps<{
     show: boolean
-    item: Record<string, any> | null
+    item: Record<string, any> | null,
+    loading: boolean
 }>()
 
 const emit = defineEmits(['update:show', 'confirm'])
 
 const confirmDelete = () => {
     emit('confirm')
-    emit('update:show', false)
 }
 </script>
 
@@ -35,9 +36,15 @@ const confirmDelete = () => {
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction @click="confirmDelete">Delete</AlertDialogAction>
+                <AlertDialogCancel :disabled="loading" class="cursor-pointer">Cancel</AlertDialogCancel>
+
+                <AlertDialogAction @click="confirmDelete" :disabled="loading"
+                    class="flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer">
+                    <Loader2 v-if="loading" class="w-4 h-4 animate-spin" />
+                    <span>{{ loading ? 'Deleting...' : 'Delete' }}</span>
+                </AlertDialogAction>
             </AlertDialogFooter>
+
         </AlertDialogContent>
     </AlertDialog>
 </template>
