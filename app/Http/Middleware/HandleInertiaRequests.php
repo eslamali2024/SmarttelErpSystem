@@ -62,7 +62,7 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             'name' => str($module->name)->limit(15),
-            'path' => $module->path,
+            'path' => "/" . $module->path,
             'icon' => $module->icon,
             'permission_title' => $module->permission_title,
             'parent_key' => $module->parent_key,

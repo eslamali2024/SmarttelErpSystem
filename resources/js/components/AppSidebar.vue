@@ -30,9 +30,6 @@ type Module = {
 
 const modules = (page.props.modules ?? []) as Module[]
 
-
-console.log(modules)
-
 const footerNavItems: NavItem[] = [
     {
         title: 'Github Repo',

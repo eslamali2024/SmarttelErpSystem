@@ -27,6 +27,7 @@ createInertiaApp({
 
         if (module) {
             const modulePath = `/Modules/${module}/resources/js/pages/${page}.vue`;
+
             return resolvePageComponent(
                 modulePath,
                 import.meta.glob<DefineComponent>('/Modules/**/resources/js/pages/**/*.vue')
