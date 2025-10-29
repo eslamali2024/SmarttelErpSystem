@@ -16,7 +16,7 @@ const props = defineProps<{
     <TableCell class="text-center">
         <!-- Icon Show:start -->
         <A v-if="props.show && !props.disabled" :href="props.show" size="sm"
-            class="mr-2 bg-blue-500 cursor-pointer text-white">
+            class="mr-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
             <i class="ri ri-eye-line"></i>
         </A>
         <span v-if="props.disabled"
@@ -26,7 +26,7 @@ const props = defineProps<{
         <!-- Icon Show:end -->
         <!-- Icon Edit:start -->
         <A v-if="props.edit && !props.disabled" :href="props.edit" size="sm"
-            class="mr-2 bg-yellow-500 cursor-pointer text-white">
+            class="mr-2 bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600">
             <i class="ri ri-pencil-line"></i>
         </A>
         <span v-if="props.disabled"
@@ -36,7 +36,7 @@ const props = defineProps<{
         <!-- Icon Edit:end -->
         <!-- Icon Delete:start -->
         <Button v-if="props.delete && !props.disabled" size="sm" v-on:click="props.delete"
-            class="bg-red-500 cursor-pointer text-white">
+            class="bg-red-500 cursor-pointer text-white hover:bg-red-600">
             <i class="ri ri-delete-bin-line"></i>
         </Button>
         <span v-if="props.disabled"

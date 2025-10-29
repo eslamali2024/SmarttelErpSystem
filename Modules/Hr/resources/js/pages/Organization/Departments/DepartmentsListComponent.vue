@@ -54,11 +54,10 @@ watch(search, () => {
     })
 }, { deep: true });
 
-
+// delete department
 const deleteDepartment = (id: number) => {
     router.delete(departmentsRoute.destroy(id).url);
 }
-
 </script>
 
 <template>
@@ -69,21 +68,22 @@ const deleteDepartment = (id: number) => {
         <div class="p-4">
             <div class="bg-gray-500/50 p-4 rounded-xl">
                 <div class="flex justify-between items-center">
-                    <h4>Departments</h4>
-                    <A class="bg-green-500 cursor-pointer" size="sm" :href="departmentsRoute.create().url">
-                        <i class="ri ri-add-line"></i> Add
+                    <h4>{{ $t('departments') }}</h4>
+                    <A class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm"
+                        :href="departmentsRoute.create().url">
+                        <i class="ri ri-add-line"></i> {{ $t("add_department") }}
                     </A>
                 </div>
                 <hr class="my-2 w-5/6 mx-auto">
 
                 <Table class="bg-gray-500/50 rounded-sm p-1">
-                    <TableCaption>Departments</TableCaption>
+                    <TableCaption>{{ $t('departments') }}</TableCaption>
                     <TableHeader>
                         <TableRow>
-                            <TableHead class="w-[100px] text-center">S.No</TableHead>
-                            <TableHead class="text-center">Name</TableHead>
-                            <TableHead class="text-center">Manager</TableHead>
-                            <TableHead class="text-center">Actions</TableHead>
+                            <TableHead class="w-[100px] text-center">{{ $t('no') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('name') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('manager') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('actions') }}</TableHead>
                         </TableRow>
                         <TableRow>
                             <TableHead class="w-[100px]"></TableHead>
@@ -109,7 +109,7 @@ const deleteDepartment = (id: number) => {
 
                     <TableFooter>
                         <TableEmpty v-if="!props.departments?.data?.length" :colspan="4">
-                            There are no departments
+                            {{ $t('no_data') }}
                         </TableEmpty>
                     </TableFooter>
                 </Table>

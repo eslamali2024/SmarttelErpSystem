@@ -38,22 +38,22 @@ const form = useForm({
         <div class="p-4">
             <div class="bg-gray-500/50 p-4 rounded-xl">
                 <div class="flex justify-between item-center">
-                    <h4>departments</h4>
+                    <h4>{{ props.method_type == 'post' ? $t('add_department') : $t('update_department') }}</h4>
                 </div>
                 <hr class="my-2 w-5/6 mx-auto">
                 <FormRequest :form="form" :action="props.action" :method_type="props.method_type"
                     :cancelRoute="departmentsRoute.index().url">
                     <div class="grid grid-cols-1 items-center gap-3">
-                        <InputGroup v-model="form.name" :modelValueError="form.errors.name" label="Name"
-                            placeholder="Please provide a valid name" type="text" />
+                        <InputGroup v-model="form.name" :modelValueError="form.errors.name" :label="$t('name')"
+                            :placeholder="$t('please_enter_a_name')" type="text" />
 
-                        <!-- <SelectGroup v-model="form.manager_id" :modelValueError="form.errors.manager_id" label="Manager"
-                            placeholder="Please select a valid manager" :options="managers" /> -->
+                        <SelectGroup v-model="form.manager_id" :modelValueError="form.errors.manager_id"
+                            :label="$t('manager')" :placeholder="$t('please_select_a_manager')" :options="managers" />
 
                         <div class="grid w-full col-span-2 gap-1.5">
                             <TextareaGroup v-model="form.description" :modelValueError="form.errors.description"
-                                label="Description" placeholder="Please provide a valid description"
-                                placeholder_message="Please provide a valid description" />
+                                :label="$t('description')" :placeholder="$t('please_enter_a_description')"
+                                :placeholder_message="$t('please_enter_a_description')" />
                         </div>
                     </div>
                 </FormRequest>

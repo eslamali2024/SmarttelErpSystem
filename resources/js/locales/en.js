@@ -7,4 +7,5 @@ export default {
     supply_chain: 'Supply Chain',
     organization: 'Organization',
     departments: 'Departments',
+    positions: 'Positions',
 }
