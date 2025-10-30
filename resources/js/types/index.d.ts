@@ -36,4 +36,17 @@ export interface User {
     updated_at: string;
 }
 
+export type AuthPermissions = {
+    name: string
+}
+
+export type Module = {
+    id: string | number
+    name: string
+    path?: string
+    icon?: string
+    permission_title?: string
+    children?: Module[]
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;

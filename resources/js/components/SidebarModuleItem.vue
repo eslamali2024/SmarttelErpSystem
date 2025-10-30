@@ -10,21 +10,26 @@ import {
 } from '@/components/ui/sidebar'
 import { Link } from '@inertiajs/vue3'
 import { usePage } from '@inertiajs/vue3'
+import { AuthPermissions, Module } from '@/types'
 
 const page = usePage();
 
-type Module = {
-    id: string | number
-    name: string
-    path?: string
-    icon?: string
-    children?: Module[]
-}
+const props = defineProps<{
+    module: Module,
+    auth_permissions: AuthPermissions[]
+}>()
 
-defineProps<{ module: Module }>()
+
+function hasPermission(module: Module) {
+    if (!module.permission_title) return true;
+
+    const permValues = props.auth_permissions;
+    return permValues.includes(module.permission_title);
+}
 </script>
+
 <template>
-    <Collapsible v-if="module.children && module.children.length" v-slot="{ open }" defaultOpen
+    <Collapsible v-if="module.children && module.children.length && hasPermission(module)" v-slot="{ open }" defaultOpen
         class="group/collapsible">
         <SidebarMenuItem>
             <SidebarMenuButton as-child>
@@ -46,18 +51,18 @@ defineProps<{ module: Module }>()
 
             <CollapsibleContent>
                 <SidebarMenuSub>
-                    <SidebarModuleItem v-for="child in module.children" :key="child.id" :module="child" />
+                    <SidebarModuleItem v-for="child in module.children" :key="child.id" :module="child"
+                        :auth_permissions="auth_permissions" />
                 </SidebarMenuSub>
             </CollapsibleContent>
         </SidebarMenuItem>
     </Collapsible>
 
-    <SidebarMenuItem v-else>
+    <SidebarMenuItem v-else-if="hasPermission(module)">
         <SidebarMenuButton as-child class="w-full">
             <Link :href="module.path" :class="{
                 'flex items-center gap-2 w-full': true,
                 'bg-gray-200 dark:bg-gray-600/50': page.url.includes(module.path),
-
             }">
             <i v-if="module.icon" :class="module.icon"></i>
             {{ $t(module.name) }}

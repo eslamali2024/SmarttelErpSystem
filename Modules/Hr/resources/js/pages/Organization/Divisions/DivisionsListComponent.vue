@@ -25,11 +25,14 @@ import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import DivisionFormDialog from './DivisionFormDialog.vue';
 import DivisionShowDialog from './DivisionShowDialog.vue';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: dashboard().url },
-    { title: 'Organization', href: null },
-    { title: 'Divisions', href: null },
+    { title: t('dashboard'), href: dashboard().url },
+    { title: t('hr'), href: null },
+    { title: t('organization'), href: null },
+    { title: t('divisions'), href: null },
 ];
 
 const props = defineProps<{

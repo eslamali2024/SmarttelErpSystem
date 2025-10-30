@@ -15,19 +15,19 @@ import { type NavItem } from '@/types'
 import { Link, usePage } from '@inertiajs/vue3'
 import { BookOpen, Folder } from 'lucide-vue-next'
 import AppLogo from './AppLogo.vue'
-
-
 import SidebarModuleItem from './SidebarModuleItem.vue'
+import { AuthPermissions, Module } from '@/types';
 
-const page = usePage()
-type Module = {
-    id: number
-    name: string
-    path: string
-    icon?: string
-    children?: Module[]
+
+interface Props {
+    auth_permissions: AuthPermissions[]
 }
 
+withDefaults(defineProps<Props>(), {
+    auth_permissions: () => [],
+});
+
+const page = usePage()
 const modules = (page.props.modules ?? []) as Module[]
 
 const footerNavItems: NavItem[] = [
@@ -61,7 +61,8 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
-            <SidebarModuleItem v-for="module in modules" :key="module.id" :module="module" />
+            <SidebarModuleItem v-for="module in modules" :key="module.id" :module="module"
+                :auth_permissions="auth_permissions" />
         </SidebarContent>
 
         <SidebarFooter>

@@ -41,7 +41,10 @@ watch(() => props.item, (newItem) => {
 
 const submitForm = () => {
     const options = {
-        onSuccess: () => emit('update:show', false)
+        onSuccess: () => {
+            emit('update:show', false)
+            form.reset();
+        }
     };
 
     if (props.method_type === 'post') {
