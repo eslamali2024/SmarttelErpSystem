@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { useForm, router } from '@inertiajs/vue3';
-import { watch, computed } from 'vue';
+import { useForm } from '@inertiajs/vue3';
+import { watch, computed, watchEffect } from 'vue';
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import TextareaGroup from '@/components/ui/textarea-group/TextareaGroup.vue';
 import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import Button from '@/components/ui/button/Button.vue';
-import positionsRoute from '@/routes/hr/organization/positions';
 import ButtonSubmit from '@/components/ui/button/ButtonSubmit.vue';
 
 const props = defineProps<{
@@ -22,29 +20,29 @@ const props = defineProps<{
         id: number
         name: string
         division_id: number
-    },
-    sections?: {
+    }[],
+    managers?: {
         id: number
         name: string
-        department_id: number
-    },
+    }
 }>();
+
 
 const emit = defineEmits(['update:show']);
 
 const form = useForm({
     name: props.item?.name ?? '',
-    department_id: props.item?.department_id ?? '',
     division_id: props.item?.division_id ?? '',
-    section_id: props.item?.section_id ?? '',
+    department_id: props.item?.department_id ?? '',
+    manager_id: props.item?.manager_id ?? '',
     description: props.item?.description ?? '',
 });
 
 watch(() => props.item, (newItem) => {
     form.name = newItem?.name ?? '';
-    form.department_id = newItem?.department_id ?? '';
     form.division_id = newItem?.division_id ?? '';
-    form.section_id = newItem?.section_id ?? '';
+    form.department_id = newItem?.department_id ?? '';
+    form.manager_id = newItem?.manager_id ?? '';
     form.description = newItem?.description ?? '';
 });
 
@@ -71,16 +69,6 @@ const departmentOptions = computed(() => {
 
     return result;
 });
-const sectionOptions = computed(() => {
-    const result = props.sections
-        ?.filter(d => String(d.department_id) === String(form.department_id))
-        .map(d => ({
-            value: d.id,
-            label: d.name
-        })) ?? [];
-
-    return result;
-});
 </script>
 
 <template>
@@ -88,7 +76,7 @@ const sectionOptions = computed(() => {
         <DialogContent class="sm:max-w-[425px]">
             <DialogHeader>
                 <DialogTitle>
-                    {{ props.method_type === 'post' ? $t('add_position') : $t('update_position') }}
+                    {{ props.method_type === 'post' ? $t('add_section') : $t('update_section') }}
                 </DialogTitle>
             </DialogHeader>
             <DialogDescription>
@@ -104,9 +92,9 @@ const sectionOptions = computed(() => {
                         :label="$t('department')" :placeholder="$t('please_select_a_department')"
                         :options="departmentOptions || []" />
 
-                    <SelectGroup v-model="form.section_id" :modelValueError="form.errors.section_id"
-                        :label="$t('section')" :placeholder="$t('please_select_a_section')"
-                        :options="sectionOptions || []" />
+                    <SelectGroup v-model="form.manager_id" :modelValueError="form.errors.manager_id"
+                        :label="$t('manager')" :placeholder="$t('please_select_a_manager')"
+                        :options="props.managers || []" />
 
                     <TextareaGroup v-model="form.description" :modelValueError="form.errors.description"
                         :label="$t('description')" :placeholder="$t('please_enter_a_description')"

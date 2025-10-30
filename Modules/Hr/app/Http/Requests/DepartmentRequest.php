@@ -13,6 +13,7 @@ class DepartmentRequest extends FormRequest
     {
         return [
             'name'          => ['required', 'string', 'max:255'],
+            'division_id'   => ['nullable', 'exists:divisions,id'],
             'manager_id'    => ['nullable', 'exists:users,id'],
             'description'   => ['nullable', 'string', 'max:2000'],
         ];

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -11,7 +10,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import TextareaGroup from '@/components/ui/textarea-group/TextareaGroup.vue';
-import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
 
 const props = defineProps<{
     show: boolean
@@ -20,10 +18,6 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:show', 'confirm'])
 
-const confirmDelete = () => {
-    emit('confirm')
-    emit('update:show', false)
-}
 </script>
 
 <template>
@@ -37,13 +31,19 @@ const confirmDelete = () => {
                     <InputGroup :modelValue="item.code" :label="$t('code')" :placeholder="$t('please_enter_a_code')"
                         type="text" :disabled="true" />
 
+                    <InputGroup :modelValue="item.division?.name" :label="$t('division')"
+                        :placeholder="$t('please_enter_a_division')" type="text" :disabled="true" />
+
                     <InputGroup :modelValue="item.department?.name" :label="$t('department')"
                         :placeholder="$t('please_enter_a_department')" type="text" :disabled="true" />
+
+                    <InputGroup :modelValue="item.section?.name" :label="$t('section')"
+                        :placeholder="$t('please_enter_a_section')" type="text" :disabled="true" />
 
                     <InputGroup :modelValue="item.name" :label="$t('name')" :placeholder="$t('please_enter_a_name')"
                         type="text" :disabled="true" />
 
-                    <InputGroup :modelValue="item.manager?.name" :label="$t('name')" type="text" :disabled="true" />
+                    <InputGroup :modelValue="item.manager?.name" :label="$t('manager')" :placeholder="$t('please_enter_a_manager')" type="text" :disabled="true" />
 
                     <TextareaGroup modelValue="item.description" :label="$t('description')" :disabled="true"
                         :placeholder="$t('please_enter_a_description')"

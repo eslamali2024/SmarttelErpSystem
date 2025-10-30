@@ -2,13 +2,14 @@
 
 namespace Modules\Hr\Models;
 
+use App\Models\User;
 use App\Traits\ScopeFilter;
-use Modules\Hr\Models\Department;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Position extends Model
+class Section extends Model
 {
     use ScopeFilter, SoftDeletes;
 
@@ -21,7 +22,6 @@ class Position extends Model
         'manager_id',
         'division_id',
         'department_id',
-        'section_id',
         'description',
     ];
 
@@ -30,8 +30,18 @@ class Position extends Model
         parent::boot();
 
         static::creating(function ($section) {
-            $section->code = $section->code ?? str($section->name)->slug()->prepend('om-pos-');
+            $section->code = $section->code ?? str($section->name)->slug()->prepend('om-sec-');
         });
+    }
+
+    /**
+     * Get the manager that owns the department.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function manager(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'manager_id');
     }
 
     /**
@@ -53,14 +63,13 @@ class Position extends Model
     {
         return $this->belongsTo(Department::class);
     }
-
     /**
-     * Get the section that belongs to the position.
+     * Get the positions that belongs to the department.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function section(): BelongsTo
+    public function positions(): HasMany
     {
-        return $this->belongsTo(Section::class);
+        return $this->hasMany(Position::class);
     }
 }

@@ -14,7 +14,9 @@ class HrDatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            DivisionSeeder::class,
             DepartmentSeeder::class,
+            SectionSeeder::class,
             PositionSeeder::class
         ]);
     }

@@ -21,7 +21,7 @@ trait ScopeFilter
     {
         $flatFilters = $this->flattenFilters($filters);
 
-        collect($flatFilters)->except('start', 'end', 'column', 'start_date', 'end_date')->each(function ($filter, $column) use ($query) {
+        collect($flatFilters)->except('start', 'end', 'column', 'start_date', 'end_date', 'page')->each(function ($filter, $column) use ($query) {
             $query->when($filter, function ($query) use ($filter, $column) {
                 if (str_contains($column, '.')) {
                     $segments       = explode('.', $column);

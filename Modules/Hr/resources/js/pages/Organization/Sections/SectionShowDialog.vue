@@ -23,7 +23,7 @@ const emit = defineEmits(['update:show'])
     <AlertDialog :open="show" @update:open="(val) => emit('update:show', val)">
         <AlertDialogContent>
             <AlertDialogHeader>
-                <AlertDialogTitle>{{ $t('show_department') }}</AlertDialogTitle>
+                <AlertDialogTitle>{{ $t('show_section') }}</AlertDialogTitle>
             </AlertDialogHeader>
             <AlertDialogDescription>
                 <div class="grid grid-cols-1 gap-3 py-4">
@@ -35,6 +35,9 @@ const emit = defineEmits(['update:show'])
 
                     <InputGroup :modelValue="item.division?.name" :label="$t('division')" type="text"
                         :placeholder="$t('please_enter_a_division')" :disabled="true" />
+
+                    <InputGroup :modelValue="item.department?.name" :label="$t('department')" type="text"
+                        :placeholder="$t('please_enter_a_department')" :disabled="true" />
 
                     <InputGroup :modelValue="item.manager?.name" :label="$t('manager')" type="text" :disabled="true"
                         :placeholder="$t('please_enter_a_manager')" />

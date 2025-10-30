@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Department extends Model
+class Division extends Model
 {
     use ScopeFilter, SoftDeletes;
 
@@ -20,7 +20,6 @@ class Department extends Model
         'code',
         'name',
         'manager_id',
-        'division_id',
         'description',
     ];
 
@@ -28,8 +27,8 @@ class Department extends Model
     {
         parent::boot();
 
-        static::creating(function ($department) {
-            $department->code = $department->code ?? str($department->name)->slug()->prepend('om-dep-');
+        static::creating(function ($division) {
+            $division->code = $division->code ?? str($division->name)->slug()->prepend('om-div-');
         });
     }
 
@@ -44,17 +43,17 @@ class Department extends Model
     }
 
     /**
-     * Get the division that the department belongs to.
+     * Get the departments that belongs to the division.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function division(): BelongsTo
+    public function departments(): HasMany
     {
-        return $this->belongsTo(Division::class);
+        return $this->hasMany(Department::class);
     }
 
     /**
-     * Get the sections that belongs to the department.
+     * Get the sections that belongs to the division.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -64,7 +63,7 @@ class Department extends Model
     }
 
     /**
-     * Get the positions that belongs to the department.
+     * Get the positions that belongs to the division.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */

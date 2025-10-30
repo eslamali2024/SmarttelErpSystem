@@ -18,22 +18,22 @@ import TableEmpty from '@/components/ui/table/TableEmpty.vue';
 import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
 import { reactive, watch, ref } from 'vue';
-import departmentsRoute from '@/routes/hr/organization/departments';
+import sectionsRoute from '@/routes/hr/organization/sections';
 import Card from '@/components/ui/Card.vue';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
-import DepartmentFormDialog from './DepartmentFormDialog.vue';
-import DepartmentShowDialog from './DepartmentShowDialog.vue';
+import SectionFormDialog from './SectionFormDialog.vue';
+import SectionShowDialog from './SectionShowDialog.vue';
 import { router } from '@inertiajs/vue3';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: dashboard().url },
     { title: 'Organization', href: null },
-    { title: 'Departments', href: null },
+    { title: 'Sections', href: null },
 ];
 
 const props = defineProps<{
-    departments?: {
+    sections?: {
         data?: any[],
         links?: any[],
         total?: number,
@@ -43,6 +43,11 @@ const props = defineProps<{
     divisions?: {
         id: number
         name: string
+    },
+    departments?: {
+        id: number
+        name: string
+        division_id: number
     },
     managers?: {
         id: number
@@ -57,12 +62,13 @@ const search = reactive({
     name: urlParams.get('name') ?? '',
     code: urlParams.get('code') ?? '',
     manager: { name: urlParams.get('manager') ?? '' },
-    division: { name: urlParams.get('division') ?? '' }
+    division: { name: urlParams.get('division') ?? '' },
+    department: { name: urlParams.get('department') ?? '' }
 });
 
 // watch search changes
 watch(search, () => {
-    router.get(departmentsRoute.index().url, search, {
+    router.get(sectionsRoute.index().url, search, {
         preserveState: true,
         replace: true,
     })
@@ -74,7 +80,7 @@ const showFormDialog = ref(false)
 const currentItem = ref<any>(null)
 
 const method_type = ref("post");
-const action = ref(departmentsRoute.store().url);
+const action = ref(sectionsRoute.store().url);
 
 const toggleFormDialog = (item?: any) => {
     showFormDialog.value = true;
@@ -82,10 +88,10 @@ const toggleFormDialog = (item?: any) => {
 
     if (item) {
         method_type.value = "put";
-        action.value = departmentsRoute.update(item.id).url;
+        action.value = sectionsRoute.update(item.id).url;
     } else {
         method_type.value = "post";
-        action.value = departmentsRoute.store().url;
+        action.value = sectionsRoute.store().url;
     }
 }
 
@@ -94,16 +100,16 @@ const toggleFormDialog = (item?: any) => {
 const showDeleteModal = ref(false)
 const isDeleting = ref(false)
 
-const toggleShowDeleteModal = (department: any) => {
-    currentItem.value = department
+const toggleShowDeleteModal = (section: any) => {
+    currentItem.value = section
     showDeleteModal.value = true
 }
 
-const deleteDepartment = () => {
+const deleteSection = () => {
     if (!currentItem.value) return
     isDeleting.value = true
 
-    router.delete(departmentsRoute.destroy(currentItem.value.id).url, {
+    router.delete(sectionsRoute.destroy(currentItem.value.id).url, {
         onFinish: () => {
             showDeleteModal.value = false
             currentItem.value = null
@@ -115,7 +121,6 @@ const deleteDepartment = () => {
     })
 }
 
-
 // Show Modal
 const showShowDialog = ref(false)
 const toggleShowDialog = (poisiton: any) => {
@@ -126,27 +131,28 @@ const toggleShowDialog = (poisiton: any) => {
 
 <template>
 
-    <Head :title="$t('departments')" />
+    <Head :title="$t('sections')" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Card>
             <template #header>
-                <h4>{{ $t('departments') }}</h4>
+                <h4>{{ $t('sections') }}</h4>
                 <Button v-on:click="toggleFormDialog(null)"
                     class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
-                    <i class="ri ri-add-line"></i> {{ $t("add_department") }}
+                    <i class="ri ri-add-line"></i> {{ $t("add_section") }}
                 </Button>
             </template>
 
             <template #body>
                 <Table>
-                    <TableCaption>{{ $t('departments') }}</TableCaption>
+                    <TableCaption>{{ $t('sections') }}</TableCaption>
                     <TableHeader>
                         <TableRow>
                             <TableHead class="w-[100px] text-center">{{ $t('no') }}</TableHead>
                             <TableHead class="text-center">{{ $t('code') }}</TableHead>
                             <TableHead class="text-center">{{ $t('name') }}</TableHead>
                             <TableHead class="text-center">{{ $t('division') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('department') }}</TableHead>
                             <TableHead class="text-center">{{ $t('manager') }}</TableHead>
                             <TableHead class="text-center">{{ $t('actions') }}</TableHead>
                         </TableRow>
@@ -162,6 +168,9 @@ const toggleShowDialog = (poisiton: any) => {
                                 <Input :placeholder="$t('division')" v-model="search.division.name" />
                             </TableHead>
                             <TableHead class="p-2">
+                                <Input :placeholder="$t('department')" v-model="search.department.name" />
+                            </TableHead>
+                            <TableHead class="p-2">
                                 <Input :placeholder="$t('manager')" v-model="search.manager.name" />
                             </TableHead>
                             <TableHead></TableHead>
@@ -169,22 +178,23 @@ const toggleShowDialog = (poisiton: any) => {
                     </TableHeader>
 
                     <TableBody>
-                        <TableRow v-for="(department, index) in props.departments?.data || []" :key="department.id">
+                        <TableRow v-for="(section, index) in props.sections?.data || []" :key="section.id">
                             <TableCell class="font-medium text-center">{{ index + 1 }}</TableCell>
-                            <TableCell class="text-center">{{ department.code ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ department.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ department.division?.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ department.manager?.name ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ section.code ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ section.name ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ section.division?.name ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ section.department?.name ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ section.manager?.name ?? '-' }}</TableCell>
                             <TableCell class="text-center flex">
-                                <Button size="sm" v-on:click="toggleShowDialog(department)"
+                                <Button size="sm" v-on:click="toggleShowDialog(section)"
                                     class="mr-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
                                     <i class="ri ri-eye-line"></i>
                                 </Button>
-                                <Button size="sm" v-on:click="toggleFormDialog(department)"
+                                <Button size="sm" v-on:click="toggleFormDialog(section)"
                                     class="mr-2 bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600">
                                     <i class="ri ri-pencil-line"></i>
                                 </Button>
-                                <Button size="sm" v-on:click="toggleShowDeleteModal(department)"
+                                <Button size="sm" v-on:click="toggleShowDeleteModal(section)"
                                     class="bg-red-500 cursor-pointer text-white hover:bg-red-600 ">
                                     <i class="ri ri-delete-bin-line"></i>
                                 </Button>
@@ -193,7 +203,7 @@ const toggleShowDialog = (poisiton: any) => {
                     </TableBody>
 
                     <TableFooter>
-                        <TableEmpty v-if="!props.departments?.data?.length" :colspan="6">
+                        <TableEmpty v-if="!props.sections?.data?.length" :colspan="7">
                             {{ $t('no_data') }}
                         </TableEmpty>
                     </TableFooter>
@@ -201,18 +211,18 @@ const toggleShowDialog = (poisiton: any) => {
             </template>
 
             <template #footer>
-                <PaginationUse :items="props.departments?.links || []" :total="props.departments?.total || 0"
-                    :itemsPerPage="props.departments?.per_page || 10"
-                    :currentPage="props.departments?.current_page || 1" :defaultPage="1" />
+                <PaginationUse :items="props.sections?.links || []" :total="props.sections?.total || 0"
+                    :itemsPerPage="props.sections?.per_page || 10" :currentPage="props.sections?.current_page || 1"
+                    :defaultPage="1" />
             </template>
         </Card>
     </AppLayout>
 
-    <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteDepartment" :loading="isDeleting" />
+    <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteSection" :loading="isDeleting" />
 
-    <DepartmentShowDialog v-model:show="showShowDialog" :item="currentItem" />
+    <SectionShowDialog v-model:show="showShowDialog" :item="currentItem" />
 
-    <DepartmentFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
-        :divisions="props.divisions" :managers="props.managers" :item="currentItem" />
+    <SectionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
+        :divisions="props.divisions" :departments="props.departments" :managers="props.managers" :item="currentItem" />
 
 </template>

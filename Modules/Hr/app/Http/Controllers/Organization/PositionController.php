@@ -3,6 +3,8 @@
 namespace Modules\Hr\Http\Controllers\Organization;
 
 use Inertia\Inertia;
+use Modules\Hr\Models\Section;
+use Modules\Hr\Models\Division;
 use Modules\Hr\Models\Position;
 use Modules\Hr\Models\Department;
 use Modules\Hr\Services\PositionService;
@@ -20,24 +22,11 @@ class PositionController extends TransactionController
      */
     public function index()
     {
-        $search = request()->query();
-        unset($search['page']);
-
         return Inertia::render($this->path . 'PositionsListComponent', [
-            'positions'     => Position::with('department')->filter($search ?? [])->paginate(10),
-            'departments'   => Department::pluck('name', 'id'),
-        ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return Inertia::render($this->path . 'PositionFormComponent', [
-            'method_type' => 'post',
-            'action'      => route('hr.organization.positions.store'),
-            'departments' => Department::pluck('name', 'id'),
+            'positions'     => Position::with(['department', 'division', 'section'])->filter(request()->query() ?? [])->paginate(10),
+            'divisions'     => Division::pluck('name', 'id'),
+            'departments'   => Department::get(['id', 'name', 'division_id']),
+            'sections'      => Section::get(['id', 'name', 'department_id']),
         ]);
     }
 
@@ -50,27 +39,6 @@ class PositionController extends TransactionController
             $this->positionService->store($request->validated());
             return redirect()->route('hr.organization.positions.index');
         });
-    }
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('hr::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Position $position)
-    {
-        return Inertia::render($this->path . 'PositionFormComponent', [
-            'method_type'   => 'put',
-            'action'        => route('hr.organization.positions.update', $position->id),
-            'position'      => $position,
-            'departments'   => Department::pluck('name', 'id'),
-        ]);
     }
 
     /**
