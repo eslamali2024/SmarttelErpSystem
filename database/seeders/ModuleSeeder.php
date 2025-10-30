@@ -32,6 +32,7 @@ class ModuleSeeder extends Seeder
         return array_merge(
             $this->getMainModules(),
             $this->getHRModules(),
+            $this->getUserManagementModules(),
 
         );
     }
@@ -86,9 +87,18 @@ class ModuleSeeder extends Seeder
                 'permission_title'  => 'supply_chain_access',
                 'status'            => true,
             ],
+            [
+                'key'               => 'user-management',
+                'name'              => 'user_management',
+                'icon'              => 'ri-settings-3-line',
+                'path'              => 'user-management',
+                'permission_title'  => 'usermanagement_access',
+                'status'            => true,
+            ],
 
         ];
     }
+
     private function getHRModules(): array
     {
         return [
@@ -133,6 +143,40 @@ class ModuleSeeder extends Seeder
                 'status'            => true,
                 'parent_key'        => 'organization',
             ],
+        ];
+    }
+
+    private function getUserManagementModules(): array
+    {
+        return [
+            [
+                'key'               => 'roles',
+                'name'              => 'roles',
+                'icon'              => 'ri-shield-user-line',
+                'path'              => 'user-management/roles',
+                'permission_title'  => 'role_access',
+                'status'            => true,
+                'parent_key'        => 'user-management',
+            ],
+            [
+                'key'               => 'permissions',
+                'name'              => 'permissions',
+                'icon'              => 'ri-lock-line',
+                'path'              => 'user-management/permissions',
+                'permission_title'  => 'permission_access',
+                'status'            => true,
+                'parent_key'        => 'user-management',
+            ],
+            [
+                'key'               => 'users',
+                'name'              => 'users',
+                'icon'              => 'ri-user-search-line',
+                'path'              => 'user-management/users',
+                'permission_title'  => 'user_access',
+                'status'            => true,
+                'parent_key'        => 'user-management',
+            ],
+
         ];
     }
 }

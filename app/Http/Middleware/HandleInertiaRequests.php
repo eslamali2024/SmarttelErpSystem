@@ -40,10 +40,9 @@ class HandleInertiaRequests extends Middleware
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
         $modules = cache()->rememberForever('modules', function () {
-            $modules = Module::with('children')->whereNull('parent_key')->get();
+            $modules = Module::with('children')->where('status', true)->whereNull('parent_key')->get();
             return $modules->map(fn($module) => $this->formatModule($module));
         });
-
 
         return [
             ...parent::share($request),
@@ -51,13 +50,19 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
+                'auth_permissions' => $request->user() ? $request->user()->getAllPermissions()->pluck('name')->toArray() : [],
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'modules' => $modules,
-
         ];
     }
 
+    /**
+     * Format a module into an array that can be used for the sidebar.
+     *
+     * @param  \App\Models\Module  $module
+     * @return array
+     */
     private  function formatModule($module)
     {
         return [

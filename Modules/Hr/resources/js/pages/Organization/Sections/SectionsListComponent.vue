@@ -25,11 +25,14 @@ import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import SectionFormDialog from './SectionFormDialog.vue';
 import SectionShowDialog from './SectionShowDialog.vue';
 import { router } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: dashboard().url },
-    { title: 'Organization', href: null },
-    { title: 'Sections', href: null },
+    { title: t('dashboard'), href: dashboard().url },
+    { title: t('hr'), href: null },
+    { title: t('organization'), href: null },
+    { title: t('sections'), href: null },
 ];
 
 const props = defineProps<{

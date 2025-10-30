@@ -10,4 +10,19 @@ export default {
     positions: 'Positions',
     sections: 'Sections',
     divisions: 'Divisions',
+    user_management: 'User Management',
+    roles: 'Roles',
+    permissions: 'Permissions',
+    users: 'Users',
+    no_data: 'No data',
+    no: '#',
+    name: 'Name',
+    actions: 'Actions',
+    cancel: 'Cancel',
+    save: 'Save',
+    please_enter_a_name: 'Please enter a name',
+    close: 'Close',
+
+
+
 }
