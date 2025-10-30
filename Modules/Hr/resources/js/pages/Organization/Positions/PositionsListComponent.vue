@@ -43,10 +43,21 @@ const props = defineProps<{
         per_page?: number,
         current_page?: number
     },
+    divisions?: {
+        id: number
+        name: string
+    },
     departments?: {
         id: number
         name: string
+        division_id: number
+    },
+    sections?: {
+        id: number
+        name: string
+        department_id: number
     }
+
 }>()
 
 // Form Data
@@ -75,7 +86,9 @@ const urlParams = new URLSearchParams(window.location.search);
 const search = reactive({
     name: urlParams.get('name') ?? '',
     code: urlParams.get('code') ?? '',
-    department: { name: urlParams.get('department') ?? '' }
+    department: { name: urlParams.get('department') ?? '' },
+    section: { name: urlParams.get('section') ?? '' },
+    division: { name: urlParams.get('division') ?? '' }
 });
 
 // watch search changes
@@ -140,8 +153,10 @@ const toggleShowDialog = (position: any) => {
                         <TableRow>
                             <TableHead class="w-[100px] text-center">{{ $t('no') }}</TableHead>
                             <TableHead class="text-center">{{ $t('code') }}</TableHead>
-                            <TableHead class="text-center">{{ $t('department') }}</TableHead>
                             <TableHead class="text-center">{{ $t('name') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('section') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('department') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('division') }}</TableHead>
                             <TableHead class="text-center">{{ $t('actions') }}</TableHead>
                         </TableRow>
                         <TableRow>
@@ -150,7 +165,13 @@ const toggleShowDialog = (position: any) => {
                                 <Input :placeholder="$t('code')" v-model="search.code" />
                             </TableHead>
                             <TableHead class="p-2">
+                                <Input :placeholder="$t('section')" v-model="search.section.name" />
+                            </TableHead>
+                            <TableHead class="p-2">
                                 <Input :placeholder="$t('department')" v-model="search.department.name" />
+                            </TableHead>
+                            <TableHead class="p-2">
+                                <Input :placeholder="$t('division')" v-model="search.division.name" />
                             </TableHead>
                             <TableHead class="p-2">
                                 <Input :placeholder="$t('name')" v-model="search.name" />
@@ -163,9 +184,11 @@ const toggleShowDialog = (position: any) => {
                         <TableRow v-for="(position, index) in props.positions?.data || []" :key="position.id">
                             <TableCell class="font-medium text-center">{{ index + 1 }}</TableCell>
                             <TableCell class="text-center">{{ position.code ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ position.section?.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ position.department?.name ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ position.division?.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ position.name }}</TableCell>
-                            <TableCell class="text-center">
+                            <TableCell class="text-center flex">
                                 <!-- Icon Edit:start -->
                                 <Button size="sm" v-on:click="toggleShowDialog(position)"
                                     class="mr-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
@@ -189,7 +212,7 @@ const toggleShowDialog = (position: any) => {
                     </TableBody>
 
                     <TableFooter>
-                        <TableEmpty v-if="!props.positions?.data?.length" :colspan="5">
+                        <TableEmpty v-if="!props.positions?.data?.length" :colspan="7">
                             {{ $t('no_data') }}
                         </TableEmpty>
                     </TableFooter>
@@ -208,7 +231,8 @@ const toggleShowDialog = (position: any) => {
         <PositionShowDialog v-model:show="showShowDialog" :item="currentItem" />
 
         <PositionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
-            :departments="props.departments" :item="currentItem" />
+            :departments="props.departments" :divisions="props.divisions" :sections="props.sections"
+            :item="currentItem" />
     </AppLayout>
 
 </template>

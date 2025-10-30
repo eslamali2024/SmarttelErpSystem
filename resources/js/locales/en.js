@@ -8,4 +8,6 @@ export default {
     organization: 'Organization',
     departments: 'Departments',
     positions: 'Positions',
+    sections: 'Sections',
+    divisions: 'Divisions',
 }

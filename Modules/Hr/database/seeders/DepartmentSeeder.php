@@ -16,18 +16,22 @@ class DepartmentSeeder extends Seeder
             [
                 'name' => 'HR',
                 'code' => 'HR',
+                'division_id' => 1
             ],
             [
                 'name' => 'IT',
                 'code' => 'IT',
+                'division_id' => 2
             ],
             [
                 'name' => 'Sales',
                 'code' => 'Sales',
+                'division_id' => 2
             ],
             [
                 'name' => 'Marketing',
                 'code' => 'Marketing',
+                'division_id' => 1
             ],
         ];
 
