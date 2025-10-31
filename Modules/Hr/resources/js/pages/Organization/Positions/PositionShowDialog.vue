@@ -11,7 +11,7 @@ import {
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import TextareaGroup from '@/components/ui/textarea-group/TextareaGroup.vue';
 
-const props = defineProps<{
+defineProps<{
     show: boolean
     item: Record<string, any> | null
 }>()
@@ -28,24 +28,25 @@ const emit = defineEmits(['update:show', 'confirm'])
             </AlertDialogHeader>
             <AlertDialogDescription>
                 <div class="grid grid-cols-1 gap-3 py-4">
-                    <InputGroup :modelValue="item.code" :label="$t('code')" :placeholder="$t('please_enter_a_code')"
+                    <InputGroup :modelValue="item?.code" :label="$t('code')" :placeholder="$t('please_enter_a_code')"
                         type="text" :disabled="true" />
 
-                    <InputGroup :modelValue="item.division?.name" :label="$t('division')"
+                    <InputGroup :modelValue="item?.division?.name" :label="$t('division')"
                         :placeholder="$t('please_enter_a_division')" type="text" :disabled="true" />
 
-                    <InputGroup :modelValue="item.department?.name" :label="$t('department')"
+                    <InputGroup :modelValue="item?.department?.name" :label="$t('department')"
                         :placeholder="$t('please_enter_a_department')" type="text" :disabled="true" />
 
-                    <InputGroup :modelValue="item.section?.name" :label="$t('section')"
+                    <InputGroup :modelValue="item?.section?.name" :label="$t('section')"
                         :placeholder="$t('please_enter_a_section')" type="text" :disabled="true" />
 
-                    <InputGroup :modelValue="item.name" :label="$t('name')" :placeholder="$t('please_enter_a_name')"
+                    <InputGroup :modelValue="item?.name" :label="$t('name')" :placeholder="$t('please_enter_a_name')"
                         type="text" :disabled="true" />
 
-                    <InputGroup :modelValue="item.manager?.name" :label="$t('manager')" :placeholder="$t('please_enter_a_manager')" type="text" :disabled="true" />
+                    <InputGroup :modelValue="item?.manager?.name" :label="$t('manager')"
+                        :placeholder="$t('please_enter_a_manager')" type="text" :disabled="true" />
 
-                    <TextareaGroup modelValue="item.description" :label="$t('description')" :disabled="true"
+                    <TextareaGroup :modelValue="item?.description" :label="$t('description')" :disabled="true"
                         :placeholder="$t('please_enter_a_description')"
                         :placeholder_message="$t('please_enter_a_description')" />
                 </div>

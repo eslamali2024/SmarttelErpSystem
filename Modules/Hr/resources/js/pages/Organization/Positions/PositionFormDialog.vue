@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { useForm, router } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { watch, computed } from 'vue';
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import TextareaGroup from '@/components/ui/textarea-group/TextareaGroup.vue';
 import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import Button from '@/components/ui/button/Button.vue';
-import positionsRoute from '@/routes/hr/organization/positions';
 import ButtonSubmit from '@/components/ui/button/ButtonSubmit.vue';
 
 const props = defineProps<{

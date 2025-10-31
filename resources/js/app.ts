@@ -31,14 +31,19 @@ createInertiaApp({
         if (module) {
             // Load module-specific translations
             try {
-                const enModule = await import(`/Modules/${module}/resources/js/locales/en.js`);
-                const arModule = await import(`/Modules/${module}/resources/js/locales/ar.js`);
+                const modules = import.meta.glob('/Modules/*/resources/js/locales/*.js');
+
+                const enPath = `/Modules/${module}/resources/js/locales/en.js`;
+                const arPath = `/Modules/${module}/resources/js/locales/ar.js`;
+
+                const enModule = modules[enPath] ? await modules[enPath]() : { default: {} };
+                const arModule = modules[arPath] ? await modules[arPath]() : { default: {} };
 
                 moduleMessages = {
                     en: enModule.default,
                     ar: arModule.default
                 };
-            } catch (e) {
+            } catch {
                 console.warn(`No module-specific languages found for module: ${module}`);
             }
 
