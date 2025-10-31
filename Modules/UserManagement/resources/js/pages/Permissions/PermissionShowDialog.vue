@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 
-const props = defineProps<{
+defineProps<{
     show: boolean
     item: Record<string, any> | null
 }>()
@@ -26,7 +26,7 @@ const emit = defineEmits(['update:show'])
             </AlertDialogHeader>
             <AlertDialogDescription>
                 <div class="grid grid-cols-1 gap-3 py-4">
-                    <InputGroup :modelValue="item.name" :label="$t('name')" :placeholder="$t('please_enter_a_name')"
+                    <InputGroup :modelValue="item?.name" :label="$t('name')" :placeholder="$t('please_enter_a_name')"
                         type="text" :disabled="true" />
                 </div>
             </AlertDialogDescription>
