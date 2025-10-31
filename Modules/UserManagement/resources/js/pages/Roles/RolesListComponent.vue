@@ -69,7 +69,12 @@ const action = ref(rolesRoute.store().url);
 const permissions = ref<any[]>([])
 const permissionsCache = ref<any[] | null>(null)  // reactive cache
 
-async function loadPermissions() {
+/**
+ * Loads all the permissions from the server and stores them in the reactive cache.
+ * If the cache already has permissions, it will use the cached value instead of making a request.
+ * @returns {Promise<void>}
+ */
+async function loadPermissions(): Promise<void> {
     try {
         if (permissionsCache.value) {
             permissions.value = permissionsCache.value
@@ -84,7 +89,30 @@ async function loadPermissions() {
         console.error('Error loading permissions:', error)
     }
 }
+/**
+ * Retrieves a role from the server.
+ * @param {any} item - The item to be retrieved, or null if no item is provided.
+ * @throws {Error} If the item is not found.
+ * @returns {Promise<void>}
+ */
+async function getRole(item?: any): Promise<void> {
+    try {
+        if (item) {
+            const response = await axios.get(rolesRoute.show(item).url)
+            if (!response.data) throw new Error('Item not found')
+            currentItem.value = response.data;
+        } else {
+            throw new Error('Item not found')
+        }
+    } catch (error) {
+        console.error('Error loading get role:', error)
+    }
+}
 
+/**
+ * Toggle the form dialog for adding or editing a role
+ * @param {any} item - The item to be edited, or null for adding a new item
+ */
 const toggleFormDialog = async (item?: any) => {
     showFormDialog.value = true
     currentItem.value = item
@@ -92,6 +120,7 @@ const toggleFormDialog = async (item?: any) => {
     await loadPermissions()
 
     if (item) {
+        await getRole(item?.id ?? null)
         method_type.value = "put"
         action.value = rolesRoute.update(item.id).url
     } else {
@@ -99,7 +128,6 @@ const toggleFormDialog = async (item?: any) => {
         action.value = rolesRoute.store().url
     }
 }
-
 
 // Delete Modal
 const showDeleteModal = ref(false)

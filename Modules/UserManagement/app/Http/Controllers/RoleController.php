@@ -7,7 +7,6 @@ use Modules\UserManagement\Models\Role;
 use App\Http\Controllers\TransactionController;
 use Modules\UserManagement\Services\RoleService;
 use Modules\UserManagement\Http\Requests\RoleRequest;
-use Modules\UserManagement\Models\Permission;
 
 class RoleController extends TransactionController
 {
@@ -32,7 +31,21 @@ class RoleController extends TransactionController
     public function create()
     {
         return response()->json([
-            Permission::pluck('name', 'id')
+            $this->roleService->getParentPermissions()
+        ]);
+    }
+
+    /**
+     * Show the specified role.
+     *
+     * @param  Role  $role
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Role $role)
+    {
+        return response()->json([
+            'role'        => $role,
+            'permissions' => $role?->permissions()?->pluck('name')?->toArray() ?? []
         ]);
     }
 
