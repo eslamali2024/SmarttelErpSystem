@@ -26,6 +26,9 @@ import SectionFormDialog from './SectionFormDialog.vue';
 import SectionShowDialog from './SectionShowDialog.vue';
 import { router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
+import Can from '@/components/ui/Auth/Can.vue';
+import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
+import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
 
 const { t } = useI18n();
 const breadcrumbs: BreadcrumbItem[] = [
@@ -51,7 +54,7 @@ const props = defineProps<{
         id: number
         name: string
         division_id: number
-    },
+    }[],
     managers?: {
         id: number
         name: string
@@ -140,10 +143,12 @@ const toggleShowDialog = (poisiton: any) => {
         <Card>
             <template #header>
                 <h4>{{ $t('sections') }}</h4>
-                <Button v-on:click="toggleFormDialog(null)"
-                    class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
-                    <i class="ri ri-add-line"></i> {{ $t("add_section") }}
-                </Button>
+                <Can permissions="section_create">
+                    <Button v-on:click="toggleFormDialog(null)"
+                        class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
+                        <i class="ri ri-add-line"></i> {{ $t("add_section") }}
+                    </Button>
+                </Can>
             </template>
 
             <template #body>
@@ -182,25 +187,19 @@ const toggleShowDialog = (poisiton: any) => {
 
                     <TableBody>
                         <TableRow v-for="(section, index) in props.sections?.data || []" :key="section.id">
-                            <TableCell class="font-medium text-center">{{ index + 1 }}</TableCell>
+                            <TableCell class="font-medium text-center">
+                                <TablePaginationNumbers :items="props.sections" :index="index" />
+                            </TableCell>
                             <TableCell class="text-center">{{ section.code ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ section.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ section.division?.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ section.department?.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ section.manager?.name ?? '-' }}</TableCell>
                             <TableCell class="text-center flex">
-                                <Button size="sm" v-on:click="toggleShowDialog(section)"
-                                    class="mr-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
-                                    <i class="ri ri-eye-line"></i>
-                                </Button>
-                                <Button size="sm" v-on:click="toggleFormDialog(section)"
-                                    class="mr-2 bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600">
-                                    <i class="ri ri-pencil-line"></i>
-                                </Button>
-                                <Button size="sm" v-on:click="toggleShowDeleteModal(section)"
-                                    class="bg-red-500 cursor-pointer text-white hover:bg-red-600 ">
-                                    <i class="ri ri-delete-bin-line"></i>
-                                </Button>
+                                <TableActionsDialog class="text-center flex justify-center" canShow="section_show"
+                                    :show="() => toggleShowDialog(section)" canEdit="section_edit"
+                                    :edit="() => toggleFormDialog(section)" canDelete="section_delete"
+                                    :delete="() => toggleShowDeleteModal(section)" />
                             </TableCell>
                         </TableRow>
                     </TableBody>
@@ -221,11 +220,18 @@ const toggleShowDialog = (poisiton: any) => {
         </Card>
     </AppLayout>
 
-    <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteSection" :loading="isDeleting" />
+    <Can permissions="section_delete">
+        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteSection"
+            :loading="isDeleting" />
+    </Can>
 
-    <SectionShowDialog v-model:show="showShowDialog" :item="currentItem" />
+    <Can permissions="section_show">
+        <SectionShowDialog v-model:show="showShowDialog" :item="currentItem" />
+    </Can>
 
-    <SectionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
-        :divisions="props.divisions" :departments="props.departments" :managers="props.managers" :item="currentItem" />
-
+    <Can :permissions="['section_create', 'section_edit']">
+        <SectionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
+            :divisions="props.divisions" :departments="props.departments" :managers="props.managers"
+            :item="currentItem" />
+    </Can>
 </template>

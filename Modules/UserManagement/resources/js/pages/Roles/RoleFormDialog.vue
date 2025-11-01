@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
-import { watch, ref } from 'vue';
+import { watch, computed } from 'vue';
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import { Dialog, DialogScrollContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import ButtonSubmit from '@/components/ui/button/ButtonSubmit.vue';
 import {
     Card,
-    CardContent,
-    CardHeader,
+    CardContent
 } from "@/components/ui/card"
 
 import {
@@ -17,6 +16,8 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs"
 import RoleModules from '@modules/UserManagement/resources/js/components/RoleModules.vue';
+import { useI18n } from 'vue-i18n';
+import Button from '@/components/ui/button/Button.vue';
 
 const props = defineProps<{
     show: boolean,
@@ -29,8 +30,9 @@ const props = defineProps<{
     permissions?: any
 }>();
 
+const { t } = useI18n();
 const emit = defineEmits(['update:show']);
-
+const isReadOnly = computed(() => props.method_type === 'show')
 const form = useForm({
     name: props.item?.role?.name ?? '',
     permissions: props.item?.permissions ?? []
@@ -41,23 +43,54 @@ watch(() => props.item, (newItem) => {
     form.permissions = newItem?.permissions ?? [];
 });
 
+/**
+ * Submits the form data to the server.
+ * If the form is in read-only mode, does nothing.
+ * If the form is in create mode, sends a POST request to the server.
+ * If the form is in update mode, sends a PUT request to the server.
+ * On success, emits an event to close the dialog and resets the form data.
+ * On error, logs the error to the console.
+ * Preserves the scroll position of the page.
+ */
 const submitForm = () => {
+    if (isReadOnly.value) return;
+    const currentPage = new URLSearchParams(window.location.search).get('page') || 1;
+
     const options = {
         onSuccess: () => {
-            emit('update:show', false)
+            emit('update:show', false);
             form.reset();
         },
-        onerror: (e: any) => {
-            console.log(e)
-        }
+        onError: (e: any) => {
+            console.error(e);
+        },
+        preserveScroll: true,
     };
 
+    const actionUrl = props.action.includes('?')
+        ? `${props.action}&page=${currentPage}`
+        : `${props.action}?page=${currentPage}`;
+
     if (props.method_type === 'post') {
-        form.post(props.action, options);
+        form.post(actionUrl, options);
     } else if (props.method_type === 'put') {
-        form.put(props.action, options);
+        form.put(actionUrl, options);
     }
 };
+
+// Get Title Dialog
+const title = computed(() => {
+    switch (props.method_type) {
+        case 'post':
+            return t('add_role')
+        case 'put':
+            return t('update_role')
+        case 'show':
+            return t('view_role')
+        default:
+            return t('add_role')
+    }
+})
 </script>
 
 <template>
@@ -67,13 +100,13 @@ const submitForm = () => {
             <DialogScrollContent class="sm:max-w-[1000px]">
                 <DialogHeader>
                     <DialogTitle>
-                        {{ props.method_type === 'post' ? $t('add_role') : $t('update_role') }}
+                        {{ title }}
                     </DialogTitle>
                 </DialogHeader>
                 <DialogDescription>
                     <div class="grid grid-cols-1 gap-3 py-4">
                         <InputGroup v-model="form.name" :modelValueError="form.errors.name" :label="$t('name')"
-                            :placeholder="$t('please_enter_a_name')" type="text" />
+                            :placeholder="$t('please_enter_a_name')" type="text" :disabled="isReadOnly" />
                         <p v-if="form.errors.permissions" class="text-sm text-red-500">
                             {{ form.errors.permissions }}
                         </p>
@@ -91,12 +124,9 @@ const submitForm = () => {
                                     <TabsContent v-for="(module, key) in props.permissions" :key="'content-' + key"
                                         :value="key">
                                         <Card>
-                                            <CardHeader class="flex justify-between gap-2 items-center">
-                                                <InputGroup :label="$t('search')"
-                                                    :placeholder="$t('please_enter_a_name')" type="text" />
-                                            </CardHeader>
                                             <CardContent class="space-y-2">
-                                                <RoleModules :module="module" :level="0" v-model="form.permissions" />
+                                                <RoleModules :module="module" :level="0" v-model="form.permissions"
+                                                    :isReadOnly="isReadOnly" />
                                             </CardContent>
                                         </Card>
                                     </TabsContent>
@@ -106,10 +136,12 @@ const submitForm = () => {
                     </div>
                 </DialogDescription>
                 <DialogFooter>
-                    <ButtonSubmit :loading="form.processing" :submit="submitForm"
+                    <ButtonSubmit :loading="form.processing" :submit="submitForm" v-if="!isReadOnly"
                         :cancel="() => emit('update:show', false)">
                         {{ $t('save') }}
                     </ButtonSubmit>
+                    <Button v-else type="button" @click="() => emit('update:show', false)" class="cursor-pointer">{{
+                        $t('close') }}</Button>
                 </DialogFooter>
             </DialogScrollContent>
         </Dialog>

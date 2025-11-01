@@ -31,6 +31,7 @@ class RoleService
         $role->update($data);
 
         $role->syncPermissions($data['permissions'] ?? []);
+        $role->forgetCachedPermissions();
         return $role;
     }
 

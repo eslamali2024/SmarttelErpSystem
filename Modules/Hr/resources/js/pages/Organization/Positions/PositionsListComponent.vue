@@ -25,6 +25,9 @@ import Button from '@/components/ui/button/Button.vue';
 import PositionFormDialog from './PositionFormDialog.vue';
 import PositionShowDialog from './PositionShowDialog.vue';
 import { useI18n } from 'vue-i18n';
+import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
+import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
+import Can from '@/components/ui/Auth/Can.vue';
 
 const { t } = useI18n();
 const breadcrumbs: BreadcrumbItem[] = [
@@ -140,10 +143,12 @@ const toggleShowDialog = (position: any) => {
         <Card>
             <template #header>
                 <h4>{{ $t('positions') }}</h4>
-                <Button v-on:click="toggleFormDialog(null)"
-                    class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
-                    <i class="ri ri-add-line"></i> {{ $t("add_position") }}
-                </Button>
+                <Can permissions="position_create">
+                    <Button v-on:click="toggleFormDialog(null)"
+                        class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
+                        <i class="ri ri-add-line"></i> {{ $t("add_position") }}
+                    </Button>
+                </Can>
             </template>
 
             <template #body>
@@ -182,31 +187,19 @@ const toggleShowDialog = (position: any) => {
 
                     <TableBody>
                         <TableRow v-for="(position, index) in props.positions?.data || []" :key="position.id">
-                            <TableCell class="font-medium text-center">{{ index + 1 }}</TableCell>
+                            <TableCell class="font-medium text-center">
+                                <TablePaginationNumbers :items="props.positions" :index="index" />
+                            </TableCell>
                             <TableCell class="text-center">{{ position.code ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ position.section?.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ position.department?.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ position.division?.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ position.name }}</TableCell>
-                            <TableCell class="text-center flex">
-                                <!-- Icon Edit:start -->
-                                <Button size="sm" v-on:click="toggleShowDialog(position)"
-                                    class="mr-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
-                                    <i class="ri ri-eye-line"></i>
-                                </Button>
-
-                                <Button size="sm" v-on:click="toggleFormDialog(position)"
-                                    class="mr-2 bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600">
-                                    <i class="ri ri-pencil-line"></i>
-                                </Button>
-
-                                <!-- Icon Edit:end -->
-                                <!-- Icon Delete:start -->
-                                <Button size="sm" v-on:click="toggleShowDeleteModal(position)"
-                                    class="bg-red-500 cursor-pointer text-white hover:bg-red-600 ">
-                                    <i class="ri ri-delete-bin-line"></i>
-                                </Button>
-                                <!-- Icon Delete:end -->
+                            <TableCell>
+                                <TableActionsDialog class="text-center flex justify-center" canShow="position_show"
+                                    :show="() => toggleShowDialog(position)" canEdit="position_edit"
+                                    :edit="() => toggleFormDialog(position)" canDelete="position_delete"
+                                    :delete="() => toggleShowDeleteModal(position)" />
                             </TableCell>
                         </TableRow>
                     </TableBody>
@@ -224,15 +217,20 @@ const toggleShowDialog = (position: any) => {
                     :defaultPage="1" />
             </template>
         </Card>
+    </AppLayout>
 
+    <Can permissions="position_delete">
         <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deletePosition"
             :loading="isDeleting" />
+    </Can>
 
+    <Can permissions="position_show">
         <PositionShowDialog v-model:show="showShowDialog" :item="currentItem" />
+    </Can>
 
+    <Can :permissions="['position_create', 'position_edit']">
         <PositionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
             :departments="props.departments" :divisions="props.divisions" :sections="props.sections"
             :item="currentItem" />
-    </AppLayout>
-
+    </Can>
 </template>

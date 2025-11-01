@@ -34,4 +34,5 @@ export default {
     section: 'Section',
     please_select_a_section: 'Please select a section',
     please_enter_a_section: 'Please enter a section',
+    update_division: 'Update Division',
 }

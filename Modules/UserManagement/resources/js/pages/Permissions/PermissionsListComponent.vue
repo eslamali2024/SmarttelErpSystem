@@ -26,6 +26,9 @@ import PermissionFormDialog from './PermissionFormDialog.vue';
 import PermissionShowDialog from './PermissionShowDialog.vue';
 import { router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
+import Can from '@/components/ui/Auth/Can.vue';
+import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
+import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
 
 const { t } = useI18n();
 const breadcrumbs: BreadcrumbItem[] = [
@@ -121,10 +124,12 @@ const toggleShowDialog = (poisiton: any) => {
         <Card>
             <template #header>
                 <h4>{{ $t('permissions') }}</h4>
-                <Button v-on:click="toggleFormDialog(null)"
-                    class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
-                    <i class="ri ri-add-line"></i> {{ $t("add_permission") }}
-                </Button>
+                <Can permissions="permission_create">
+                    <Button v-on:click="toggleFormDialog(null)"
+                        class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
+                        <i class="ri ri-add-line"></i> {{ $t("add_permission") }}
+                    </Button>
+                </Can>
             </template>
 
             <template #body>
@@ -147,21 +152,15 @@ const toggleShowDialog = (poisiton: any) => {
 
                     <TableBody>
                         <TableRow v-for="(permission, index) in props.permissions?.data || []" :key="permission.id">
-                            <TableCell class="font-medium text-center">{{ index + 1 }}</TableCell>
+                            <TableCell class="font-medium text-center">
+                                <TablePaginationNumbers :items="props.permissions" :index="index" />
+                            </TableCell>
                             <TableCell class="text-center">{{ permission.name ?? '-' }}</TableCell>
                             <TableCell class="text-center flex justify-center">
-                                <Button size="sm" v-on:click="toggleShowDialog(permission)"
-                                    class="mr-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
-                                    <i class="ri ri-eye-line"></i>
-                                </Button>
-                                <Button size="sm" v-on:click="toggleFormDialog(permission)"
-                                    class="mr-2 bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600">
-                                    <i class="ri ri-pencil-line"></i>
-                                </Button>
-                                <Button size="sm" v-on:click="toggleShowDeleteModal(permission)"
-                                    class="bg-red-500 cursor-pointer text-white hover:bg-red-600 ">
-                                    <i class="ri ri-delete-bin-line"></i>
-                                </Button>
+                                <TableActionsDialog class="text-center flex justify-center" canShow="permission_show"
+                                    :show="() => toggleShowDialog(permission)" canEdit="permission_edit"
+                                    :edit="() => toggleFormDialog(permission)" canDelete="permission_delete"
+                                    :delete="() => toggleShowDeleteModal(permission)" />
                             </TableCell>
                         </TableRow>
                     </TableBody>
@@ -182,11 +181,18 @@ const toggleShowDialog = (poisiton: any) => {
         </Card>
     </AppLayout>
 
-    <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deletePermission" :loading="isDeleting" />
+    <Can permissions="permission_delete">
+        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deletePermission"
+            :loading="isDeleting" />
+    </Can>
 
-    <PermissionShowDialog v-model:show="showShowDialog" :item="currentItem" />
+    <Can permissions="permission_show">
+        <PermissionShowDialog v-model:show="showShowDialog" :item="currentItem" />
+    </Can>
 
-    <PermissionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
-        :item="currentItem" />
+    <Can :permissions="['permission_create', 'permission_edit']">
+        <PermissionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
+            :item="currentItem" />
+    </Can>
 
 </template>

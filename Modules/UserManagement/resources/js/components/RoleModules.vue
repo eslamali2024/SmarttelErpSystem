@@ -8,6 +8,7 @@ const props = defineProps<{
     level?: number
     permKey?: string
     modelValue?: string[]
+    isReadOnly?: boolean
 }>()
 
 const emit = defineEmits(['update:modelValue'])
@@ -44,6 +45,7 @@ const checkboxHandle = (value: string) => {
 
 // Handle Select All
 const toggleSelectAll = () => {
+    if (props.isReadOnly) return
     const allPerms = getAllPermissions(props.module!)
     const current = props.modelValue || []
     const allSelected = allPerms.every(p => current.includes(p))
@@ -69,7 +71,6 @@ const isAllSelected = computed(() => {
 </script>
 <template>
     <div class="space-y-2" :style="{ paddingLeft: padding }">
-
         <!-- Parent Module -->
         <div v-if="module"
             class="flex justify-between items-center bg-gray-100 dark:bg-gray-700/50  p-2 rounded cursor-pointer hover:bg-gray-200 hover:dark:bg-gray-700 duration-200"
@@ -87,7 +88,7 @@ const isAllSelected = computed(() => {
                 <label
                     class="text-sm font-medium cursor-pointer flex gap-2 items-center border rounded p-1 hover:bg-white hover:dark:bg-gray-600 duration-200">
                     <Checkbox :id="'select-all-' + module.access" :value="module.key" :model-value="isAllSelected"
-                        @click.stop="toggleSelectAll" />
+                        @click.stop="toggleSelectAll" :disabled="props.isReadOnly" />
                     <span @click.stop="toggleSelectAll">{{ $t('select_all') }}</span>
                 </label>
 
@@ -96,7 +97,7 @@ const isAllSelected = computed(() => {
                     class="text-sm font-medium cursor-pointer flex gap-2 items-center border rounded p-1 hover:bg-white hover:dark:bg-gray-600 duration-200">
                     <Checkbox :id="module.access" name="permissions[]" :value="module.access"
                         :model-value="props.modelValue?.includes(module.access)"
-                        @click.stop="checkboxHandle(module.access)" />
+                        @click.stop="checkboxHandle(module.access)" :disabled="props.isReadOnly" />
                     {{ $t('access') }}
                 </label>
 
@@ -107,7 +108,8 @@ const isAllSelected = computed(() => {
         <div v-if="hasChildren && open" class="pl-4 border-l border-gray-300 duration-200">
             <div v-for="(child, key) in module.children" :key="key">
                 <RoleModules :module="child" :level="(props.level || 0) + 1" :model-value="props.modelValue"
-                    :permKey="key" @update:modelValue="emit('update:modelValue', $event)" />
+                    :permKey="key" @update:modelValue="emit('update:modelValue', $event)"
+                    :isReadOnly="props.isReadOnly" />
             </div>
         </div>
 
@@ -118,7 +120,7 @@ const isAllSelected = computed(() => {
                     class="flex items-center gap-2">
                     <Checkbox :id="permValue" name="permissions[]" :value="permValue"
                         :model-value="props.modelValue?.includes(String(permValue))"
-                        @click.stop="checkboxHandle(String(permValue))" />
+                        @click.stop="checkboxHandle(String(permValue))" :disabled="props.isReadOnly" />
                     <label :for="permValue" class="capitalize">{{ permKey }}</label>
                 </div>
             </div>

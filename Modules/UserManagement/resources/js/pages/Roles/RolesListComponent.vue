@@ -23,10 +23,12 @@ import Card from '@/components/ui/Card.vue';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import RoleFormDialog from './RoleFormDialog.vue';
-import RoleShowDialog from './RoleShowDialog.vue';
 import { router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import axios from 'axios'
+import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
+import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
+import Can from '@/components/ui/Auth/Can.vue';
 
 const { t } = useI18n();
 const breadcrumbs: BreadcrumbItem[] = [
@@ -42,7 +44,7 @@ const props = defineProps<{
         total?: number,
         per_page?: number,
         current_page?: number
-    }
+    },
 }>()
 
 // reactive search
@@ -50,6 +52,7 @@ const urlParams = new URLSearchParams(window.location.search);
 
 const search = reactive({
     name: urlParams.get('name') ?? '',
+    page: urlParams.get('page') ?? 1
 });
 
 // watch search changes
@@ -95,7 +98,7 @@ async function loadPermissions(): Promise<void> {
  * @throws {Error} If the item is not found.
  * @returns {Promise<void>}
  */
-async function getRole(item?: any): Promise<void> {
+async function fetchRoleDetails(item?: any): Promise<void> {
     try {
         if (item) {
             const response = await axios.get(rolesRoute.show(item).url)
@@ -113,15 +116,15 @@ async function getRole(item?: any): Promise<void> {
  * Toggle the form dialog for adding or editing a role
  * @param {any} item - The item to be edited, or null for adding a new item
  */
-const toggleFormDialog = async (item?: any) => {
+const toggleFormDialog = async (item?: any, actionType?: string) => {
     showFormDialog.value = true
     currentItem.value = item
 
     await loadPermissions()
 
     if (item) {
-        await getRole(item?.id ?? null)
-        method_type.value = "put"
+        await fetchRoleDetails(item?.id ?? null)
+        method_type.value = actionType ?? "put"
         action.value = rolesRoute.update(item.id).url
     } else {
         method_type.value = "post"
@@ -153,13 +156,6 @@ const deleteRole = () => {
         }
     })
 }
-
-// Show Modal
-const showShowDialog = ref(false)
-const toggleShowDialog = (poisiton: any) => {
-    currentItem.value = poisiton
-    showShowDialog.value = true
-}
 </script>
 
 <template>
@@ -170,10 +166,12 @@ const toggleShowDialog = (poisiton: any) => {
         <Card>
             <template #header>
                 <h4>{{ $t('roles') }}</h4>
-                <Button v-on:click="toggleFormDialog(null)"
-                    class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
-                    <i class="ri ri-add-line"></i> {{ $t("add_role") }}
-                </Button>
+                <Can permissions="role_create">
+                    <Button v-on:click="toggleFormDialog(null)"
+                        class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
+                        <i class="ri ri-add-line"></i> {{ $t("add_role") }}
+                    </Button>
+                </Can>
             </template>
 
             <template #body>
@@ -196,21 +194,15 @@ const toggleShowDialog = (poisiton: any) => {
 
                     <TableBody>
                         <TableRow v-for="(role, index) in props.roles?.data || []" :key="role.id">
-                            <TableCell class="font-medium text-center">{{ index + 1 }}</TableCell>
+                            <TableCell class="font-medium text-center">
+                                <TablePaginationNumbers :items="props.roles" :index="index" />
+                            </TableCell>
                             <TableCell class="text-center">{{ role.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center flex justify-center">
-                                <Button size="sm" v-on:click="toggleShowDialog(role)"
-                                    class="mr-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
-                                    <i class="ri ri-eye-line"></i>
-                                </Button>
-                                <Button size="sm" v-on:click="toggleFormDialog(role)"
-                                    class="mr-2 bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600">
-                                    <i class="ri ri-pencil-line"></i>
-                                </Button>
-                                <Button size="sm" v-on:click="toggleShowDeleteModal(role)"
-                                    class="bg-red-500 cursor-pointer text-white hover:bg-red-600 ">
-                                    <i class="ri ri-delete-bin-line"></i>
-                                </Button>
+                            <TableCell>
+                                <TableActionsDialog class="text-center flex justify-center" canShow="role_show"
+                                    :show="() => toggleFormDialog(role, 'show')" canEdit="role_edit"
+                                    :edit="() => toggleFormDialog(role)" canDelete="role_delete"
+                                    :delete="() => toggleShowDeleteModal(role)" />
                             </TableCell>
                         </TableRow>
                     </TableBody>
@@ -231,11 +223,12 @@ const toggleShowDialog = (poisiton: any) => {
         </Card>
     </AppLayout>
 
-    <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteRole" :loading="isDeleting" />
+    <Can permissions="role_delete">
+        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteRole" :loading="isDeleting" />
+    </Can>
 
-    <RoleShowDialog v-model:show="showShowDialog" :item="currentItem" />
-
-    <RoleFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
-        :permissions="permissionsCache" :item="currentItem" />
-
+    <Can :permissions="['role_create', 'role_show', 'role_edit']">
+        <RoleFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
+            :permissions="permissionsCache" :item="currentItem" />
+    </Can>
 </template>
