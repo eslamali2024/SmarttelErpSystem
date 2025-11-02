@@ -9,52 +9,46 @@ import { show } from '@/routes/two-factor';
 import { edit as editPassword } from '@/routes/user-password';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
+import { computed } from 'vue';
 
-const sidebarNavItems: NavItem[] = [
+const { t } = useI18n();
+
+const sidebarNavItems = computed<NavItem[]>(() => [
     {
-        title: 'Profile',
+        title: t('profile'),
         href: editProfile(),
     },
     {
-        title: 'Password',
+        title: t('password'),
         href: editPassword(),
     },
     {
-        title: 'Two-Factor Auth',
+        title: t('two_factor_auth'),
         href: show(),
     },
     {
-        title: 'Appearance',
+        title: t('appearance'),
         href: editAppearance(),
     },
-];
-
+]);
 const currentPath = typeof window !== undefined ? window.location.pathname : '';
 </script>
 
 <template>
     <div class="px-4 py-6">
-        <Heading
-            title="Settings"
-            description="Manage your profile and account settings"
-        />
+        <Heading :title="$t('settings')" :description="t('settings_description')" />
 
         <div class="flex flex-col lg:flex-row lg:space-x-12">
             <aside class="w-full max-w-xl lg:w-48">
                 <nav class="flex flex-col space-y-1 space-x-0">
-                    <Button
-                        v-for="item in sidebarNavItems"
-                        :key="toUrl(item.href)"
-                        variant="ghost"
-                        :class="[
-                            'w-full justify-start',
-                            { 'bg-muted': urlIsActive(item.href, currentPath) },
-                        ]"
-                        as-child
-                    >
+                    <Button v-for="item in sidebarNavItems" :key="toUrl(item.href)" variant="ghost" :class="[
+                        'w-full justify-start',
+                        { 'bg-muted': urlIsActive(item.href, currentPath) },
+                    ]" as-child>
                         <Link :href="item.href">
-                            <component :is="item.icon" class="h-4 w-4" />
-                            {{ item.title }}
+                        <component :is="item.icon" class="h-4 w-4" />
+                        {{ item.title }}
                         </Link>
                     </Button>
                 </nav>
