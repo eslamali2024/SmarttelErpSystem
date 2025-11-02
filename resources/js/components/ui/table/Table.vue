@@ -10,7 +10,7 @@ const props = defineProps<{
 <template>
     <div class="relative w-full overflow-x-auto">
         <table
-            :class="cn('w-full caption-bottom text-sm rounded-sm p-1 bg-transparent dark:bg-gray-500/50', props.class)">
+            :class="cn('w-full caption-bottom text-sm rounded-sm p-1 bg-transparent dark:bg-gray-500/50 border ', props.class)">
             <slot />
         </table>
     </div>
