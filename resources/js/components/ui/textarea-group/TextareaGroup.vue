@@ -12,7 +12,8 @@ interface Props extends PrimitiveProps {
     placeholder?: string
     type?: string,
     placeholder_message?: string,
-    disabled?: boolean
+    disabled?: boolean,
+    vueError?: any
 }
 
 const props = defineProps<Props>()
@@ -31,8 +32,9 @@ const model = computed({
         <p class="text-sm text-muted-foreground">
             {{ props.placeholder_message }}
         </p>
-        <span v-if="props.modelValueError">
-            <p class="text-sm text-red-500 mt-2">{{ props.modelValueError }}</p>
-        </span>
+        <p v-if="props.modelValueError" class="text-sm text-red-500 mt-2">
+            {{ props.modelValueError || vueError?.$errors[0]?.$message }}
+        </p>
+
     </div>
 </template>

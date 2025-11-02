@@ -16,6 +16,7 @@ interface Props {
     label?: string,
     placeholder?: string,
     options?: Record<string, string> | Array<{ value: string | number, label: string }> | undefined | any[],
+    vueError?: any
 }
 
 const props = defineProps<Props>()
@@ -52,6 +53,7 @@ watch(optionsArray, (newOptions) => {
 // We add This For Warning User If Select Is Open and empty
 const isOpen = ref(false)
 watch(isOpen, (open) => {
+    props.vueError?.$touch()
     if (!open) {
         nextTick(() => {
             const active = document.activeElement as HTMLElement | null
@@ -60,7 +62,6 @@ watch(isOpen, (open) => {
     }
 })
 </script>
-
 <template>
     <div>
         <Label v-if="props.label">{{ props.label }}</Label>
@@ -80,8 +81,8 @@ watch(isOpen, (open) => {
             </SelectContent>
         </Select>
 
-        <p v-if="props.modelValueError" class="text-sm text-red-500 mt-2">
-            {{ props.modelValueError }}
+        <p v-if="props.modelValueError || vueError?.$errors[0]?.$message" class="text-sm text-red-500 mt-2">
+            {{ props.modelValueError || vueError?.$errors[0]?.$message }}
         </p>
     </div>
 </template>

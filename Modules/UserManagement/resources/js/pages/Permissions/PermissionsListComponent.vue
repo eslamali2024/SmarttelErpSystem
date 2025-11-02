@@ -19,7 +19,6 @@ import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
 import { reactive, watch, ref } from 'vue';
 import permissionsRoute from '@/routes/user-management/permissions';
-import Card from '@/components/ui/Card.vue';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import PermissionFormDialog from './PermissionFormDialog.vue';
@@ -29,8 +28,22 @@ import { useI18n } from 'vue-i18n';
 import Can from '@/components/ui/Auth/Can.vue';
 import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
 import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardFooter
+} from '@/components/ui/card';
 
 const { t } = useI18n();
+const showLoading = ref(false)
+const showFormDialog = ref(false)
+const currentItem = ref<any>(null)
+const method_type = ref("post");
+const action = ref(permissionsRoute.store().url);
+const urlParams = new URLSearchParams(window.location.search);
+
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
     { title: t('user_management'), href: null },
@@ -48,8 +61,6 @@ const props = defineProps<{
 }>()
 
 // reactive search
-const urlParams = new URLSearchParams(window.location.search);
-
 const search = reactive({
     name: urlParams.get('name') ?? '',
 });
@@ -63,14 +74,8 @@ watch(search, () => {
 }, { deep: true });
 
 
-// Form Data
-const showFormDialog = ref(false)
-const currentItem = ref<any>(null)
-
-const method_type = ref("post");
-const action = ref(permissionsRoute.store().url);
-
 const toggleFormDialog = (item?: any) => {
+    showLoading.value = true
     showFormDialog.value = true;
     currentItem.value = item;
 
@@ -81,6 +86,8 @@ const toggleFormDialog = (item?: any) => {
         method_type.value = "post";
         action.value = permissionsRoute.store().url;
     }
+
+    showLoading.value = false
 }
 
 // Delete Modal
@@ -122,17 +129,19 @@ const toggleShowDialog = (poisiton: any) => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Card>
-            <template #header>
-                <h4>{{ $t('permissions') }}</h4>
+            <CardHeader class="flex justify-between items-center">
+                <CardTitle>
+                    {{ $t('permissions') }}
+                </CardTitle>
                 <Can permissions="permission_create">
                     <Button v-on:click="toggleFormDialog(null)"
                         class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
                         <i class="ri ri-add-line"></i> {{ $t("add_permission") }}
                     </Button>
                 </Can>
-            </template>
+            </CardHeader>
 
-            <template #body>
+            <CardContent>
                 <Table>
                     <TableCaption>{{ $t('permissions') }}</TableCaption>
                     <TableHeader>
@@ -171,13 +180,13 @@ const toggleShowDialog = (poisiton: any) => {
                         </TableEmpty>
                     </TableFooter>
                 </Table>
-            </template>
+            </CardContent>
 
-            <template #footer>
+            <CardFooter>
                 <PaginationUse :items="props.permissions?.links || []" :total="props.permissions?.total || 0"
                     :itemsPerPage="props.permissions?.per_page || 10"
                     :currentPage="props.permissions?.current_page || 1" :defaultPage="1" />
-            </template>
+            </CardFooter>
         </Card>
     </AppLayout>
 
@@ -192,7 +201,7 @@ const toggleShowDialog = (poisiton: any) => {
 
     <Can :permissions="['permission_create', 'permission_edit']">
         <PermissionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
-            :item="currentItem" />
+            :item="currentItem" :loading="showLoading" />
     </Can>
 
 </template>

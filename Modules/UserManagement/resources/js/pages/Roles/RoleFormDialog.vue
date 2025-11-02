@@ -18,6 +18,8 @@ import {
 import RoleModules from '@modules/UserManagement/resources/js/components/RoleModules.vue';
 import { useI18n } from 'vue-i18n';
 import Button from '@/components/ui/button/Button.vue';
+import { required, minLength, maxLength } from '@vuelidate/validators'
+import useVuelidate from '@vuelidate/core'
 
 const props = defineProps<{
     show: boolean,
@@ -27,7 +29,8 @@ const props = defineProps<{
         role?: any,
         permissions?: any[]
     },
-    permissions?: any
+    permissions?: any,
+    loading?: boolean
 }>();
 
 const { t } = useI18n();
@@ -38,9 +41,18 @@ const form = useForm({
     permissions: props.item?.permissions ?? []
 });
 
+// Vuelidate
+const $v = useVuelidate({
+    name: { required, minLength: minLength(5), maxLength: maxLength(255) },
+    permissions: {
+        $each: { required }
+    }
+}, form)
+
 watch(() => props.item, (newItem) => {
     form.name = newItem?.role?.name ?? '';
     form.permissions = newItem?.permissions ?? [];
+    $v.value.$reset();
 });
 
 /**
@@ -53,13 +65,15 @@ watch(() => props.item, (newItem) => {
  * Preserves the scroll position of the page.
  */
 const submitForm = () => {
-    if (isReadOnly.value) return;
+    $v.value.$touch()
+    if (isReadOnly.value || $v.value.$invalid) return;
     const currentPage = new URLSearchParams(window.location.search).get('page') || 1;
 
     const options = {
         onSuccess: () => {
             emit('update:show', false);
             form.reset();
+            $v.value.$reset();
         },
         onError: (e: any) => {
             console.error(e);
@@ -103,11 +117,13 @@ const title = computed(() => {
                         {{ title }}
                     </DialogTitle>
                 </DialogHeader>
-                <DialogDescription>
+                <DialogDescription :loading="props.loading">
                     <div class="grid grid-cols-1 gap-3 py-4">
                         <InputGroup v-model="form.name" :modelValueError="form.errors.name" :label="$t('name')"
-                            :placeholder="$t('please_enter_a_name')" type="text" :disabled="isReadOnly" />
-                        <p v-if="form.errors.permissions" class="text-sm text-red-500">
+                            :placeholder="$t('please_enter_a_name')" type="text" :disabled="isReadOnly"
+                            :vue-error="$v?.name" />
+                        <p v-if="form.errors.permissions || $v?.permissions.$errors[0]?.$message"
+                            class="text-sm text-red-500">
                             {{ form.errors.permissions }}
                         </p>
 
@@ -137,11 +153,11 @@ const title = computed(() => {
                 </DialogDescription>
                 <DialogFooter>
                     <ButtonSubmit :loading="form.processing" :submit="submitForm" v-if="!isReadOnly"
-                        :cancel="() => emit('update:show', false)">
+                        :cancel="() => emit('update:show', false)" :disabled="props.loading">
                         {{ $t('save') }}
                     </ButtonSubmit>
-                    <Button v-else type="button" @click="() => emit('update:show', false)" class="cursor-pointer">{{
-                        $t('close') }}</Button>
+                    <Button v-else type="button" @click="() => emit('update:show', false)" class="cursor-pointer">
+                        {{ $t('close') }}</Button>
                 </DialogFooter>
             </DialogScrollContent>
         </Dialog>

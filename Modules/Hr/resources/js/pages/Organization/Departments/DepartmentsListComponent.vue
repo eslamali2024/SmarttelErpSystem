@@ -19,7 +19,6 @@ import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
 import { reactive, watch, ref } from 'vue';
 import departmentsRoute from '@/routes/hr/organization/departments';
-import Card from '@/components/ui/Card.vue';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import DepartmentFormDialog from './DepartmentFormDialog.vue';
@@ -29,15 +28,28 @@ import { useI18n } from 'vue-i18n';
 import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
 import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
 import Can from '@/components/ui/Auth/Can.vue';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardFooter
+} from '@/components/ui/card';
 
+// Master Data
 const { t } = useI18n();
+const showFormDialog = ref(false)
+const currentItem = ref<any>(null)
+const method_type = ref("post");
+const action = ref(departmentsRoute.store().url);
+const showLoading = ref(false)
+
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
     { title: t('hr'), href: null },
     { title: t('organization'), href: null },
     { title: t('departments'), href: null },
 ];
-
 
 const props = defineProps<{
     departments?: {
@@ -76,14 +88,12 @@ watch(search, () => {
 }, { deep: true });
 
 
-// Form Data
-const showFormDialog = ref(false)
-const currentItem = ref<any>(null)
-
-const method_type = ref("post");
-const action = ref(departmentsRoute.store().url);
-
+/**
+ * Toggle the form dialog for adding or editing a department
+ * @param {any} item - The item to be edited, or null for adding a new item
+ */
 const toggleFormDialog = (item?: any) => {
+    showLoading.value = true
     showFormDialog.value = true;
     currentItem.value = item;
 
@@ -94,6 +104,8 @@ const toggleFormDialog = (item?: any) => {
         method_type.value = "post";
         action.value = departmentsRoute.store().url;
     }
+
+    showLoading.value = false
 }
 
 
@@ -106,6 +118,11 @@ const toggleShowDeleteModal = (department: any) => {
     showDeleteModal.value = true
 }
 
+/**
+ * Delete a department
+ *
+ * @returns {void}
+ */
 const deleteDepartment = () => {
     if (!currentItem.value) return
     isDeleting.value = true
@@ -122,7 +139,6 @@ const deleteDepartment = () => {
     })
 }
 
-
 // Show Modal
 const showShowDialog = ref(false)
 const toggleShowDialog = (poisiton: any) => {
@@ -137,17 +153,17 @@ const toggleShowDialog = (poisiton: any) => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Card>
-            <template #header>
-                <h4>{{ $t('departments') }}</h4>
+            <CardHeader class="flex justify-between items-center">
+                <CardTitle>{{ $t('departments') }}</CardTitle>
                 <Can permissions="department_create">
                     <Button v-on:click="toggleFormDialog(null)"
                         class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
                         <i class="ri ri-add-line"></i> {{ $t("add_department") }}
                     </Button>
                 </Can>
-            </template>
+            </CardHeader>
 
-            <template #body>
+            <CardContent>
                 <Table>
                     <TableCaption>{{ $t('departments') }}</TableCaption>
                     <TableHeader>
@@ -201,13 +217,13 @@ const toggleShowDialog = (poisiton: any) => {
                         </TableEmpty>
                     </TableFooter>
                 </Table>
-            </template>
+            </CardContent>
 
-            <template #footer>
+            <CardFooter>
                 <PaginationUse :items="props.departments?.links || []" :total="props.departments?.total || 0"
                     :itemsPerPage="props.departments?.per_page || 10"
                     :currentPage="props.departments?.current_page || 1" :defaultPage="1" />
-            </template>
+            </CardFooter>
         </Card>
     </AppLayout>
 
@@ -222,7 +238,7 @@ const toggleShowDialog = (poisiton: any) => {
 
     <Can :permissions="['department_create', 'department_edit']">
         <DepartmentFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
-            :divisions="props.divisions" :managers="props.managers" :item="currentItem" />
+            :divisions="props.divisions" :managers="props.managers" :item="currentItem" :loading="showLoading" />
     </Can>
 
 </template>

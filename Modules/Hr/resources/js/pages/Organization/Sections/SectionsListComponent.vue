@@ -19,7 +19,6 @@ import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
 import { reactive, watch, ref } from 'vue';
 import sectionsRoute from '@/routes/hr/organization/sections';
-import Card from '@/components/ui/Card.vue';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import SectionFormDialog from './SectionFormDialog.vue';
@@ -29,8 +28,22 @@ import { useI18n } from 'vue-i18n';
 import Can from '@/components/ui/Auth/Can.vue';
 import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
 import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardFooter
+} from '@/components/ui/card';
 
+// Master Data
 const { t } = useI18n();
+const showFormDialog = ref(false)
+const currentItem = ref<any>(null)
+const method_type = ref("post");
+const action = ref(sectionsRoute.store().url);
+const showLoading = ref(false)
+
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
     { title: t('hr'), href: null },
@@ -81,14 +94,8 @@ watch(search, () => {
 }, { deep: true });
 
 
-// Form Data
-const showFormDialog = ref(false)
-const currentItem = ref<any>(null)
-
-const method_type = ref("post");
-const action = ref(sectionsRoute.store().url);
-
 const toggleFormDialog = (item?: any) => {
+    showLoading.value = true
     showFormDialog.value = true;
     currentItem.value = item;
 
@@ -99,8 +106,9 @@ const toggleFormDialog = (item?: any) => {
         method_type.value = "post";
         action.value = sectionsRoute.store().url;
     }
-}
 
+    showLoading.value = false
+}
 
 // Delete Modal
 const showDeleteModal = ref(false)
@@ -141,17 +149,17 @@ const toggleShowDialog = (poisiton: any) => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Card>
-            <template #header>
-                <h4>{{ $t('sections') }}</h4>
+            <CardHeader class="flex justify-between items-center">
+                <CardTitle>{{ $t('sections') }}</CardTitle>
                 <Can permissions="section_create">
                     <Button v-on:click="toggleFormDialog(null)"
                         class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
                         <i class="ri ri-add-line"></i> {{ $t("add_section") }}
                     </Button>
                 </Can>
-            </template>
+            </CardHeader>
 
-            <template #body>
+            <CardContent>
                 <Table>
                     <TableCaption>{{ $t('sections') }}</TableCaption>
                     <TableHeader>
@@ -210,13 +218,13 @@ const toggleShowDialog = (poisiton: any) => {
                         </TableEmpty>
                     </TableFooter>
                 </Table>
-            </template>
+            </CardContent>
 
-            <template #footer>
+            <CardFooter>
                 <PaginationUse :items="props.sections?.links || []" :total="props.sections?.total || 0"
                     :itemsPerPage="props.sections?.per_page || 10" :currentPage="props.sections?.current_page || 1"
                     :defaultPage="1" />
-            </template>
+            </CardFooter>
         </Card>
     </AppLayout>
 
@@ -232,6 +240,6 @@ const toggleShowDialog = (poisiton: any) => {
     <Can :permissions="['section_create', 'section_edit']">
         <SectionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
             :divisions="props.divisions" :departments="props.departments" :managers="props.managers"
-            :item="currentItem" />
+            :item="currentItem" :loading="showLoading" />
     </Can>
 </template>
