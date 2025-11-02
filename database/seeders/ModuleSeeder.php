@@ -31,8 +31,8 @@ class ModuleSeeder extends Seeder
     {
         return array_merge(
             $this->getMainModules(),
-            $this->getHRModules(),
             $this->getUserManagementModules(),
+            $this->getHRModules(),
 
         );
     }

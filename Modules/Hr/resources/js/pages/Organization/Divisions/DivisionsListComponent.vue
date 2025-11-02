@@ -19,7 +19,13 @@ import Input from '@/components/ui/input/Input.vue';
 import { reactive, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import divisionsRoute from '@/routes/hr/organization/divisions';
-import Card from '@/components/ui/Card.vue';
+// import Card from '@/components/ui/Card.vue';
+import Card from '@/components/ui/card/Card.vue';
+import CardHeader from '@/components/ui/card/CardHeader.vue';
+import CardTitle from '@/components/ui/card/CardTitle.vue';
+import CardContent from '@/components/ui/card/CardContent.vue';
+import CardDescription from '@/components/ui/card/CardDescription.vue';
+import CardFooter from '@/components/ui/card/CardFooter.vue';
 import { ref } from 'vue';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
@@ -130,8 +136,76 @@ const toggleShowDialog = (poisiton: any) => {
     <Head :title="$t('divisions')" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
+            
         <Card>
-            <template #header>
+            <CardHeader>
+                <CardTitle class="flex justify-between px-6 pb-6">
+                    {{ $t('divisions') }}
+                    <Can permissions="division_create">
+                        <Button v-on:click="toggleFormDialog(null)"
+                            class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
+                            <i class="ri ri-add-line"></i> {{ $t("add_division") }}
+                        </Button>
+                    </Can>
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                 <Table>
+                    <TableCaption>{{ $t('divisions') }}</TableCaption>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead class="w-[100px] text-center">{{ $t('no') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('code') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('name') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('manager') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('actions') }}</TableHead>
+                        </TableRow>
+                        <TableRow>
+                            <TableHead class="w-[100px]"></TableHead>
+                            <TableHead class="p-2">
+                                <Input placeholder="Code" v-model="search.code" />
+                            </TableHead>
+                            <TableHead class="p-2">
+                                <Input placeholder="Name" v-model="search.name" />
+                            </TableHead>
+                            <TableHead class="p-2">
+                                <Input placeholder="Manager" v-model="search.manager.name" />
+                            </TableHead>
+                            <TableHead></TableHead>
+                        </TableRow>
+                    </TableHeader>
+
+                    <TableBody>
+                        <TableRow v-for="(division, index) in props.divisions?.data || []" :key="division.id">
+                            <TableCell class="font-medium text-center">
+                                <TablePaginationNumbers :items="props.divisions" :index="index" />
+                            </TableCell>
+                            <TableCell class="text-center">{{ division.code ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ division.name ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ division.manager?.name ?? '-' }}</TableCell>
+                            <TableCell class="text-center flex">
+                                <TableActionsDialog class="text-center flex justify-center" canShow="division_show"
+                                    :show="() => toggleShowDialog(division)" canEdit="division_edit"
+                                    :edit="() => toggleFormDialog(division)" canDelete="division_delete"
+                                    :delete="() => toggleShowDeleteModal(division)" />
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
+
+                    <TableFooter>
+                        <TableEmpty v-if="!props.divisions?.data?.length" :colspan="5">
+                            {{ $t('no_data') }}
+                        </TableEmpty>
+                    </TableFooter>
+                </Table>
+            </CardContent>
+            <CardFooter>
+                <PaginationUse :items="props.divisions?.links || []" :total="props.divisions?.total || 0"
+                    :itemsPerPage="props.divisions?.per_page || 10" :currentPage="props.divisions?.current_page || 1"
+                    :defaultPage="1" />
+            </CardFooter>
+            <!-- <Card -->
+            <!-- <template #header>
                 <h4>{{ $t('divisions') }}</h4>
                 <Can permissions="division_create">
                     <Button v-on:click="toggleFormDialog(null)"
@@ -196,7 +270,7 @@ const toggleShowDialog = (poisiton: any) => {
                 <PaginationUse :items="props.divisions?.links || []" :total="props.divisions?.total || 0"
                     :itemsPerPage="props.divisions?.per_page || 10" :currentPage="props.divisions?.current_page || 1"
                     :defaultPage="1" />
-            </template>
+            </template> -->
         </Card>
     </AppLayout>
 
