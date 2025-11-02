@@ -19,7 +19,6 @@ import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
 import { reactive, watch, ref } from 'vue';
 import userRoute from '@/routes/user-management/users';
-import Card from '@/components/ui/Card.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import UserFormDialog from './UserFormDialog.vue';
 import { router } from '@inertiajs/vue3';
@@ -28,6 +27,13 @@ import axios from 'axios'
 import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
 import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
 import Can from '@/components/ui/Auth/Can.vue';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardFooter
+} from '@/components/ui/card';
 
 const { t } = useI18n();
 const breadcrumbs: BreadcrumbItem[] = [
@@ -76,6 +82,7 @@ const roles = ref<any[]>([])
 const rolesCache = ref<any[] | null>(null)
 const permissions = ref<any[]>([])
 const permissionsCache = ref<any[] | null>(null)
+const showLoading = ref(false)
 
 /**
  * Loads the initial roles and permissions data from the server and stores them in the reactive cache.
@@ -126,8 +133,8 @@ async function fetchUserDetails(item?: any): Promise<void> {
  * @param {any} item - The item to be edited, or null for adding a new item
  */
 const toggleFormDialog = async (item?: any, actionType?: string) => {
+    showLoading.value = true
     showFormDialog.value = true
-    currentItem.value = item
 
     await loadInitialData()
 
@@ -136,6 +143,8 @@ const toggleFormDialog = async (item?: any, actionType?: string) => {
         method_type.value = actionType ?? "put"
         action.value = userRoute.update(item.id).url
     }
+
+    showLoading.value = false
 }
 
 // Delete Modal
@@ -170,11 +179,13 @@ const deleteUser = () => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Card>
-            <template #header>
-                <h4>{{ $t('users') }}</h4>
-            </template>
+            <CardHeader class="flex justify-between items-center">
+                <CardTitle>
+                    {{ $t('users') }}
+                </CardTitle>
+            </CardHeader>
 
-            <template #body>
+            <CardContent>
                 <Table>
                     <TableCaption>{{ $t('users') }}</TableCaption>
                     <TableHeader>
@@ -228,13 +239,13 @@ const deleteUser = () => {
                         </TableEmpty>
                     </TableFooter>
                 </Table>
-            </template>
+            </CardContent>
 
-            <template #footer>
+            <CardFooter>
                 <PaginationUse :items="props.users?.links || []" :total="props.users?.total || 0"
                     :itemsPerPage="props.users?.per_page || 10" :currentPage="props.users?.current_page || 1"
                     :defaultPage="1" />
-            </template>
+            </CardFooter>
         </Card>
     </AppLayout>
 
@@ -244,6 +255,6 @@ const deleteUser = () => {
 
     <Can :permissions="['user_create', 'user_show', 'user_edit']">
         <UserFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action" :roles="rolesCache"
-            :permissions="permissionsCache" :item="currentItem" />
+            :permissions="permissionsCache" :item="currentItem" :loading="showLoading" />
     </Can>
 </template>

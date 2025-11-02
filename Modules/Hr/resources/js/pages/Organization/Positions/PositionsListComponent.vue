@@ -19,7 +19,6 @@ import Input from '@/components/ui/input/Input.vue';
 import { reactive, watch, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import positionsRoute from '@/routes/hr/organization/positions';
-import Card from '@/components/ui/Card.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import Button from '@/components/ui/button/Button.vue';
 import PositionFormDialog from './PositionFormDialog.vue';
@@ -28,15 +27,28 @@ import { useI18n } from 'vue-i18n';
 import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
 import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
 import Can from '@/components/ui/Auth/Can.vue';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardFooter
+} from '@/components/ui/card';
 
+// Master Data
 const { t } = useI18n();
+const showFormDialog = ref(false)
+const currentItem = ref<any>(null)
+const method_type = ref("post");
+const action = ref(positionsRoute.store().url);
+const showLoading = ref(false)
+
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
     { title: t('hr'), href: null },
     { title: t('organization'), href: null },
     { title: t('positions'), href: null },
 ];
-
 
 const props = defineProps<{
     positions?: {
@@ -63,14 +75,13 @@ const props = defineProps<{
 
 }>()
 
-// Form Data
-const showFormDialog = ref(false)
-const currentItem = ref<any>(null)
 
-const method_type = ref("post");
-const action = ref(positionsRoute.store().url);
-
+/**
+ * Toggle the form dialog for adding or editing a position
+ * @param {any} item - The item to be edited, or null for adding a new item
+ */
 const toggleFormDialog = (item?: any) => {
+    showLoading.value = true
     showFormDialog.value = true;
     currentItem.value = item;
 
@@ -81,6 +92,8 @@ const toggleFormDialog = (item?: any) => {
         method_type.value = "post";
         action.value = positionsRoute.store().url;
     }
+
+    showLoading.value = false
 }
 
 // reactive search
@@ -141,17 +154,17 @@ const toggleShowDialog = (position: any) => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Card>
-            <template #header>
-                <h4>{{ $t('positions') }}</h4>
+            <CardHeader class="flex justify-between items-center">
+                <CardTitle>{{ $t('positions') }}</CardTitle>
                 <Can permissions="position_create">
                     <Button v-on:click="toggleFormDialog(null)"
                         class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
                         <i class="ri ri-add-line"></i> {{ $t("add_position") }}
                     </Button>
                 </Can>
-            </template>
+            </CardHeader>
 
-            <template #body>
+            <CardContent>
                 <Table>
                     <TableCaption>{{ $t('positions') }}</TableCaption>
                     <TableHeader>
@@ -210,12 +223,12 @@ const toggleShowDialog = (position: any) => {
                         </TableEmpty>
                     </TableFooter>
                 </Table>
-            </template>
-            <template #footer>
+            </CardContent>
+            <CardFooter>
                 <PaginationUse :items="props.positions?.links || []" :total="props.positions?.total || 0"
                     :itemsPerPage="props.positions?.per_page || 10" :currentPage="props.positions?.current_page || 1"
                     :defaultPage="1" />
-            </template>
+            </CardFooter>
         </Card>
     </AppLayout>
 
@@ -230,7 +243,7 @@ const toggleShowDialog = (position: any) => {
 
     <Can :permissions="['position_create', 'position_edit']">
         <PositionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
-            :departments="props.departments" :divisions="props.divisions" :sections="props.sections"
-            :item="currentItem" />
+            :departments="props.departments" :divisions="props.divisions" :sections="props.sections" :item="currentItem"
+            :loading="showLoading" />
     </Can>
 </template>
