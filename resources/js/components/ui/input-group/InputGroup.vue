@@ -10,6 +10,7 @@ interface Props {
     placeholder?: string
     type?: string
     disabled?: boolean
+    vueError?: any
 }
 
 const props = defineProps<Props>()
@@ -24,10 +25,10 @@ const model = computed({
 <template>
     <div class="w-full">
         <Label>{{ props.label }}</Label>
-        <Input :type="props.type || 'text'" :placeholder="props.placeholder" v-model="model"
-            :disabled="props.disabled" />
-        <p v-if="props.modelValueError" class="text-sm text-red-500 mt-2">
-            {{ props.modelValueError }}
+        <Input :type="props.type || 'text'" :placeholder="props.placeholder" v-model="model" :disabled="props.disabled"
+            @input="vueError?.$touch()" @blur="vueError?.$touch()" />
+        <p v-if="props.modelValueError || vueError?.$errors[0]?.$message" class="text-sm text-red-500 mt-2">
+            {{ props.modelValueError || vueError?.$errors[0]?.$message }}
         </p>
     </div>
 </template>

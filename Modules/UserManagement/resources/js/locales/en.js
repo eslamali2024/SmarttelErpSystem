@@ -8,4 +8,10 @@ export default {
     select_all: 'Select All',
     view_role: 'View Role',
     update_permission: 'Update Permission',
+    add_user: 'Add User',
+    update_user: 'Update User',
+    show_user: 'Show User',
+    please_select_roles: 'Please Select Roles',
+    role: 'Role',
+    view_user: 'View User',
 }

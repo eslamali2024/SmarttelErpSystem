@@ -24,6 +24,7 @@ export default {
     close: 'Close',
     search: 'Search',
     access: 'Access',
-
-
+    no_results: 'No results',
+    email: 'Email',
+    please_enter_a_email: 'Please enter a email',
 }
