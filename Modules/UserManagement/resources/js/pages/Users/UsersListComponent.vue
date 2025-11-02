@@ -18,11 +18,10 @@ import TableEmpty from '@/components/ui/table/TableEmpty.vue';
 import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
 import { reactive, watch, ref } from 'vue';
-import rolesRoute from '@/routes/user-management/roles';
+import userRoute from '@/routes/user-management/users';
 import Card from '@/components/ui/Card.vue';
-import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
-import RoleFormDialog from './RoleFormDialog.vue';
+import UserFormDialog from './UserFormDialog.vue';
 import { router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import axios from 'axios'
@@ -34,11 +33,11 @@ const { t } = useI18n();
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
     { title: t('user_management'), href: null },
-    { title: t('roles'), href: null },
+    { title: t('users'), href: null },
 ];
 
 const props = defineProps<{
-    roles?: {
+    users?: {
         data?: any[],
         links?: any[],
         total?: number,
@@ -52,12 +51,16 @@ const urlParams = new URLSearchParams(window.location.search);
 
 const search = reactive({
     name: urlParams.get('name') ?? '',
+    email: urlParams.get('email') ?? '',
+    roles: {
+        name: urlParams.get('roles') ?? ''
+    },
     page: urlParams.get('page') ?? 1
 });
 
 // watch search changes
 watch(search, () => {
-    router.get(rolesRoute.index().url, search, {
+    router.get(userRoute.index().url, search, {
         preserveState: true,
         replace: true,
     })
@@ -68,28 +71,33 @@ watch(search, () => {
 const showFormDialog = ref(false)
 const currentItem = ref<any>(null)
 const method_type = ref("post");
-const action = ref(rolesRoute.store().url);
+const action = ref('');
+const roles = ref<any[]>([])
+const rolesCache = ref<any[] | null>(null)
 const permissions = ref<any[]>([])
-const permissionsCache = ref<any[] | null>(null)  // reactive cache
+const permissionsCache = ref<any[] | null>(null)
 
 /**
- * Loads all the permissions from the server and stores them in the reactive cache.
- * If the cache already has permissions, it will use the cached value instead of making a request.
+ * Loads the initial roles and permissions data from the server and stores them in the reactive cache.
+ * If the cache already has roles and permissions, it will use the cached value instead of making a request.
  * @returns {Promise<void>}
  */
-async function loadPermissions(): Promise<void> {
+async function loadInitialData(): Promise<void> {
     try {
-        if (permissionsCache.value) {
+        if (rolesCache.value && permissionsCache.value) {
+            roles.value = rolesCache.value
             permissions.value = permissionsCache.value
             return
         }
 
-        const response = await axios.get(rolesRoute.create().url)
-        permissions.value = Array.isArray(response.data) ? response.data[0] : response.data
+        const response = await axios.get(userRoute.create().url)
+        roles.value = Array.isArray(response.data) ? response.data[0].roles : response.data.roles
+        permissions.value = Array.isArray(response.data) ? response.data[0].permissions : response.data.permissions
 
+        rolesCache.value = roles.value
         permissionsCache.value = permissions.value
     } catch (error) {
-        console.error('Error loading permissions:', error)
+        console.error('Error loading roles:', error)
     }
 }
 
@@ -99,10 +107,10 @@ async function loadPermissions(): Promise<void> {
  * @throws {Error} If the item is not found.
  * @returns {Promise<void>}
  */
-async function fetchRoleDetails(item?: any): Promise<void> {
+async function fetchUserDetails(item?: any): Promise<void> {
     try {
         if (item) {
-            const response = await axios.get(rolesRoute.show(item).url)
+            const response = await axios.get(userRoute.show(item).url)
             if (!response.data) throw new Error('Item not found')
             currentItem.value = response.data;
         } else {
@@ -121,15 +129,12 @@ const toggleFormDialog = async (item?: any, actionType?: string) => {
     showFormDialog.value = true
     currentItem.value = item
 
-    await loadPermissions()
+    await loadInitialData()
 
     if (item) {
-        await fetchRoleDetails(item?.id ?? null)
+        await fetchUserDetails(item?.id ?? null)
         method_type.value = actionType ?? "put"
-        action.value = rolesRoute.update(item.id).url
-    } else {
-        method_type.value = "post"
-        action.value = rolesRoute.store().url
+        action.value = userRoute.update(item.id).url
     }
 }
 
@@ -142,11 +147,11 @@ const toggleShowDeleteModal = (role: any) => {
     showDeleteModal.value = true
 }
 
-const deleteRole = () => {
+const deleteUser = () => {
     if (!currentItem.value) return
     isDeleting.value = true
 
-    router.delete(rolesRoute.destroy(currentItem.value.id).url, {
+    router.delete(userRoute.destroy(currentItem.value.id).url, {
         onFinish: () => {
             showDeleteModal.value = false
             currentItem.value = null
@@ -161,27 +166,23 @@ const deleteRole = () => {
 
 <template>
 
-    <Head :title="$t('roles')" />
+    <Head :title="$t('users')" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Card>
             <template #header>
-                <h4>{{ $t('roles') }}</h4>
-                <Can permissions="role_create">
-                    <Button v-on:click="toggleFormDialog(null)"
-                        class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
-                        <i class="ri ri-add-line"></i> {{ $t("add_role") }}
-                    </Button>
-                </Can>
+                <h4>{{ $t('users') }}</h4>
             </template>
 
             <template #body>
                 <Table>
-                    <TableCaption>{{ $t('roles') }}</TableCaption>
+                    <TableCaption>{{ $t('users') }}</TableCaption>
                     <TableHeader>
                         <TableRow>
                             <TableHead class="w-[100px] text-center">{{ $t('no') }}</TableHead>
                             <TableHead class="text-center">{{ $t('name') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('email') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('roles') }}</TableHead>
                             <TableHead class="text-center">{{ $t('actions') }}</TableHead>
                         </TableRow>
                         <TableRow>
@@ -189,27 +190,40 @@ const deleteRole = () => {
                             <TableHead class="p-2">
                                 <Input :placeholder="$t('name')" v-model="search.name" />
                             </TableHead>
+                            <TableHead class="p-2">
+                                <Input :placeholder="$t('email')" v-model="search.email" />
+                            </TableHead>
+                            <TableHead class="p-2">
+                                <Input :placeholder="$t('role')" v-model="search.roles.name" />
+                            </TableHead>
                             <TableHead></TableHead>
                         </TableRow>
                     </TableHeader>
 
                     <TableBody>
-                        <TableRow v-for="(role, index) in props.roles?.data || []" :key="role.id">
+                        <TableRow v-for="(user, index) in props.users?.data || []" :key="user.id">
                             <TableCell class="font-medium text-center">
-                                <TablePaginationNumbers :items="props.roles" :index="index" />
+                                <TablePaginationNumbers :items="props.users" :index="index" />
                             </TableCell>
-                            <TableCell class="text-center">{{ role.name ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ user.name ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ user.email ?? '-' }}</TableCell>
+                            <TableCell class="text-center">
+                                {{
+                                    user.roles.map((role: any) => role.name).join(', ').toString().substring(0,
+                                        20).concat('...')
+                                }}
+                            </TableCell>
                             <TableCell>
-                                <TableActionsDialog class="text-center flex justify-center" canShow="role_show"
-                                    :show="() => toggleFormDialog(role, 'show')" canEdit="role_edit"
-                                    :edit="() => toggleFormDialog(role)" canDelete="role_delete"
-                                    :delete="() => toggleShowDeleteModal(role)" />
+                                <TableActionsDialog class="text-center flex justify-center" canShow="user_show"
+                                    :show="() => toggleFormDialog(user, 'show')" canEdit="user_edit"
+                                    :edit="() => toggleFormDialog(user)" canDelete="user_delete"
+                                    :delete="() => toggleShowDeleteModal(user)" />
                             </TableCell>
                         </TableRow>
                     </TableBody>
 
                     <TableFooter>
-                        <TableEmpty v-if="!props.roles?.data?.length" :colspan="3">
+                        <TableEmpty v-if="!props.users?.data?.length" :colspan="5">
                             {{ $t('no_data') }}
                         </TableEmpty>
                     </TableFooter>
@@ -217,19 +231,19 @@ const deleteRole = () => {
             </template>
 
             <template #footer>
-                <PaginationUse :items="props.roles?.links || []" :total="props.roles?.total || 0"
-                    :itemsPerPage="props.roles?.per_page || 10" :currentPage="props.roles?.current_page || 1"
+                <PaginationUse :items="props.users?.links || []" :total="props.users?.total || 0"
+                    :itemsPerPage="props.users?.per_page || 10" :currentPage="props.users?.current_page || 1"
                     :defaultPage="1" />
             </template>
         </Card>
     </AppLayout>
 
-    <Can permissions="role_delete">
-        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteRole" :loading="isDeleting" />
+    <Can permissions="user_delete">
+        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteUser" :loading="isDeleting" />
     </Can>
 
-    <Can :permissions="['role_create', 'role_show', 'role_edit']">
-        <RoleFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
+    <Can :permissions="['user_create', 'user_show', 'user_edit']">
+        <UserFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action" :roles="rolesCache"
             :permissions="permissionsCache" :item="currentItem" />
     </Can>
 </template>
