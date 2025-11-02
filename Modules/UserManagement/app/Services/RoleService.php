@@ -14,7 +14,9 @@ class RoleService
      */
     public function store(array $data): Role
     {
-        return Role::create($data);
+        $role = Role::create($data);
+        $role->givePermissionTo($data['permissions'] ?? []);
+        return $role;
     }
 
     /**
@@ -28,6 +30,8 @@ class RoleService
     {
         $role->update($data);
 
+        $role->syncPermissions($data['permissions'] ?? []);
+        $role->forgetCachedPermissions();
         return $role;
     }
 
@@ -40,5 +44,15 @@ class RoleService
     public function destroy(Role $role): bool
     {
         return $role->delete();
+    }
+
+    /**
+     * Return an array of permissions with their respective groups
+     *
+     * @return array
+     */
+    public function getParentPermissions(): array
+    {
+        return config('permissions_detailed');
     }
 }

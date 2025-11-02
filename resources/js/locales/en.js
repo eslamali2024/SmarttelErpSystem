@@ -22,7 +22,8 @@ export default {
     save: 'Save',
     please_enter_a_name: 'Please enter a name',
     close: 'Close',
-
+    search: 'Search',
+    access: 'Access',
 
 
 }

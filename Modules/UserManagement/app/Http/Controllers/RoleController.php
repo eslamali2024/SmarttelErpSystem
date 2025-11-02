@@ -7,7 +7,6 @@ use Modules\UserManagement\Models\Role;
 use App\Http\Controllers\TransactionController;
 use Modules\UserManagement\Services\RoleService;
 use Modules\UserManagement\Http\Requests\RoleRequest;
-use Modules\UserManagement\Models\Permission;
 
 class RoleController extends TransactionController
 {
@@ -21,7 +20,7 @@ class RoleController extends TransactionController
     public function index()
     {
         return Inertia::render($this->path . 'RolesListComponent', [
-            'roles' => Role::filter(request()->query() ?? [])->paginate(10),
+            'roles' => Role::filter(request()->query() ?? [])->paginate(request('perPage', 10)),
         ]);
     }
 
@@ -32,7 +31,21 @@ class RoleController extends TransactionController
     public function create()
     {
         return response()->json([
-            Permission::pluck('name', 'id')
+            $this->roleService->getParentPermissions()
+        ]);
+    }
+
+    /**
+     * Show the specified role.
+     *
+     * @param  Role  $role
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Role $role)
+    {
+        return response()->json([
+            'role'        => $role,
+            'permissions' => $role?->permissions()?->pluck('name')?->toArray() ?? []
         ]);
     }
 
@@ -43,7 +56,7 @@ class RoleController extends TransactionController
     {
         return $this->withTransaction(function () use ($request) {
             $this->roleService->store($request->validated());
-            return redirect()->route('user-management.roles.index');
+            return redirect()->route('user-management.roles.index', ['page' => request('page', 1)]);
         });
     }
 
@@ -54,7 +67,7 @@ class RoleController extends TransactionController
     {
         return $this->withTransaction(function () use ($request, $role) {
             $this->roleService->update($role, $request->validated());
-            return redirect()->route('user-management.roles.index');
+            return redirect()->route('user-management.roles.index', ['page' => request('page', 1)]);
         });
     }
 

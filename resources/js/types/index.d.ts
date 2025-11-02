@@ -3,11 +3,12 @@ import type { LucideIcon } from 'lucide-vue-next';
 
 export interface Auth {
     user: User;
+    auth_permissions: AuthPermissions[]
 }
 
 export interface BreadcrumbItem {
     title: string;
-    href: string;
+    href: string | null;
 }
 
 export interface NavItem {
@@ -36,9 +37,7 @@ export interface User {
     updated_at: string;
 }
 
-export type AuthPermissions = {
-    name: string
-}
+export type AuthPermissions = string;
 
 export type Module = {
     id: string | number

@@ -26,6 +26,9 @@ import DepartmentFormDialog from './DepartmentFormDialog.vue';
 import DepartmentShowDialog from './DepartmentShowDialog.vue';
 import { router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
+import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
+import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
+import Can from '@/components/ui/Auth/Can.vue';
 
 const { t } = useI18n();
 const breadcrumbs: BreadcrumbItem[] = [
@@ -136,10 +139,12 @@ const toggleShowDialog = (poisiton: any) => {
         <Card>
             <template #header>
                 <h4>{{ $t('departments') }}</h4>
-                <Button v-on:click="toggleFormDialog(null)"
-                    class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
-                    <i class="ri ri-add-line"></i> {{ $t("add_department") }}
-                </Button>
+                <Can permissions="department_create">
+                    <Button v-on:click="toggleFormDialog(null)"
+                        class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
+                        <i class="ri ri-add-line"></i> {{ $t("add_department") }}
+                    </Button>
+                </Can>
             </template>
 
             <template #body>
@@ -174,24 +179,18 @@ const toggleShowDialog = (poisiton: any) => {
 
                     <TableBody>
                         <TableRow v-for="(department, index) in props.departments?.data || []" :key="department.id">
-                            <TableCell class="font-medium text-center">{{ index + 1 }}</TableCell>
+                            <TableCell class="font-medium text-center">
+                                <TablePaginationNumbers :items="props.departments" :index="index" />
+                            </TableCell>
                             <TableCell class="text-center">{{ department.code ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ department.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ department.division?.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ department.manager?.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center flex">
-                                <Button size="sm" v-on:click="toggleShowDialog(department)"
-                                    class="mr-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
-                                    <i class="ri ri-eye-line"></i>
-                                </Button>
-                                <Button size="sm" v-on:click="toggleFormDialog(department)"
-                                    class="mr-2 bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600">
-                                    <i class="ri ri-pencil-line"></i>
-                                </Button>
-                                <Button size="sm" v-on:click="toggleShowDeleteModal(department)"
-                                    class="bg-red-500 cursor-pointer text-white hover:bg-red-600 ">
-                                    <i class="ri ri-delete-bin-line"></i>
-                                </Button>
+                            <TableCell>
+                                <TableActionsDialog class="text-center flex justify-center" canShow="department_show"
+                                    :show="() => toggleShowDialog(department)" canEdit="department_edit"
+                                    :edit="() => toggleFormDialog(department)" canDelete="department_delete"
+                                    :delete="() => toggleShowDeleteModal(department)" />
                             </TableCell>
                         </TableRow>
                     </TableBody>
@@ -212,11 +211,18 @@ const toggleShowDialog = (poisiton: any) => {
         </Card>
     </AppLayout>
 
-    <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteDepartment" :loading="isDeleting" />
+    <Can permissions="department_delete">
+        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteDepartment"
+            :loading="isDeleting" />
+    </Can>
 
-    <DepartmentShowDialog v-model:show="showShowDialog" :item="currentItem" />
+    <Can permissions="department_show">
+        <DepartmentShowDialog v-model:show="showShowDialog" :item="currentItem" />
+    </Can>
 
-    <DepartmentFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
-        :divisions="props.divisions" :managers="props.managers" :item="currentItem" />
+    <Can :permissions="['department_create', 'department_edit']">
+        <DepartmentFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
+            :divisions="props.divisions" :managers="props.managers" :item="currentItem" />
+    </Can>
 
 </template>

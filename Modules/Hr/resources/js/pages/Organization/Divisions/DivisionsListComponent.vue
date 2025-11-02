@@ -26,6 +26,9 @@ import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import DivisionFormDialog from './DivisionFormDialog.vue';
 import DivisionShowDialog from './DivisionShowDialog.vue';
 import { useI18n } from 'vue-i18n';
+import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
+import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
+import Can from '@/components/ui/Auth/Can.vue';
 
 const { t } = useI18n();
 const breadcrumbs: BreadcrumbItem[] = [
@@ -130,10 +133,12 @@ const toggleShowDialog = (poisiton: any) => {
         <Card>
             <template #header>
                 <h4>{{ $t('divisions') }}</h4>
-                <Button v-on:click="toggleFormDialog(null)"
-                    class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
-                    <i class="ri ri-add-line"></i> {{ $t("add_division") }}
-                </Button>
+                <Can permissions="division_create">
+                    <Button v-on:click="toggleFormDialog(null)"
+                        class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
+                        <i class="ri ri-add-line"></i> {{ $t("add_division") }}
+                    </Button>
+                </Can>
             </template>
 
             <template #body>
@@ -164,23 +169,17 @@ const toggleShowDialog = (poisiton: any) => {
 
                     <TableBody>
                         <TableRow v-for="(division, index) in props.divisions?.data || []" :key="division.id">
-                            <TableCell class="font-medium text-center">{{ index + 1 }}</TableCell>
+                            <TableCell class="font-medium text-center">
+                                <TablePaginationNumbers :items="props.divisions" :index="index" />
+                            </TableCell>
                             <TableCell class="text-center">{{ division.code ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ division.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ division.manager?.name ?? '-' }}</TableCell>
                             <TableCell class="text-center flex">
-                                <Button size="sm" v-on:click="toggleShowDialog(division)"
-                                    class="mr-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
-                                    <i class="ri ri-eye-line"></i>
-                                </Button>
-                                <Button size="sm" v-on:click="toggleFormDialog(division)"
-                                    class="mr-2 bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600">
-                                    <i class="ri ri-pencil-line"></i>
-                                </Button>
-                                <Button size="sm" v-on:click="toggleShowDeleteModal(division)"
-                                    class="bg-red-500 cursor-pointer text-white hover:bg-red-600 ">
-                                    <i class="ri ri-delete-bin-line"></i>
-                                </Button>
+                                <TableActionsDialog class="text-center flex justify-center" canShow="division_show"
+                                    :show="() => toggleShowDialog(division)" canEdit="division_edit"
+                                    :edit="() => toggleFormDialog(division)" canDelete="division_delete"
+                                    :delete="() => toggleShowDeleteModal(division)" />
                             </TableCell>
                         </TableRow>
                     </TableBody>
@@ -201,11 +200,17 @@ const toggleShowDialog = (poisiton: any) => {
         </Card>
     </AppLayout>
 
-    <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteDivision" :loading="isDeleting" />
+    <Can permissions="division_delete">
+        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteDivision"
+            :loading="isDeleting" />
+    </Can>
 
-    <DivisionShowDialog v-model:show="showShowDialog" :item="currentItem" />
+    <Can permissions="division_show">
+        <DivisionShowDialog v-model:show="showShowDialog" :item="currentItem" />
+    </Can>
 
-    <DivisionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
-        :managers="props.managers" :item="currentItem" />
-
+    <Can :permissions="['division_create', 'division_edit']">
+        <DivisionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
+            :managers="props.managers" :item="currentItem" />
+    </Can>
 </template>
