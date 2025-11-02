@@ -18,6 +18,8 @@ import {
     CardContent
 } from "@/components/ui/card"
 import RoleModules from '@modules/UserManagement/resources/js/components/RoleModules.vue';
+import { required, email, minLength, maxLength } from '@vuelidate/validators'
+import useVuelidate from '@vuelidate/core'
 
 const props = defineProps<{
     show: boolean,
@@ -44,13 +46,22 @@ const form = useForm({
 
 });
 
-watch(() => props.item, (newItem) => {
-    form.name = newItem?.user?.name ?? '';
-    form.email = newItem?.user?.email ?? '';
-    form.roles = newItem?.roles ?? [];
-    form.permissions = newItem?.permissions ?? [];
+// Vuelidate
+const $v = useVuelidate({
+    name: { required, minLength: minLength(5), maxLength: maxLength(255) },
+    email: { required, email },
+}, form)
 
-    roleOptions = props.roles?.map((role) => ({ value: role, label: role })) || [];
+watch(() => props.item, (newItem) => {
+    if (newItem) {
+        console.log(newItem);
+        form.name = newItem?.user?.name ?? '';
+        form.email = newItem?.user?.email ?? '';
+        form.roles = newItem?.roles ?? [];
+        form.permissions = newItem?.permissions ?? [];
+
+        roleOptions = props.roles?.map((role) => ({ value: role, label: role })) || [];
+    }
 });
 
 /**
@@ -63,7 +74,9 @@ watch(() => props.item, (newItem) => {
  * Preserves the scroll position of the page.
  */
 const submitForm = () => {
-    if (isReadOnly.value) return;
+    $v.value.$touch()
+    if (isReadOnly.value || $v.value.$invalid) return;
+
     const currentPage = new URLSearchParams(window.location.search).get('page') || 1;
 
     const options = {
@@ -113,10 +126,15 @@ const title = computed(() => {
                 </DialogHeader>
                 <DialogDescription>
                     <div class="grid grid-cols-1 gap-3 py-4">
-                        <InputGroup v-model="form.name" :modelValueError="form.errors.name" :label="$t('name')"
-                            :placeholder="$t('please_enter_a_name')" type="text" :disabled="isReadOnly" />
-                        <InputGroup v-model="form.email" :modelValueError="form.errors.email" :label="$t('email')"
-                            :placeholder="$t('please_enter_a_email')" type="text" :disabled="isReadOnly" />
+                        <InputGroup v-model="form.name" :modelValueError="form.errors.name" :vueError="$v.name"
+                            :label="$t('name')" :placeholder="$t('please_enter_a_name')" type="text"
+                            :disabled="isReadOnly" />
+                        <span v-if="!$v.name">Name is required</span>
+
+                        <InputGroup v-model="form.email" :modelValueError="form.errors.email" :vueError="$v.email"
+                            :label="$t('email')" :placeholder="$t('please_enter_a_email')" type="text"
+                            :disabled="isReadOnly" />
+
                         <SelectSearchable :items="roleOptions" v-model:modelValue="form.roles"
                             :modelValueError="form.errors.roles" :label="$t('roles')"
                             :placeholder="$t('please_select_roles')" :disabled="isReadOnly" />
