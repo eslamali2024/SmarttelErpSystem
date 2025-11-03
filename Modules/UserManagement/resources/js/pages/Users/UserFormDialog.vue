@@ -31,7 +31,8 @@ const props = defineProps<{
         permissions?: any[]
     },
     roles?: string[],
-    permissions?: any
+    permissions?: any,
+    loading?: boolean
 }>();
 
 const { t } = useI18n();
@@ -50,11 +51,13 @@ const form = useForm({
 const $v = useVuelidate({
     name: { required, minLength: minLength(5), maxLength: maxLength(255) },
     email: { required, email },
+    roles: {
+        $each: { required }
+    },
 }, form)
 
 watch(() => props.item, (newItem) => {
     if (newItem) {
-        console.log(newItem);
         form.name = newItem?.user?.name ?? '';
         form.email = newItem?.user?.email ?? '';
         form.roles = newItem?.roles ?? [];
@@ -62,6 +65,7 @@ watch(() => props.item, (newItem) => {
 
         roleOptions = props.roles?.map((role) => ({ value: role, label: role })) || [];
     }
+    $v.value.$reset();
 });
 
 /**
@@ -83,6 +87,7 @@ const submitForm = () => {
         onSuccess: () => {
             emit('update:show', false);
             form.reset();
+            $v.value.$reset();
         },
         onError: (e: any) => {
             console.error(e);
@@ -124,14 +129,13 @@ const title = computed(() => {
                         {{ title }}
                     </DialogTitle>
                 </DialogHeader>
-                <DialogDescription>
+                <DialogDescription :loading="loading">
                     <div class="grid grid-cols-1 gap-3 py-4">
-                        <InputGroup v-model="form.name" :modelValueError="form.errors.name" :vueError="$v.name"
+                        <InputGroup v-model="form.name" :modelValueError="form.errors.name" :vueError="$v?.name"
                             :label="$t('name')" :placeholder="$t('please_enter_a_name')" type="text"
                             :disabled="isReadOnly" />
-                        <span v-if="!$v.name">Name is required</span>
 
-                        <InputGroup v-model="form.email" :modelValueError="form.errors.email" :vueError="$v.email"
+                        <InputGroup v-model="form.email" :modelValueError="form.errors.email" :vueError="$v?.email"
                             :label="$t('email')" :placeholder="$t('please_enter_a_email')" type="text"
                             :disabled="isReadOnly" />
 
@@ -173,7 +177,7 @@ const title = computed(() => {
                 </DialogDescription>
                 <DialogFooter>
                     <ButtonSubmit :loading="form.processing" :submit="submitForm" v-if="!isReadOnly"
-                        :cancel="() => emit('update:show', false)">
+                        :disabled="props.loading" :cancel="() => emit('update:show', false)">
                         {{ $t('save') }}
                     </ButtonSubmit>
                     <Button v-else type="button" @click="() => emit('update:show', false)" class="cursor-pointer">

@@ -6,6 +6,8 @@ import TextareaGroup from '@/components/ui/textarea-group/TextareaGroup.vue';
 import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import ButtonSubmit from '@/components/ui/button/ButtonSubmit.vue';
+import { required, minLength, maxLength } from '@vuelidate/validators'
+import useVuelidate from '@vuelidate/core'
 
 const props = defineProps<{
     show: boolean,
@@ -15,7 +17,7 @@ const props = defineProps<{
     divisions?: {
         id: number
         name: string
-    },
+    }[],
     departments?: {
         id: number
         name: string
@@ -24,7 +26,8 @@ const props = defineProps<{
     managers?: {
         id: number
         name: string
-    }
+    }[],
+    loading: boolean
 }>();
 
 
@@ -38,19 +41,32 @@ const form = useForm({
     description: props.item?.description ?? '',
 });
 
+// Vuelidate
+const $v = useVuelidate({
+    name: { required, minLength: minLength(5), maxLength: maxLength(255) },
+    description: { maxLength: maxLength(2000) },
+    division_id: { required },
+    department_id: { required },
+}, form)
+
 watch(() => props.item, (newItem) => {
     form.name = newItem?.name ?? '';
     form.division_id = newItem?.division_id ?? '';
     form.department_id = newItem?.department_id ?? '';
     form.manager_id = newItem?.manager_id ?? '';
     form.description = newItem?.description ?? '';
+    $v.value.$reset();
 });
 
 const submitForm = () => {
+    $v.value.$touch()
+    if ($v.value.$invalid) return;
+
     const options = {
         onSuccess: () => {
             emit('update:show', false)
             form.reset();
+            $v.value.$reset();
         }
     };
 
@@ -82,30 +98,31 @@ const departmentOptions = computed(() => {
                     {{ props.method_type === 'post' ? $t('add_section') : $t('update_section') }}
                 </DialogTitle>
             </DialogHeader>
-            <DialogDescription>
+            <DialogDescription :loading="loading">
                 <div class="grid grid-cols-1 gap-3 py-4">
                     <InputGroup v-model="form.name" :modelValueError="form.errors.name" :label="$t('name')"
-                        :placeholder="$t('please_enter_a_name')" type="text" />
+                        :placeholder="$t('please_enter_a_name')" type="text" :vue-error="$v?.name" />
 
                     <SelectGroup v-model="form.division_id" :modelValueError="form.errors.division_id"
                         :label="$t('division')" :placeholder="$t('please_select_a_division')"
-                        :options="props.divisions || []" />
+                        :options="props.divisions || []" :vue-error="$v?.division_id" />
 
                     <SelectGroup v-model="form.department_id" :modelValueError="form.errors.department_id"
                         :label="$t('department')" :placeholder="$t('please_select_a_department')"
-                        :options="departmentOptions || []" />
+                        :options="departmentOptions || []" :vue-error="$v?.department_id" />
 
                     <SelectGroup v-model="form.manager_id" :modelValueError="form.errors.manager_id"
                         :label="$t('manager')" :placeholder="$t('please_select_a_manager')"
-                        :options="props.managers || []" />
+                        :options="props.managers || []" :vue-error="$v?.manager_id" />
 
                     <TextareaGroup v-model="form.description" :modelValueError="form.errors.description"
-                        :label="$t('description')" :placeholder="$t('please_enter_a_description')"
+                        :vue-error="$v?.description" :label="$t('description')"
+                        :placeholder="$t('please_enter_a_description')"
                         :placeholder_message="$t('please_enter_a_description')" />
                 </div>
             </DialogDescription>
             <DialogFooter>
-                <ButtonSubmit :loading="form.processing" :submit="submitForm"
+                <ButtonSubmit :loading="form.processing" :submit="submitForm" :disabled="loading"
                     :cancel="() => emit('update:show', false)">
                     {{ $t('save') }}
                 </ButtonSubmit>

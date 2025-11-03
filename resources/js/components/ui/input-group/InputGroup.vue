@@ -26,7 +26,7 @@ const model = computed({
     <div class="w-full">
         <Label>{{ props.label }}</Label>
         <Input :type="props.type || 'text'" :placeholder="props.placeholder" v-model="model" :disabled="props.disabled"
-            @input="vueError?.$touch()" @blur="vueError?.$touch()" />
+            @blur="vueError.$touch()" />
         <p v-if="props.modelValueError || vueError?.$errors[0]?.$message" class="text-sm text-red-500 mt-2">
             {{ props.modelValueError || vueError?.$errors[0]?.$message }}
         </p>

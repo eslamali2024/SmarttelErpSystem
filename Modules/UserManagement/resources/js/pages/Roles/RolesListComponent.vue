@@ -19,7 +19,6 @@ import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
 import { reactive, watch, ref } from 'vue';
 import rolesRoute from '@/routes/user-management/roles';
-import Card from '@/components/ui/Card.vue';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import RoleFormDialog from './RoleFormDialog.vue';
@@ -29,6 +28,13 @@ import axios from 'axios'
 import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
 import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
 import Can from '@/components/ui/Auth/Can.vue';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardFooter
+} from '@/components/ui/card';
 
 const { t } = useI18n();
 const breadcrumbs: BreadcrumbItem[] = [
@@ -65,6 +71,7 @@ watch(search, () => {
 
 
 // Form Data
+const showLoading = ref(false)
 const showFormDialog = ref(false)
 const currentItem = ref<any>(null)
 const method_type = ref("post");
@@ -118,6 +125,7 @@ async function fetchRoleDetails(item?: any): Promise<void> {
  * @param {any} item - The item to be edited, or null for adding a new item
  */
 const toggleFormDialog = async (item?: any, actionType?: string) => {
+    showLoading.value = true
     showFormDialog.value = true
     currentItem.value = item
 
@@ -131,6 +139,8 @@ const toggleFormDialog = async (item?: any, actionType?: string) => {
         method_type.value = "post"
         action.value = rolesRoute.store().url
     }
+
+    showLoading.value = false
 }
 
 // Delete Modal
@@ -165,17 +175,19 @@ const deleteRole = () => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Card>
-            <template #header>
-                <h4>{{ $t('roles') }}</h4>
+            <CardHeader class="flex justify-between items-center">
+                <CardTitle>
+                    {{ $t('roles') }}
+                </CardTitle>
                 <Can permissions="role_create">
                     <Button v-on:click="toggleFormDialog(null)"
                         class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
                         <i class="ri ri-add-line"></i> {{ $t("add_role") }}
                     </Button>
                 </Can>
-            </template>
+            </CardHeader>
 
-            <template #body>
+            <CardContent>
                 <Table>
                     <TableCaption>{{ $t('roles') }}</TableCaption>
                     <TableHeader>
@@ -214,13 +226,13 @@ const deleteRole = () => {
                         </TableEmpty>
                     </TableFooter>
                 </Table>
-            </template>
+            </CardContent>
 
-            <template #footer>
+            <CardFooter>
                 <PaginationUse :items="props.roles?.links || []" :total="props.roles?.total || 0"
                     :itemsPerPage="props.roles?.per_page || 10" :currentPage="props.roles?.current_page || 1"
                     :defaultPage="1" />
-            </template>
+            </CardFooter>
         </Card>
     </AppLayout>
 
@@ -230,6 +242,6 @@ const deleteRole = () => {
 
     <Can :permissions="['role_create', 'role_show', 'role_edit']">
         <RoleFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
-            :permissions="permissionsCache" :item="currentItem" />
+            :permissions="permissionsCache" :item="currentItem" :loading="showLoading" />
     </Can>
 </template>

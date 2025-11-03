@@ -19,13 +19,13 @@ import Input from '@/components/ui/input/Input.vue';
 import { reactive, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import divisionsRoute from '@/routes/hr/organization/divisions';
-// import Card from '@/components/ui/Card.vue';
-import Card from '@/components/ui/card/Card.vue';
-import CardHeader from '@/components/ui/card/CardHeader.vue';
-import CardTitle from '@/components/ui/card/CardTitle.vue';
-import CardContent from '@/components/ui/card/CardContent.vue';
-import CardDescription from '@/components/ui/card/CardDescription.vue';
-import CardFooter from '@/components/ui/card/CardFooter.vue';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardFooter
+} from '@/components/ui/card';
 import { ref } from 'vue';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
@@ -36,7 +36,14 @@ import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
 import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
 import Can from '@/components/ui/Auth/Can.vue';
 
+// Master Data
 const { t } = useI18n();
+const showFormDialog = ref(false)
+const currentItem = ref<any>(null)
+const method_type = ref("post");
+const action = ref(divisionsRoute.store().url);
+const showLoading = ref(false)
+
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
     { title: t('hr'), href: null },
@@ -75,15 +82,12 @@ watch(search, () => {
     })
 }, { deep: true });
 
-
-// Form Data
-const showFormDialog = ref(false)
-const currentItem = ref<any>(null)
-
-const method_type = ref("post");
-const action = ref(divisionsRoute.store().url);
-
+/**
+ * Toggle the form dialog for adding or editing a division
+ * @param {any} item - The item to be edited, or null for adding a new item
+ */
 const toggleFormDialog = (item?: any) => {
+    showLoading.value = true
     showFormDialog.value = true;
     currentItem.value = item;
 
@@ -94,8 +98,9 @@ const toggleFormDialog = (item?: any) => {
         method_type.value = "post";
         action.value = divisionsRoute.store().url;
     }
-}
 
+    showLoading.value = false
+}
 
 // Delete Modal
 const showDeleteModal = ref(false)
@@ -106,6 +111,13 @@ const toggleShowDeleteModal = (division: any) => {
     showDeleteModal.value = true
 }
 
+/**
+ * Delete a division
+ *
+ * If the division exists, toggle the isDeleting flag to true, and make a DELETE request to the server.
+ * On success, toggle the showDeleteModal flag to false, set the currentItem to null, and toggle the isDeleting flag to false.
+ * On error, toggle the isDeleting flag to false.
+ */
 const deleteDivision = () => {
     if (!currentItem.value) return
     isDeleting.value = true
@@ -136,21 +148,20 @@ const toggleShowDialog = (poisiton: any) => {
     <Head :title="$t('divisions')" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-            
         <Card>
-            <CardHeader>
-                <CardTitle class="flex justify-between px-6 pb-6">
+            <CardHeader class="flex justify-between items-center">
+                <CardTitle>
                     {{ $t('divisions') }}
-                    <Can permissions="division_create">
-                        <Button v-on:click="toggleFormDialog(null)"
-                            class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
-                            <i class="ri ri-add-line"></i> {{ $t("add_division") }}
-                        </Button>
-                    </Can>
                 </CardTitle>
+                <Can permissions="division_create">
+                    <Button v-on:click="toggleFormDialog(null)"
+                        class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
+                        <i class="ri ri-add-line"></i> {{ $t("add_division") }}
+                    </Button>
+                </Can>
             </CardHeader>
             <CardContent>
-                 <Table>
+                <Table>
                     <TableCaption>{{ $t('divisions') }}</TableCaption>
                     <TableHeader>
                         <TableRow>
@@ -218,6 +229,6 @@ const toggleShowDialog = (poisiton: any) => {
 
     <Can :permissions="['division_create', 'division_edit']">
         <DivisionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
-            :managers="props.managers" :item="currentItem" />
+            :loading="showLoading" :managers="props.managers" :item="currentItem" />
     </Can>
 </template>

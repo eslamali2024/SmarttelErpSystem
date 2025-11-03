@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-vue-next";
 
 const props = defineProps<{
     loading: boolean,
+    disabled?: boolean,
     submit?: () => void,
     cancel?: () => void,
 }>();
@@ -19,7 +20,7 @@ const props = defineProps<{
     <!-- Submit button -->
     <Button v-if="submit" type="button" @click="submit"
         :class="['bg-green-500/50 cursor-pointer text-white hover:bg-green-600', { 'opacity-50 cursor-not-allowed': loading }]"
-        :disabled="loading">
+        :disabled="loading || disabled">
         <Loader2 v-if="loading" class="w-4 h-4 animate-spin mr-2" />
         <slot />
     </Button>

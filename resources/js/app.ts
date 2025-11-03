@@ -2,22 +2,28 @@ import '../css/app.css';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
-import { createApp, h } from 'vue';
+import { createApp, h, watch } from 'vue';
 import { initializeTheme } from './composables/useAppearance';
 import 'remixicon/fonts/remixicon.css';
 import { createI18n } from 'vue-i18n';
 import en from './locales/en';
 import ar from './locales/ar';
+import { useLang } from './composables/useLang';
 
 // Sit General Messages
 const generalMessages = { en, ar };
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const { lang } = useLang();
 
-const i18n = createI18n({
+// Sit Language for Site
+export const i18n = createI18n({
     legacy: false,
-    locale: 'en',
+    locale: lang.value,
     fallbackLocale: 'en',
     messages: generalMessages
+});
+watch(lang, (newLang) => {
+    i18n.global.locale.value = newLang;
 });
 
 createInertiaApp({
