@@ -3,6 +3,7 @@
 namespace Modules\UserManagement\Http\Controllers;
 
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Gate;
 use Modules\UserManagement\Models\Role;
 use App\Http\Controllers\TransactionController;
 use Modules\UserManagement\Services\RoleService;
@@ -19,6 +20,8 @@ class RoleController extends TransactionController
      */
     public function index()
     {
+        abort_if(Gate::denies('role_access'), 403);
+
         return Inertia::render($this->path . 'RolesListComponent', [
             'roles' => Role::filter(request()->query() ?? [])->paginate(request('perPage', 10)),
         ]);
@@ -30,6 +33,8 @@ class RoleController extends TransactionController
      */
     public function create()
     {
+        abort_if(Gate::denies('role_create'), 403);
+
         return response()->json([
             $this->roleService->getParentPermissions()
         ]);
@@ -43,6 +48,8 @@ class RoleController extends TransactionController
      */
     public function show(Role $role)
     {
+        abort_if(Gate::denies('role_show'), 403);
+
         return response()->json([
             'role'        => $role,
             'permissions' => $role?->permissions()?->pluck('name')?->toArray() ?? []
@@ -54,6 +61,8 @@ class RoleController extends TransactionController
      */
     public function store(RoleRequest $request)
     {
+        abort_if(Gate::denies('role_create'), 403);
+
         return $this->withTransaction(function () use ($request) {
             $this->roleService->store($request->validated());
             return redirect()->route('user-management.roles.index', ['page' => request('page', 1)]);
@@ -65,6 +74,8 @@ class RoleController extends TransactionController
      */
     public function update(RoleRequest $request, Role $role)
     {
+        abort_if(Gate::denies('role_edit'), 403);
+
         return $this->withTransaction(function () use ($request, $role) {
             $this->roleService->update($role, $request->validated());
             return redirect()->route('user-management.roles.index', ['page' => request('page', 1)]);
@@ -76,6 +87,8 @@ class RoleController extends TransactionController
      */
     public function destroy(Role $role)
     {
+        abort_if(Gate::denies('role_delete'), 403);
+
         return $this->withTransaction(function () use ($role) {
             $this->roleService->destroy($role);
             return redirect()->route('user-management.roles.index');

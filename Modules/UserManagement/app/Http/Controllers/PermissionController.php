@@ -3,6 +3,7 @@
 namespace Modules\UserManagement\Http\Controllers;
 
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Gate;
 use Modules\UserManagement\Models\Permission;
 use App\Http\Controllers\TransactionController;
 use Modules\UserManagement\Services\PermissionService;
@@ -19,6 +20,8 @@ class PermissionController extends TransactionController
      */
     public function index()
     {
+        abort_if(Gate::denies('permission_access'), 403);
+
         return Inertia::render($this->path . 'PermissionsListComponent', [
             'permissions' => Permission::filter(request()->query() ?? [])->paginate(10),
         ]);
@@ -29,6 +32,8 @@ class PermissionController extends TransactionController
      */
     public function store(PermissionRequest $request)
     {
+        abort_if(Gate::denies('permission_create'), 403);
+
         return $this->withTransaction(function () use ($request) {
             $this->roleService->store($request->validated());
             return redirect()->route('user-management.permissions.index');
@@ -40,6 +45,8 @@ class PermissionController extends TransactionController
      */
     public function update(PermissionRequest $request, Permission $permission)
     {
+        abort_if(Gate::denies('permission_edit'), 403);
+
         return $this->withTransaction(function () use ($request, $permission) {
             $this->roleService->update($permission, $request->validated());
             return redirect()->route('user-management.permissions.index');
@@ -51,6 +58,8 @@ class PermissionController extends TransactionController
      */
     public function destroy(Permission $permission)
     {
+        abort_if(Gate::denies('permission_delete'), 403);
+
         return $this->withTransaction(function () use ($permission) {
             $this->roleService->destroy($permission);
             return redirect()->route('user-management.permissions.index');

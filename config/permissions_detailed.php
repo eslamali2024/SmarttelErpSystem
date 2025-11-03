@@ -79,4 +79,19 @@ return [
             ],
         ]
     ],
+
+    // 'CRM' => [
+    //     'id'               => 'crm',
+    //     'access'           => 'crm_access',
+    //     'title'            => 'CRM',
+    //     'children'      => []
+    // ],
+
+    // 'Supply Chain' => [
+    //     'id'               => 'supply_chain',
+    //     'access'           => 'supply_chain_access',
+    //     'title'            => 'Supply Chain',
+    //     'children'      => []
+    // ],
+
 ];

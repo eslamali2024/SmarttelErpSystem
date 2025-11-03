@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import { watch, computed } from 'vue';
+import { computed } from 'vue';
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import TextareaGroup from '@/components/ui/textarea-group/TextareaGroup.vue';
 import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import ButtonSubmit from '@/components/ui/button/ButtonSubmit.vue';
 import { required, minLength, maxLength } from '@vuelidate/validators'
-import useVuelidate from '@vuelidate/core'
+import { useDynamicForm } from '@/composables/useDynamicForm';
 
 const props = defineProps<{
     show: boolean,
@@ -17,7 +16,7 @@ const props = defineProps<{
     divisions?: {
         id: number
         name: string
-    }[],
+    },
     departments?: {
         id: number
         name: string
@@ -33,31 +32,25 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:show']);
 
-const form = useForm({
-    name: props.item?.name ?? '',
-    department_id: props.item?.department_id ?? '',
-    division_id: props.item?.division_id ?? '',
-    section_id: props.item?.section_id ?? '',
-    description: props.item?.description ?? '',
-});
-
 // Vuelidate
-const $v = useVuelidate({
-    name: { required, minLength: minLength(5), maxLength: maxLength(255) },
-    description: { maxLength: maxLength(2000) },
-    division_id: { required },
-    department_id: { required },
-    section_id: { required },
-}, form)
+const formSchema = (props: any) => ({
+    formStructure: {
+        name: props.item?.name ?? '',
+        department_id: props.item?.department_id ?? '',
+        division_id: props.item?.division_id ?? '',
+        section_id: props.item?.section_id ?? '',
+        description: props.item?.description ?? '',
+    },
+    validationRules: {
+        name: { required, minLength: minLength(5), maxLength: maxLength(255) },
+        description: { maxLength: maxLength(2000) },
+        division_id: { required },
+        department_id: { required },
+        section_id: { required },
+    }
+})
 
-watch(() => props.item, (newItem) => {
-    form.name = newItem?.name ?? '';
-    form.department_id = newItem?.department_id ?? '';
-    form.division_id = newItem?.division_id ?? '';
-    form.section_id = newItem?.section_id ?? '';
-    form.description = newItem?.description ?? '';
-    $v.value.$reset();
-});
+const { form, $v } = useDynamicForm(props, formSchema)
 
 const submitForm = () => {
     $v.value.$touch()

@@ -243,7 +243,7 @@ const toggleShowDialog = (position: any) => {
 
     <Can :permissions="['position_create', 'position_edit']">
         <PositionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
-            :departments="props.departments" :divisions="props.divisions" :sections="props.sections" :item="currentItem"
-            :loading="showLoading" />
+            :departments="props?.departments" :divisions="props.divisions" :sections="props?.sections"
+            :item="currentItem" :loading="showLoading" />
     </Can>
 </template>

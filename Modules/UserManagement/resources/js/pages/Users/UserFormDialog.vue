@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
 import { watch, computed } from 'vue';
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import { Dialog, DialogScrollContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
@@ -19,7 +18,7 @@ import {
 } from "@/components/ui/card"
 import RoleModules from '@modules/UserManagement/resources/js/components/RoleModules.vue';
 import { required, email, minLength, maxLength } from '@vuelidate/validators'
-import useVuelidate from '@vuelidate/core'
+import { useDynamicForm } from '@/composables/useDynamicForm';
 
 const props = defineProps<{
     show: boolean,
@@ -39,34 +38,28 @@ const { t } = useI18n();
 const emit = defineEmits(['update:show']);
 let roleOptions = props.roles?.map((role) => ({ value: role, label: role })) || [];
 const isReadOnly = computed(() => props.method_type === 'show')
-const form = useForm({
-    name: props.item?.user?.name ?? '',
-    email: props.item?.user?.email ?? '',
-    roles: Array.isArray(props.item?.roles) ? props.item.roles : [],
-    permissions: props.item?.permissions ?? []
-
+watch(() => props.item, () => {
+    roleOptions = props.roles?.map((role) => ({ value: role, label: role })) || [];
 });
 
 // Vuelidate
-const $v = useVuelidate({
-    name: { required, minLength: minLength(5), maxLength: maxLength(255) },
-    email: { required, email },
-    roles: {
-        $each: { required }
+const formSchema = (props: any) => ({
+    formStructure: {
+        name: props.item?.user?.name ?? '',
+        email: props.item?.user?.email ?? '',
+        roles: Array.isArray(props.item?.roles) ? props.item.roles : [],
+        permissions: props.item?.permissions ?? []
     },
-}, form)
-
-watch(() => props.item, (newItem) => {
-    if (newItem) {
-        form.name = newItem?.user?.name ?? '';
-        form.email = newItem?.user?.email ?? '';
-        form.roles = newItem?.roles ?? [];
-        form.permissions = newItem?.permissions ?? [];
-
-        roleOptions = props.roles?.map((role) => ({ value: role, label: role })) || [];
+    validationRules: {
+        name: { required, minLength: minLength(5), maxLength: maxLength(255) },
+        email: { required, email },
+        roles: {
+            $each: { required }
+        },
     }
-    $v.value.$reset();
-});
+})
+
+const { form, $v } = useDynamicForm(props, formSchema)
 
 /**
  * Submits the form data to the server.
