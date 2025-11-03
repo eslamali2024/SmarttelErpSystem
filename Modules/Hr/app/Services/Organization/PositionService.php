@@ -1,6 +1,6 @@
 <?php
 
-namespace  Modules\Hr\Services;
+namespace Modules\Hr\Services\Organization;
 
 use Modules\Hr\Models\Position;
 

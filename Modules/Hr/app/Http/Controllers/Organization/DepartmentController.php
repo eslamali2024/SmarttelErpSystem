@@ -7,9 +7,9 @@ use Inertia\Inertia;
 use Modules\Hr\Models\Division;
 use Modules\Hr\Models\Department;
 use Illuminate\Support\Facades\Gate;
-use Modules\Hr\Services\DepartmentService;
 use App\Http\Controllers\TransactionController;
-use Modules\Hr\Http\Requests\DepartmentRequest;
+use Modules\Hr\Services\Organization\DepartmentService;
+use Modules\Hr\Http\Requests\Organization\DepartmentRequest;
 
 class DepartmentController extends TransactionController
 {

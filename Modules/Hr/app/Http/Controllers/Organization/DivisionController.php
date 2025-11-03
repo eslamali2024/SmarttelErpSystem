@@ -6,9 +6,9 @@ use App\Models\User;
 use Inertia\Inertia;
 use Modules\Hr\Models\Division;
 use Illuminate\Support\Facades\Gate;
-use Modules\Hr\Services\DivisionService;
-use Modules\Hr\Http\Requests\DivisionRequest;
 use App\Http\Controllers\TransactionController;
+use Modules\Hr\Services\Organization\DivisionService;
+use Modules\Hr\Http\Requests\Organization\DivisionRequest;
 
 class DivisionController extends TransactionController
 {

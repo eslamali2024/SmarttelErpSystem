@@ -77,6 +77,13 @@ return [
                     ],
                 ]
             ],
+            'Employees' => [
+                'Create'                    => 'employee_create',
+                'Edit'                      => 'employee_edit',
+                'Show'                      => 'employee_show',
+                'Delete'                    => 'employee_delete',
+                'List'                      => 'employee_access',
+            ]
         ]
     ],
 
