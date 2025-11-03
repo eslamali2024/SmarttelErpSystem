@@ -42,4 +42,5 @@ export default {
     appearance: 'Appearance',
     settings_description: 'Customize the appearance of the application',
     settings: 'Settings',
+    employees: 'Employees',
 }

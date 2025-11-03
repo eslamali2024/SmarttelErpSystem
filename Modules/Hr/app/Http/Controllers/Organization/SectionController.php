@@ -8,9 +8,9 @@ use Modules\Hr\Models\Section;
 use Modules\Hr\Models\Division;
 use Modules\Hr\Models\Department;
 use Illuminate\Support\Facades\Gate;
-use Modules\Hr\Services\SectionService;
-use Modules\Hr\Http\Requests\SectionRequest;
 use App\Http\Controllers\TransactionController;
+use Modules\Hr\Services\Organization\SectionService;
+use Modules\Hr\Http\Requests\Organization\SectionRequest;
 
 class SectionController extends TransactionController
 {

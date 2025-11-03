@@ -7,10 +7,10 @@ use Modules\Hr\Models\Section;
 use Modules\Hr\Models\Division;
 use Modules\Hr\Models\Position;
 use Modules\Hr\Models\Department;
-use Modules\Hr\Services\PositionService;
-use Modules\Hr\Http\Requests\PositionRequest;
-use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Gate;
+use App\Http\Controllers\TransactionController;
+use Modules\Hr\Services\Organization\PositionService;
+use Modules\Hr\Http\Requests\Organization\PositionRequest;
 
 class PositionController extends TransactionController
 {

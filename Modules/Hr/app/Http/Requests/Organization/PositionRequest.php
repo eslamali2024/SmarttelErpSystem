@@ -1,10 +1,10 @@
 <?php
 
-namespace Modules\Hr\Http\Requests;
+namespace Modules\Hr\Http\Requests\Organization;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DepartmentRequest extends FormRequest
+class PositionRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -12,10 +12,12 @@ class DepartmentRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'code'          => ['nullable', 'string', 'max:255'],
             'name'          => ['required', 'string', 'max:255'],
-            'division_id'   => ['nullable', 'exists:divisions,id'],
-            'manager_id'    => ['nullable', 'exists:users,id'],
             'description'   => ['nullable', 'string', 'max:2000'],
+            'department_id' => ['nullable', 'exists:departments,id'],
+            'division_id'   => ['nullable', 'exists:divisions,id'],
+            'section_id'    => ['nullable', 'exists:sections,id'],
         ];
     }
 

@@ -33,7 +33,7 @@ class PermissionsTableSeeder extends Seeder
     private function getHRModules(): array
     {
         return [
-            // Dashboard
+            // Modules
             'dashboard_access',
             'hr_access',
             'usermanagement_access',
@@ -72,6 +72,13 @@ class PermissionsTableSeeder extends Seeder
             'position_edit',
             'position_delete',
             'position_show',
+
+            // Employees
+            'employee_access',
+            'employee_create',
+            'employee_edit',
+            'employee_delete',
+            'employee_show',
         ];
     }
     private function getUserManagementModules(): array

@@ -143,6 +143,14 @@ class ModuleSeeder extends Seeder
                 'status'            => true,
                 'parent_key'        => 'organization',
             ],
+            [
+                'name'              => 'employees',
+                'icon'              => 'ri-user-fill',
+                'path'              => 'hr/employees',
+                'permission_title'  => 'employee_access',
+                'status'            => true,
+                'parent_key'        => 'hr',
+            ],
         ];
     }
 
