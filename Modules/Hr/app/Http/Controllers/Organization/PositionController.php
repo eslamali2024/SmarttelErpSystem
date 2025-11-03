@@ -7,9 +7,10 @@ use Modules\Hr\Models\Section;
 use Modules\Hr\Models\Division;
 use Modules\Hr\Models\Position;
 use Modules\Hr\Models\Department;
-use Modules\Hr\Services\PositionService;
-use Modules\Hr\Http\Requests\PositionRequest;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\TransactionController;
+use Modules\Hr\Services\Organization\PositionService;
+use Modules\Hr\Http\Requests\Organization\PositionRequest;
 
 class PositionController extends TransactionController
 {
@@ -22,6 +23,8 @@ class PositionController extends TransactionController
      */
     public function index()
     {
+        abort_if(Gate::denies('position_access'), 403);
+
         return Inertia::render($this->path . 'PositionsListComponent', [
             'positions'     => Position::with(['department', 'division', 'section'])->filter(request()->query() ?? [])->paginate(10),
             'divisions'     => Division::pluck('name', 'id'),
@@ -35,6 +38,8 @@ class PositionController extends TransactionController
      */
     public function store(PositionRequest $request)
     {
+        abort_if(Gate::denies('position_create'), 403);
+
         return $this->withTransaction(function () use ($request) {
             $this->positionService->store($request->validated());
             return redirect()->route('hr.organization.positions.index');
@@ -46,6 +51,8 @@ class PositionController extends TransactionController
      */
     public function update(PositionRequest $request, Position $position)
     {
+        abort_if(Gate::denies('position_edit'), 403);
+
         return $this->withTransaction(function () use ($request, $position) {
             $this->positionService->update($position, $request->validated());
             return redirect()->route('hr.organization.positions.index');
@@ -57,6 +64,8 @@ class PositionController extends TransactionController
      */
     public function destroy(Position $position)
     {
+        abort_if(Gate::denies('position_delete'), 403);
+
         return $this->withTransaction(function () use ($position) {
             $this->positionService->destroy($position);
             return redirect()->route('hr.organization.positions.index');

@@ -4,11 +4,12 @@ namespace Modules\Hr\Http\Controllers\Organization;
 
 use App\Models\User;
 use Inertia\Inertia;
-use Modules\Hr\Models\Department;
-use App\Http\Controllers\TransactionController;
-use Modules\Hr\Services\DepartmentService;
-use Modules\Hr\Http\Requests\DepartmentRequest;
 use Modules\Hr\Models\Division;
+use Modules\Hr\Models\Department;
+use Illuminate\Support\Facades\Gate;
+use App\Http\Controllers\TransactionController;
+use Modules\Hr\Services\Organization\DepartmentService;
+use Modules\Hr\Http\Requests\Organization\DepartmentRequest;
 
 class DepartmentController extends TransactionController
 {
@@ -21,6 +22,8 @@ class DepartmentController extends TransactionController
      */
     public function index()
     {
+        abort_if(Gate::denies('department_access'), 403);
+
         return Inertia::render($this->path . 'DepartmentsListComponent', [
             'departments' => Department::with(['manager', 'division'])->filter(request()->query() ?? [])->paginate(10),
             'divisions'   => Division::pluck('name', 'id'),
@@ -33,6 +36,8 @@ class DepartmentController extends TransactionController
      */
     public function store(DepartmentRequest $request)
     {
+        abort_if(Gate::denies('department_create'), 403);
+
         return $this->withTransaction(function () use ($request) {
             $this->departmentService->store($request->validated());
             return redirect()->route('hr.organization.departments.index');
@@ -44,6 +49,8 @@ class DepartmentController extends TransactionController
      */
     public function update(DepartmentRequest $request, Department $department)
     {
+        abort_if(Gate::denies('department_edit'), 403);
+
         return $this->withTransaction(function () use ($request, $department) {
             $this->departmentService->update($department, $request->validated());
             return redirect()->route('hr.organization.departments.index');
@@ -55,6 +62,8 @@ class DepartmentController extends TransactionController
      */
     public function destroy(Department $department)
     {
+        abort_if(Gate::denies('department_delete'), 403);
+
         return $this->withTransaction(function () use ($department) {
             $this->departmentService->destroy($department);
             return redirect()->route('hr.organization.departments.index');

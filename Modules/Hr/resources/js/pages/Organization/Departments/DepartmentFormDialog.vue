@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import { watch } from 'vue';
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import TextareaGroup from '@/components/ui/textarea-group/TextareaGroup.vue';
 import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import ButtonSubmit from '@/components/ui/button/ButtonSubmit.vue';
 import { required, minLength, maxLength } from '@vuelidate/validators'
-import useVuelidate from '@vuelidate/core'
+import { useDynamicForm } from '@/composables/useDynamicForm';
 
 const props = defineProps<{
     show: boolean,
@@ -17,37 +15,32 @@ const props = defineProps<{
     divisions?: {
         id: number
         name: string
-    }[],
+    },
     managers?: {
         id: number
         name: string
-    }[],
+    },
     loading?: boolean
 }>();
 
 const emit = defineEmits(['update:show']);
 
-const form = useForm({
-    name: props.item?.name ?? '',
-    division_id: props.item?.division_id ?? '',
-    manager_id: props.item?.manager_id ?? '',
-    description: props.item?.description ?? '',
-});
-
 // Vuelidate
-const $v = useVuelidate({
-    name: { required, minLength: minLength(1), maxLength: maxLength(255) },
-    description: { maxLength: maxLength(2000) },
-    division_id: { required },
-}, form)
+const formSchema = (props: any) => ({
+    formStructure: {
+        name: props.item?.name ?? '',
+        division_id: props.item?.division_id ?? '',
+        manager_id: props.item?.manager_id ?? '',
+        description: props.item?.description ?? '',
+    },
+    validationRules: {
+        name: { required, minLength: minLength(1), maxLength: maxLength(255) },
+        description: { maxLength: maxLength(2000) },
+        division_id: { required },
+    }
+})
 
-watch(() => props.item, (newItem) => {
-    form.name = newItem?.name ?? '';
-    form.division_id = newItem?.division_id ?? '';
-    form.manager_id = newItem?.manager_id ?? '';
-    form.description = newItem?.description ?? '';
-    $v.value.$reset();
-});
+const { form, $v } = useDynamicForm(props, formSchema)
 
 const submitForm = () => {
     $v.value.$touch()

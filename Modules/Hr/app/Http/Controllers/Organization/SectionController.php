@@ -7,9 +7,10 @@ use Inertia\Inertia;
 use Modules\Hr\Models\Section;
 use Modules\Hr\Models\Division;
 use Modules\Hr\Models\Department;
-use Modules\Hr\Services\SectionService;
-use Modules\Hr\Http\Requests\SectionRequest;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\TransactionController;
+use Modules\Hr\Services\Organization\SectionService;
+use Modules\Hr\Http\Requests\Organization\SectionRequest;
 
 class SectionController extends TransactionController
 {
@@ -22,6 +23,8 @@ class SectionController extends TransactionController
      */
     public function index()
     {
+        abort_if(Gate::denies('section_access'), 403);
+
         return Inertia::render($this->path . 'SectionsListComponent', [
             'sections'    => Section::with(['manager', 'division', 'department'])->filter(request()->query() ?? [])->paginate(10),
             'divisions'   => Division::pluck('name', 'id'),
@@ -35,6 +38,8 @@ class SectionController extends TransactionController
      */
     public function store(SectionRequest $request)
     {
+        abort_if(Gate::denies('section_create'), 403);
+
         return $this->withTransaction(function () use ($request) {
             $this->sectionService->store($request->validated());
             return redirect()->route('hr.organization.sections.index');
@@ -46,6 +51,8 @@ class SectionController extends TransactionController
      */
     public function update(SectionRequest $request, Section $section)
     {
+        abort_if(Gate::denies('section_edit'), 403);
+
         return $this->withTransaction(function () use ($request, $section) {
             $this->sectionService->update($section, $request->validated());
             return redirect()->route('hr.organization.sections.index');
@@ -57,6 +64,8 @@ class SectionController extends TransactionController
      */
     public function destroy(Section $section)
     {
+        abort_if(Gate::denies('section_delete'), 403);
+
         return $this->withTransaction(function () use ($section) {
             $this->sectionService->destroy($section);
             return redirect()->route('hr.organization.sections.index');

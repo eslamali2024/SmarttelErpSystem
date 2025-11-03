@@ -2,7 +2,6 @@
 import {
     Pagination,
     PaginationContent,
-    PaginationEllipsis,
     PaginationItem,
     PaginationNext,
     PaginationPrevious,
@@ -34,7 +33,7 @@ const goTo = (url: string) => {
             <PaginationPrevious v-if="items[props.currentPage - 2]"
                 v-on:click="goTo(items[props.currentPage - 1].url)" />
 
-            <template v-for="(item, index) in items" :key="index">
+            <template v-for="(item, index) in items" :key="index" v-if="items.length > 1">
                 <PaginationItem :value="parseInt(item.label)" :is-active="item.active" v-on:click="goTo(item.url)">
                     {{ item.label }}
                 </PaginationItem>

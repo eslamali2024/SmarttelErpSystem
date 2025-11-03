@@ -77,6 +77,28 @@ return [
                     ],
                 ]
             ],
+            'Employees' => [
+                'Create'                    => 'employee_create',
+                'Edit'                      => 'employee_edit',
+                'Show'                      => 'employee_show',
+                'Delete'                    => 'employee_delete',
+                'List'                      => 'employee_access',
+            ]
         ]
     ],
+
+    // 'CRM' => [
+    //     'id'               => 'crm',
+    //     'access'           => 'crm_access',
+    //     'title'            => 'CRM',
+    //     'children'      => []
+    // ],
+
+    // 'Supply Chain' => [
+    //     'id'               => 'supply_chain',
+    //     'access'           => 'supply_chain_access',
+    //     'title'            => 'Supply Chain',
+    //     'children'      => []
+    // ],
+
 ];

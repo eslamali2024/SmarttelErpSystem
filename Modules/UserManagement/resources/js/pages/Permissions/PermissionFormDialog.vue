@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import { watch } from 'vue';
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import ButtonSubmit from '@/components/ui/button/ButtonSubmit.vue';
 import { required, minLength, maxLength } from '@vuelidate/validators'
-import useVuelidate from '@vuelidate/core'
+import { useDynamicForm } from '@/composables/useDynamicForm';
 
 const props = defineProps<{
     show: boolean,
@@ -18,19 +16,19 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:show']);
 
-const form = useForm({
-    name: props.item?.name ?? '',
-});
-
 // Vuelidate
-const $v = useVuelidate({
-    name: { required, minLength: minLength(5), maxLength: maxLength(255) },
-}, form)
+const formSchema = (props: any) => ({
+    formStructure: {
+        name: props.item?.name ?? '',
 
-watch(() => props.item, (newItem) => {
-    form.name = newItem?.name ?? '';
-    $v.value.$reset();
-});
+    },
+    validationRules: {
+        name: { required, minLength: minLength(5), maxLength: maxLength(255) },
+    }
+})
+
+const { form, $v } = useDynamicForm(props, formSchema)
+
 
 const submitForm = () => {
     $v.value.$touch()
