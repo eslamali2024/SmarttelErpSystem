@@ -23,8 +23,30 @@ const props = defineProps<{
     action: string,
     item?: any,
     genders?: any,
-    marital_statuess?: any
+    marital_statuess?: any,
+    auto_generate_code?: string,
+    divisions?: {
+        id: number
+        name: string
+    },
+    departments?: {
+        id: number
+        name: string
+        division_id: number
+    }[],
+    sections?: {
+        id: number
+        name: string
+        department_id: number
+    }[],
+    positions?: {
+        id: number
+        name: string
+        section_id: number
+    }[],
 }>();
+
+
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
@@ -37,13 +59,17 @@ const stepIndex = ref(1);
 const steps = ref([
     { step: 1, title: t('basic_data'), status: 'active', form: null },
     { step: 2, title: t('contract'), status: 'inactive', form: null },
-    { step: 3, title: t('salary'), status: 'inactive', form: null },
+    // { step: 3, title: t('salary'), status: 'inactive', form: null },
 ]);
+
+watch(steps, () => {
+    console.log(steps.value)
+
+}, { deep: true })
 
 // Disable "Next" button if current step is not complete or it's the last step
 const isNextDisabledComputed = computed(() => {
-    const currentStep = steps.value.find(s => s.step === stepIndex.value);
-    return currentStep?.status !== 'complete' || stepIndex.value > steps.value.length;
+    return stepIndex.value !== steps.value.length;
 });
 
 // Handle form submission
@@ -52,15 +78,13 @@ const form = ref(null);
 
 const mergeSteps = () => {
     steps.value.forEach(step => {
-        if (step.form) {
-            step.form = {
-                ...step.form,
-                errors: {}
-            };
+        if (!step.form) step.form = {};
+        if (!step.form.errors) step.form.errors = {};
 
+        if (step.form) {
             data.value = {
                 ...data.value,
-                ['step_' + step.step]: { ...step.form }
+                ['step_' + step.step]: { ...step.form, errors: undefined }
             };
         }
     });
@@ -68,71 +92,89 @@ const mergeSteps = () => {
     form.value = useForm(data.value);
 };
 
-const submitForm = () => {
+/**
+ * Submits the form by calling the `validateAllSteps` method and then
+ * the `put` or `post` method of the `form` depending on the `method_type` prop.
+ * If `validateAllSteps` returns true, the `onSuccess` option is called with a callback
+ * that resets the form and clears all the errors of the steps.
+ * If `validateAllSteps` returns false, the `onError` option is called with a callback
+ * that sets the errors of the steps based on the server errors.
+ */
+const submitForm = async () => {
     mergeSteps();
 
     if (stepIndex.value === steps.value.length) {
+        console.log(steps.value)
+        const canSubmit = await validateAllSteps();
+        if (canSubmit) {
+            const options = {
+                onSuccess: () => {
+                    form.value.reset();
+                    steps.value.forEach(step => {
+                        if (step.form) step.form.errors = {};
+                    });
+                },
+                onError: (serverErrors) => {
+                    Object.keys(serverErrors).forEach(key => {
+                        // key = "step_1.name" -> split to stepKey & field
+                        const [stepKey, field] = key.split('.');
+                        const stepNumber = parseInt(stepKey.replace('step_', ''), 10);
+                        stepIndex.value = stepNumber;
 
-        const options = {
-            onSuccess: () => {
-                form.value?.reset();
-                steps.value.forEach(step => {
-                    if (step.form) step.form.errors = {};
-                });
-            },
-            onError: (serverErrors) => {
-                Object.keys(serverErrors).forEach(key => {
-                    // key = "step_1.name" -> split to stepKey & field
-                    const [stepKey, field] = key.split('.');
-                    const stepNumber = parseInt(stepKey.replace('step_', ''), 10);
+                        const step = steps.value.find(s => s.step === stepNumber);
+                        if (step && step.form) {
+                            if (!step.form.errors) step.form.errors = {};
+                            step.form.errors[field] = serverErrors[key];
+                        } else {
+                            if (!step.form) step.form = {};
+                            if (!step.form.errors) step.form.errors = {};
 
-                    const step = steps.value.find(s => s.step === stepNumber);
-                    if (step && step.form) {
-                        if (!step.form.errors) step.form.errors = {};
-                        step.form.errors[field] = serverErrors[key];
-                    }
-                });
+                            step.form.errors = {
+                                ...step.form.errors,
+                                [field]: serverErrors[key]
+                            };
+                        }
+                    });
 
-                console.log('Step-wise errors:', steps.value);
+                }
+            };
+
+            if (props.method_type === 'post') {
+                form.value?.post(props.action, options);
+            } else if (props.method_type === 'put') {
+                form.value?.put(props.action, options);
             }
-        };
-
-        if (props.method_type === 'post') {
-            form.value?.post(props.action, options);
-        } else if (props.method_type === 'put') {
-            form.value?.put(props.action, options);
         }
     }
 };
 
-// Track validated steps
-const checkValidatedStep = ref(null);
-const pendingValidation = ref({});
+
+// Validation
+const step_1 = ref<{ checkValidation?: () => Promise<boolean> | boolean } | null>(null);
+const step_2 = ref<{ checkValidation?: () => Promise<boolean> | boolean } | null>(null);
+
+const validateAllSteps = async () => {
+    const results = await Promise.all([
+        step_1.value && typeof step_1.value.checkValidation === 'function'
+            ? Promise.resolve(step_1.value.checkValidation())
+            : Promise.resolve(false),
+        step_2.value && typeof step_2.value.checkValidation === 'function'
+            ? Promise.resolve(step_2.value.checkValidation())
+            : Promise.resolve(false),
+    ]);
 
 
-// Validate a step
-const validateStep = (index, data) => {
-    const step = steps.value.find(s => s.step === index);
-    if (!step) return;
-
-    step.status = data.status ? 'complete' : 'active';
-
-    step.form = data.form;
-
-    // Update the next step to active if current is complete
-    if (data.status && index < steps.value.length) {
-        const nextStep = steps.value.find(s => s.step === index + 1);
-        if (nextStep && nextStep.status === 'inactive') {
-            nextStep.status = 'active';
-        }
+    if (results.every(r => r === true)) {
+        return true;
+    } else {
+        results.forEach((result, index) => {
+            if (result === false) {
+                stepIndex.value = index + 1;
+            }
+        })
+        return false;
     }
-};
-
-watch(checkValidatedStep, (newVal) => {
-    if (pendingValidation.value.step === newVal) {
-        validateStep(pendingValidation.value.step, pendingValidation.value);
-    }
-});
+}
 </script>
 
 <template>
@@ -180,15 +222,13 @@ watch(checkValidatedStep, (newVal) => {
                         </div>
 
                         <div class="flex flex-col gap-4 mt-4">
-                            <BasicData v-if="stepIndex === 1" :step="1" :form="steps[0].form"
-                                :checkValidatedStep="checkValidatedStep"
-                                @validation="val => pendingValidation = { step: 1, ...val }"
+                            <BasicData v-show="stepIndex === 1" :step="1" v-model:form="steps[0].form" ref="step_1"
+                                :item="props.item" :auto_generate_code="auto_generate_code"
                                 :marital_statuess="marital_statuess" :genders="genders" />
 
-                            <Contract v-if="stepIndex === 2" :step="2" :form="steps[1].form"
-                                :checkValidatedStep="checkValidatedStep"
-                                @validation="val => pendingValidation = { step: 2, ...val }"
-                                :marital_statuess="marital_statuess" :genders="genders" />
+                            <Contract v-show="stepIndex === 2" :step="2" v-model:form="steps[1].form" ref="step_2"
+                                :item="props.item?.contract" :divisions="divisions" :departments="departments"
+                                :sections="sections" :positions="positions" />
 
                             <!-- <BasicData v-if="stepIndex === 2" />
                             <BasicData v-if="stepIndex === 3" /> -->
@@ -199,14 +239,13 @@ watch(checkValidatedStep, (newVal) => {
                                 Back
                             </Button>
                             <div class="flex items-center gap-3">
-                                <Button v-if="stepIndex !== steps.length" size="sm" @click="() => {
-                                    checkValidatedStep = stepIndex
-                                    if (isNextDisabledComputed) return
+                                <Button v-if="isNextDisabledComputed" size="sm" @click="() => {
                                     nextStep()
+
                                 }">
                                     Next
                                 </Button>
-                                <Button v-if="stepIndex === steps.length" size="sm" type="submit">
+                                <Button v-else size="sm" type="submit">
                                     Submit
                                 </Button>
                             </div>

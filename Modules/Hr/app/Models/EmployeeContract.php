@@ -48,7 +48,7 @@ class EmployeeContract extends Model
      */
     public function contractPositions(): HasMany
     {
-        return $this->hasMany(ContractPosition::class);
+        return $this->hasMany(ContractPosition::class, 'contract_id');
     }
 
     /**
@@ -58,8 +58,8 @@ class EmployeeContract extends Model
      *
      * @return \Modules\Hr\Models\ContractPosition|null
      */
-    public function currentContractPosition(): HasOne
+    public function currentPosition(): HasOne
     {
-        return $this->contractPositions()->where('status', ContractStatusEnum::ACTIVE)->first();
+        return $this->hasOne(ContractPosition::class, 'contract_id')->where('status', ContractStatusEnum::ACTIVE);
     }
 }

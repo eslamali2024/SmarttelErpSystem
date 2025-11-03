@@ -16,4 +16,11 @@ return [
     'dob'                   => 'Date of Birth',
     'address'               => 'Address',
     'notes'                 => 'Notes',
+    'division'              => 'Division',
+    'department'            => 'Department',
+    'section'               => 'Section',
+    'position'              => 'Position',
+    'start_date'            => 'Start Date',
+    'end_date'              => 'End Date',
+    'employee_code'         => 'Employee Code',
 ];

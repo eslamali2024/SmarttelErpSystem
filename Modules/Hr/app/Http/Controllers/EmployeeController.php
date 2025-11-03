@@ -2,15 +2,13 @@
 
 namespace Modules\Hr\Http\Controllers;
 
-use App\Models\User;
 use Inertia\Inertia;
 use Modules\Hr\Models\Employee;
 use Illuminate\Support\Facades\Gate;
 use Modules\Hr\Services\EmployeeService;
 use Modules\Hr\Http\Requests\EmployeeRequest;
 use App\Http\Controllers\TransactionController;
-use Modules\Hr\Enums\GenderEnum;
-use Modules\Hr\Enums\MaritalStatusEnum;
+use Modules\Hr\Transformers\EmployeeResource;
 
 class EmployeeController extends TransactionController
 {
@@ -26,8 +24,7 @@ class EmployeeController extends TransactionController
         abort_if(Gate::denies('employee_access'), 403);
 
         return Inertia::render($this->path . 'EmployeesListComponent', [
-            'employees'     => Employee::with('manager')->filter(request()->query() ?? [])->paginate(request('perPage', 10)),
-            'managers'      => User::pluck('name', 'id'),
+            'employees'     => Employee::filter(request()->query() ?? [])->paginate(request('perPage', 10)),
         ]);
     }
 
@@ -41,10 +38,9 @@ class EmployeeController extends TransactionController
         abort_if(Gate::denies('employee_create'), 403);
 
         return Inertia::render($this->path . 'EmployeeFormComponent', [
-            'method_type'       => 'post',
-            'action'            => route('hr.employees.store'),
-            'genders'           => GenderEnum::items(),
-            'marital_statuess'  => MaritalStatusEnum::items(),
+            'method_type'        => 'post',
+            'action'             => route('hr.employees.store'),
+            ...$this->employeeService->getInitilizeData()
         ]);
     }
 
@@ -62,6 +58,21 @@ class EmployeeController extends TransactionController
     }
 
     /**
+     * Show the details of the given employee.
+     *
+     * @param  \Modules\Hr\Models\Employee  $employee
+     * @return \Inertia\Response
+     */
+    public function show(Employee $employee)
+    {
+        abort_if(Gate::denies('employee_show'), 403);
+
+        return Inertia::render($this->path . 'EmployeeShowComponent', [
+            'employee' => $employee
+        ]);
+    }
+
+    /**
      * Show the form for editing the given employee.
      *
      * @param  \Modules\Hr\Models\Employee  $employee
@@ -70,11 +81,15 @@ class EmployeeController extends TransactionController
     public function edit(Employee $employee)
     {
         abort_if(Gate::denies('employee_create'), 403);
+        $employee->load([
+            'currentContract.currentPosition'
+        ]);
 
         return Inertia::render($this->path . 'EmployeeFormComponent', [
-            'employee'      => $employee,
-            'method_type'   => 'put',
-            'action'        => route('hr.employees.update', $employee)
+            'item'               => new EmployeeResource($employee),
+            'method_type'        => 'put',
+            'action'             => route('hr.employees.update', $employee),
+            ...$this->employeeService->getInitilizeData()
         ]);
     }
 

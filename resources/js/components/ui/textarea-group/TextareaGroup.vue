@@ -32,7 +32,7 @@ const model = computed({
         <p class="text-sm text-muted-foreground">
             {{ props.placeholder_message }}
         </p>
-        <p v-if="props.modelValueError" class="text-sm text-red-500 mt-2">
+        <p v-if="props.modelValueError || vueError?.$errors[0]?.$message" class="text-sm text-red-500 mt-2">
             {{ props.modelValueError || vueError?.$errors[0]?.$message }}
         </p>
 

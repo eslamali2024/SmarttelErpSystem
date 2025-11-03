@@ -67,4 +67,11 @@ export default {
     notes: 'Notes',
     please_enter_a_notes: 'Please enter a notes',
     please_enter_a_address: 'Please enter a address',
+    position: 'Position',
+    please_select_a_position: 'Please select a position',
+    start_date: 'Start Date',
+    end_date: 'End Date',
+    please_enter_a_end_date: 'Please enter a end date',
+    please_enter_a_start_date: 'Please enter a start date',
+
 }

@@ -6,7 +6,10 @@ use App\Traits\ScopeFilter;
 use Modules\Hr\Enums\GenderEnum;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Hr\Enums\MaritalStatusEnum;
+use Modules\Hr\Enums\ContractStatusEnum;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Employee extends Model
 {
@@ -36,4 +39,29 @@ class Employee extends Model
         'joining_date'      => 'date',
         'dob'               => 'date',
     ];
+
+    public static function autoGenerateCode()
+    {
+        return 'EMP-' . str_pad(Employee::count() + 1, 5, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Get the employee contracts.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(EmployeeContract::class, 'employee_id');
+    }
+
+    /**
+     * Get the current active contract of the employee.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function currentContract(): HasOne
+    {
+        return $this->hasOne(EmployeeContract::class, 'employee_id')->where('status', ContractStatusEnum::ACTIVE);
+    }
 }

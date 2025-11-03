@@ -81,11 +81,6 @@ watch(search, () => {
 const showDeleteModal = ref(false)
 const isDeleting = ref(false)
 
-const toggleShowDeleteModal = (employee: any) => {
-    currentItem.value = employee
-    showDeleteModal.value = true
-}
-
 const deleteSection = () => {
     if (!currentItem.value) return
     isDeleting.value = true
@@ -180,8 +175,8 @@ const deleteSection = () => {
                             <TableCell class="text-center">{{ employee.status ?? '-' }}</TableCell>
                             <TableCell class="text-center flex">
                                 <TableActions class="text-center flex justify-center" canShow="employee_show"
-                                    :show="employeeRoute.show(employee.id).url" canEdit="employee_edit"
-                                    :edit="employeeRoute.edit(employee.id).url" canDelete="employee_delete"
+                                    :show="employeesRoute.show(employee.id).url" canEdit="employee_edit"
+                                    :edit="employeesRoute.edit(employee.id).url" canDelete="employee_delete"
                                     :delete="() => toggleShowDeleteModal(employee)" />
                             </TableCell>
                         </TableRow>
