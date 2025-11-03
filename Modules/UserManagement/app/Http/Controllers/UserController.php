@@ -4,6 +4,7 @@ namespace Modules\UserManagement\Http\Controllers;
 
 use App\Models\User;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Gate;
 use Modules\UserManagement\Models\Role;
 use Modules\UserManagement\Models\Permission;
 use App\Http\Controllers\TransactionController;
@@ -22,6 +23,8 @@ class UserController extends TransactionController
      */
     public function index()
     {
+        abort_if(Gate::denies('user_access'), 403);
+
         return Inertia::render($this->path . 'UsersListComponent', [
             'users' => User::with('roles')->filter(request()->query() ?? [])->paginate(request('perPage', 10)),
         ]);
@@ -34,6 +37,8 @@ class UserController extends TransactionController
      */
     public function create()
     {
+        abort_if(Gate::denies('user_create'), 403);
+
         return response()->json([
             'roles'       => Role::pluck('name')->toArray(),
             'permissions' => $this->roleService->getParentPermissions()
@@ -48,6 +53,8 @@ class UserController extends TransactionController
      */
     public function show(User $user)
     {
+        abort_if(Gate::denies('user_show'), 403);
+
         return response()->json([
             'user'        => $user,
             'roles'       => $user?->roles()?->pluck('name')?->toArray() ?? [],
@@ -60,6 +67,8 @@ class UserController extends TransactionController
      */
     public function update(UserRequest $request, User $user)
     {
+        abort_if(Gate::denies('user_edit'), 403);
+
         return $this->withTransaction(function () use ($request, $user) {
             $this->userService->update($user, $request->validated());
             return redirect()->route('user-management.users.index', ['page' => request('page', 1)]);
@@ -71,6 +80,8 @@ class UserController extends TransactionController
      */
     public function destroy(User $user)
     {
+        abort_if(Gate::denies('user_delete'), 403);
+
         return $this->withTransaction(function () use ($user) {
             $this->userService->destroy($user);
             return redirect()->route('user-management.users.index');

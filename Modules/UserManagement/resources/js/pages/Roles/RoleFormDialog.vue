@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import { watch, computed } from 'vue';
+import { computed } from 'vue';
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import { Dialog, DialogScrollContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import ButtonSubmit from '@/components/ui/button/ButtonSubmit.vue';
@@ -19,7 +18,7 @@ import RoleModules from '@modules/UserManagement/resources/js/components/RoleMod
 import { useI18n } from 'vue-i18n';
 import Button from '@/components/ui/button/Button.vue';
 import { required, minLength, maxLength } from '@vuelidate/validators'
-import useVuelidate from '@vuelidate/core'
+import { useDynamicForm } from '@/composables/useDynamicForm';
 
 const props = defineProps<{
     show: boolean,
@@ -36,24 +35,20 @@ const props = defineProps<{
 const { t } = useI18n();
 const emit = defineEmits(['update:show']);
 const isReadOnly = computed(() => props.method_type === 'show')
-const form = useForm({
-    name: props.item?.role?.name ?? '',
-    permissions: props.item?.permissions ?? []
-});
 
 // Vuelidate
-const $v = useVuelidate({
-    name: { required, minLength: minLength(5), maxLength: maxLength(255) },
-    permissions: {
-        $each: { required }
+const formSchema = (props: any) => ({
+    formStructure: {
+        name: props.item?.role?.name ?? '',
+        permissions: props.item?.permissions ?? []
+    },
+    validationRules: {
+        name: { required, minLength: minLength(5), maxLength: maxLength(255) },
+        permissions: { $each: { required } }
     }
-}, form)
+})
 
-watch(() => props.item, (newItem) => {
-    form.name = newItem?.role?.name ?? '';
-    form.permissions = newItem?.permissions ?? [];
-    $v.value.$reset();
-});
+const { form, $v } = useDynamicForm(props, formSchema)
 
 /**
  * Submits the form data to the server.
