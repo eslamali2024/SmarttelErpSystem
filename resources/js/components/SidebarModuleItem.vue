@@ -19,18 +19,37 @@ const props = defineProps<{
     auth_permissions: AuthPermissions[]
 }>()
 
+// Import the recursive component
+import SidebarModuleItem from './SidebarModuleItem.vue'
 
 function hasPermission(module: Module) {
     if (!module.permission_title) return true;
-
     const permValues = props.auth_permissions;
     return permValues.includes(module.permission_title);
 }
+
+// Check if current URL is part of this module or any of its children
+function isInModulePath(module: Module): boolean {
+    // Check if current URL matches this module's path
+    if (page.url.startsWith(module.path)) {
+        return true;
+    }
+
+    // Recursively check children
+    if (module.children) {
+        return module.children.some(child => isInModulePath(child));
+    }
+
+    return false;
+}
+
+// Determine if collapsible should be open by default
+const shouldBeOpen = isInModulePath(props.module);
 </script>
 
 <template>
-    <Collapsible v-if="module.children && module.children.length && hasPermission(module)" v-slot="{ open }" defaultOpen
-        class="group/collapsible">
+    <Collapsible v-if="module.children && module.children.length && hasPermission(module)" v-slot="{ open }"
+        :defaultOpen="shouldBeOpen" class="group/collapsible">
         <SidebarMenuItem>
             <SidebarMenuButton as-child>
                 <CollapsibleTrigger asChild>
@@ -62,7 +81,7 @@ function hasPermission(module: Module) {
         <SidebarMenuButton as-child class="w-full">
             <Link :href="module.path" :class="{
                 'flex items-center gap-2 w-full': true,
-                'bg-gray-200 dark:bg-gray-600/50': page.url.includes(module.path),
+                'bg-gray-200 dark:bg-gray-600/50': page.url.startsWith(module.path),
             }">
             <i v-if="module.icon" :class="module.icon"></i>
             <span class="text-nowrap">{{ $t(module.name).substring(0, 20) }}</span>
