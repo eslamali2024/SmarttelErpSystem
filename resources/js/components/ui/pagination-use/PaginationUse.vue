@@ -19,7 +19,7 @@ interface Props extends PrimitiveProps {
 }
 
 const props = defineProps<Props>();
-let items = props.items.splice(1, props.items.length - 2);
+let items = (props.items).splice(1, props.items.length - 2);
 
 // methods
 const goTo = (url: string) => {

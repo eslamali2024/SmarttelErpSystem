@@ -5,7 +5,7 @@ import { Dialog, DialogScrollContent, DialogHeader, DialogTitle, DialogFooter, D
 import ButtonSubmit from '@/components/ui/button/ButtonSubmit.vue';
 import { useI18n } from 'vue-i18n';
 import Button from '@/components/ui/button/Button.vue';
-import SelectSearchable from '@/components/ui/SelectSearchable.vue';
+import SelectTags from '@/components/ui/tags-input/SelectTags.vue';
 import {
     Tabs,
     TabsContent,
@@ -132,7 +132,7 @@ const title = computed(() => {
                             :label="$t('email')" :placeholder="$t('please_enter_a_email')" type="text"
                             :disabled="isReadOnly" />
 
-                        <SelectSearchable :items="roleOptions" v-model:modelValue="form.roles"
+                        <SelectTags :options="roleOptions" v-model:modelValue="form.roles"
                             :modelValueError="form.errors.roles" :label="$t('roles')"
                             :placeholder="$t('please_select_roles')" :disabled="isReadOnly" />
 

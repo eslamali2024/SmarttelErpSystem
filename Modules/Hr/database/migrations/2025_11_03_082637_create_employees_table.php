@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Modules\Hr\Enums\ContractStatusEnum;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -25,6 +26,7 @@ return new class extends Migration
             $table->date('joining_date')->nullable();
             $table->string('national_id')->nullable();
             $table->text('notes', 2000)->nullable();
+            $table->integer('status')->default(ContractStatusEnum::ACTIVE)->nullable()->comment('1 = Active, 2 = Inactive in enum ContractStatusEnum.php');
             $table->softDeletes();
             $table->timestamps();
         });

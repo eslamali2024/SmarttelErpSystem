@@ -1,111 +1,131 @@
 <script setup lang="ts">
-import { watch } from 'vue'
+import { nextTick, computed, watch } from 'vue'
 import { useDynamicForm } from '@/composables/useDynamicForm';
-import { required, minLength, maxLength, email } from '@vuelidate/validators'
-import InputGroup from '@/components/ui/input-group/InputGroup.vue';
+import { required, maxLength } from '@vuelidate/validators'
 import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
+import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import TextareaGroup from '@/components/ui/textarea-group/TextareaGroup.vue';
 
+// Props
 const props = defineProps<{
     item?: any,
-    genders?: any,
-    marital_statuess?: any,
+    divisions?: {
+        id: number
+        name: string
+    },
+    departments?: { id: number; name: string; division_id: number }[],
+    sections?: { id: number; name: string; department_id: number }[],
+    positions?: { id: number; name: string; section_id: number }[],
     step: number,
-    checkValidatedStep?: any,
     form: any,
 }>();
 
-const emit = defineEmits(['validation']);
+const emit = defineEmits(['update:form']);
 
-// Vuelidate
+// Vuelidate schema
 const formSchema = (props: any) => ({
     formStructure: {
-        employee_code: props.form?.employee_code ?? '',
-        name: props.form?.name ?? '',
-        name_ar: props.form?.name_ar ?? '',
-        email: props.form?.email ?? '',
-        gender: props.form?.gender ?? '',
-        marital_status: props.form?.marital_status ?? '',
-        phone: props.form?.phone ?? '',
-        joining_date: props.form?.joining_date ?? '',
-        national_id: props.form?.national_id ?? '',
-        dob: props.form?.dob ?? '',
-        address: props.form?.address ?? '',
-        notes: props.form?.notes ?? '',
+        division_id: props.item?.division_id ?? '',
+        department_id: props.item?.department_id ?? '',
+        section_id: props.item?.section_id ?? '',
+        position_id: props.item?.position_id ?? '',
+        start_date: props.item?.start_date ?? new Date().toISOString().split('T')[0],
+        end_date: props.item?.end_date ?? '',
+        notes: props.item?.notes ?? '',
     },
     validationRules: {
-        employee_code: { required, minLength: minLength(2), maxLength: maxLength(255) },
-        name: { required, minLength: minLength(5), maxLength: maxLength(255) },
-        name_ar: { required, minLength: minLength(5), maxLength: maxLength(255) },
-        email: { required, minLength: minLength(5), maxLength: maxLength(255), email },
-        marital_status: { required },
-        joining_date: { required },
-        dob: { required },
-        address: { required, maxLength: maxLength(2000) },
-        phone: { required },
-        national_id: { required, minLength: minLength(14), maxLength: maxLength(14) },
+        division_id: { required },
+        department_id: { required },
+        section_id: { required },
+        position_id: { required },
+        start_date: { required },
+        end_date: { required },
         notes: { maxLength: maxLength(2000) },
-        gender: { required },
     }
 })
 
 const { form, $v } = useDynamicForm(props, formSchema)
 
+
+// Computed options
+const departmentOptions = computed(() => {
+    return props.departments
+        ?.filter(d => String(d.division_id) === String(form.division_id))
+        .map(d => ({ value: d.id, label: d.name })) ?? [];
+});
+
+const sectionOptions = computed(() => {
+    return props.sections
+        ?.filter(s => String(s.department_id) === String(form.department_id))
+        .map(s => ({ value: s.id, label: s.name })) ?? [];
+});
+
+const positionOptions = computed(() => {
+    return props.positions
+        ?.filter(p => String(p.section_id) === String(form.section_id))
+        .map(p => ({ value: p.id, label: p.name })) ?? [];
+});
+
+// Watch form to emit changes to parent
 watch(
-    [form, () => props.checkValidatedStep, () => props.step, () => props.form],
-    () => {
-        if (props.checkValidatedStep === props.step) {
-            $v.value.$touch();
+    [form, () => props.item],
+    ([newForm, newItem]) => {
+        if (newItem && Object.keys(newItem).length > 0) {
+            emit('update:form', newForm);
+            return;
         }
 
-        emit('validation', {
-            status: !$v.value.$invalid,
-            form: form
-        });
+        if (JSON.stringify(newForm) !== JSON.stringify(props.form)) {
+            emit('update:form', newForm);
+        }
+
+        // Calculate end date
+        if (form.start_date && !isNaN(new Date(form.start_date).getTime())) {
+            const start = new Date(form.start_date);
+            const end = new Date(start);
+            end.setFullYear(start.getFullYear() + 1);
+            form.end_date = end.toISOString().split('T')[0];
+        }
     },
     { deep: true, immediate: true }
 );
 
+// Validation check
+const checkValidation = async () => {
+    $v.value.$touch();
+    await nextTick();
 
+    return $v.value.$errors.length === 0;
+}
+
+defineExpose({ checkValidation })
 </script>
+
 <template>
     <div class="grid grid-cols-2 gap-3 py-4">
-        <InputGroup v-model="form.code" :modelValueError="form.errors.code" :label="$t('employee_code')"
-            :placeholder="$t('please_enter_a_employee_code')" type="text" :vue-error="$v?.code" class="col-span-2" />
+        <InputGroup v-model="form.start_date" :modelValueError="props.form?.errors?.start_date"
+            :label="$t('start_date')" :placeholder="$t('please_enter_a_start_date')" type="date"
+            :vue-error="$v?.start_date" />
 
-        <InputGroup v-model="form.name" :modelValueError="form.errors.name" :label="$t('name')"
-            :placeholder="$t('please_enter_a_name')" type="text" :vue-error="$v?.name" />
+        <InputGroup v-model="form.end_date" :modelValueError="props.form?.errors?.end_date" :label="$t('end_date')"
+            :placeholder="$t('please_enter_a_end_date')" type="date" :vue-error="$v?.end_date" />
 
-        <InputGroup v-model="form.name_ar" :modelValueError="form.errors.name_ar" :label="$t('name_ar')"
-            :placeholder="$t('please_enter_a_name_ar')" type="text" :vue-error="$v?.name_ar" />
+        <SelectGroup v-model="form.division_id" :modelValueError="props.form?.errors?.division_id"
+            :label="$t('division')" :placeholder="$t('please_select_a_division')" :vue-error="$v?.division_id"
+            :options="props.divisions" />
 
-        <InputGroup v-model="form.email" :modelValueError="form.errors.email" :label="$t('email')"
-            :placeholder="$t('please_enter_a_email')" type="email" :vue-error="$v?.email" />
+        <SelectGroup v-model="form.department_id" :modelValueError="props.form?.errors?.department_id"
+            :label="$t('department')" :placeholder="$t('please_select_a_department')" :vue-error="$v?.department_id"
+            :options="departmentOptions" />
 
-        <InputGroup v-model="form.phone" :modelValueError="form.errors.phone" :label="$t('phone')"
-            :placeholder="$t('please_enter_a_phone')" type="text" :vue-error="$v?.phone" />
+        <SelectGroup v-model="form.section_id" :modelValueError="props.form?.errors?.section_id" :label="$t('section')"
+            :placeholder="$t('please_select_a_section')" :vue-error="$v?.section_id" :options="sectionOptions" />
 
-        <SelectGroup v-model="form.gender" :modelValueError="form.errors.gender" :label="$t('gender')"
-            :placeholder="$t('please_select_a_department')" :vue-error="$v?.gender" :options="props.genders || []" />
+        <SelectGroup v-model="form.position_id" :modelValueError="props.form?.errors?.position_id"
+            :label="$t('position')" :placeholder="$t('please_select_a_position')" :vue-error="$v?.position_id"
+            :options="positionOptions" />
 
-        <SelectGroup v-model="form.marital_status" :modelValueError="form.errors.marital_status"
-            :label="$t('marital_status')" :placeholder="$t('please_select_a_marital_status')"
-            :vue-error="$v?.marital_status" :options="props.marital_statuess || []" />
-
-        <InputGroup v-model="form.national_id" :modelValueError="form.errors.national_id" :label="$t('national_id')"
-            :placeholder="$t('please_enter_a_national_id')" type="text" :vue-error="$v?.national_id" />
-
-        <InputGroup v-model="form.joining_date" :modelValueError="form.errors.joining_date" :label="$t('joining_date')"
-            :placeholder="$t('please_enter_a_joining_date')" type="date" :vue-error="$v?.joining_date" />
-
-        <InputGroup v-model="form.dob" :modelValueError="form.errors.dob" :label="$t('dob')"
-            :placeholder="$t('please_enter_a_dob')" type="date" :vue-error="$v?.dob" />
-
-        <TextareaGroup v-model="form.address" :modelValueError="form.errors.address" :label="$t('address')"
-            :placeholder="$t('please_enter_a_address')" :vue-error="$v?.address"
-            :placeholder_message="$t('please_enter_a_address')" class="col-span-2" />
-
-        <TextareaGroup v-model="form.notes" :modelValueError="form.errors.notes" :label="$t('notes')"
+        <TextareaGroup v-model="form.notes" :modelValueError="props.form?.errors?.notes" :label="$t('notes')"
             :placeholder="$t('please_enter_a_notes')" :vue-error="$v?.notes"
             :placeholder_message="$t('please_enter_a_notes')" class="col-span-2" />
     </div>

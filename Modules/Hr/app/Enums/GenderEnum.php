@@ -22,4 +22,12 @@ enum GenderEnum: int
             self::FEMALE->value => self::FEMALE->label(),
         ];
     }
+    
+    public static function values(): array
+    {
+        return [
+            self::MALE->value,
+            self::FEMALE->value
+        ];
+    }
 }

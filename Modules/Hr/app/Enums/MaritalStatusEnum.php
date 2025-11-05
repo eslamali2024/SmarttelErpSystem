@@ -22,4 +22,12 @@ enum MaritalStatusEnum: int
             self::SINGLE->value => self::SINGLE->label(),
         ];
     }
+
+    public static function values(): array
+    {
+        return [
+            self::MARIED->value,
+            self::SINGLE->value
+        ];
+    }
 }
