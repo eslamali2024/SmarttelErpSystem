@@ -83,6 +83,27 @@ return [
                 'access'                    => 'hr_master_access',
 
                 'children'                  => [
+                    'Time Managements' => [
+                        'Create'                    => 'time_management_create',
+                        'Edit'                      => 'time_management_edit',
+                        'Show'                      => 'time_management_show',
+                        'Delete'                    => 'time_management_delete',
+                        'List'                      => 'time_management_access',
+                    ],
+                    'Work Schedules' => [
+                        'Create'                    => 'work_schedule_create',
+                        'Edit'                      => 'work_schedule_edit',
+                        'Show'                      => 'work_schedule_show',
+                        'Delete'                    => 'work_schedule_delete',
+                        'List'                      => 'work_schedule_access',
+                    ],
+                    'Work Schedule Rules' => [
+                        'Create'                    => 'work_schedule_rule_create',
+                        'Edit'                      => 'work_schedule_rule_edit',
+                        'Show'                      => 'work_schedule_rule_show',
+                        'Delete'                    => 'work_schedule_rule_delete',
+                        'List'                      => 'work_schedule_rule_access',
+                    ],
                     'Allowance Types' => [
                         'Create'                    => 'allowance_type_create',
                         'Edit'                      => 'allowance_type_edit',

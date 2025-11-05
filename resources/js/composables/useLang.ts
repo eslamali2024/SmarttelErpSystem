@@ -1,4 +1,6 @@
 import { ref } from 'vue';
+import axios from 'axios';
+import locale from '@/routes/locale';
 
 type Lang = 'ar' | 'en';
 
@@ -14,7 +16,7 @@ const getStoredLang = (): Lang | null => {
     return stored === 'ar' || stored === 'en' ? stored : null;
 };
 
-const lang = ref<Lang>('en');
+const lang = ref<Lang>(getStoredLang() || 'en');
 
 export function useLang() {
     if (typeof window !== 'undefined') {
@@ -28,10 +30,14 @@ export function useLang() {
         lang.value = value;
         localStorage.setItem('lang', value);
         setCookie('lang', value);
+        axios.get(locale.change(value).url).then(() => {
+            console.log('Language changed');
+        });
     }
 
     return {
         lang,
+        getStoredLang,
         updateLang,
     };
 }

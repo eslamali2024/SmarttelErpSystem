@@ -12,6 +12,7 @@ class DepartmentRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'code'          => ['nullable', 'string', 'max:255'],
             'name'          => ['required', 'string', 'max:255'],
             'division_id'   => ['nullable', 'exists:divisions,id'],
             'manager_id'    => ['nullable', 'exists:users,id'],
@@ -25,5 +26,21 @@ class DepartmentRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    /**
+     * Get the validation attributes that apply to the request.
+     *
+     * @return array
+     */
+    public function attributes(): array
+    {
+        return [
+            'code'          => __('hr.code'),
+            'name'          => __('hr.name'),
+            'division_id'   => __('hr.division'),
+            'manager_id'    => __('hr.manager'),
+            'description'   => __('hr.description'),
+        ];
     }
 }

@@ -27,4 +27,15 @@ class InsuranceCompanyRequest extends FormRequest
     {
         return true;
     }
+
+    public function attributes()
+    {
+        return [
+            'name'          => __('hr.name'),
+            'email'         => __('hr.email'),
+            'phone'         => __('hr.phone'),
+            'address'       => __('hr.address'),
+            'website'       => __('hr.website'),
+        ];
+    }
 }

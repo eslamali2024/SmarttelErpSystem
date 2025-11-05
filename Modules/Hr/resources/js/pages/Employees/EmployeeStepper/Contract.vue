@@ -9,13 +9,12 @@ import TextareaGroup from '@/components/ui/textarea-group/TextareaGroup.vue';
 // Props
 const props = defineProps<{
     item?: any,
-    divisions?: {
-        id: number
-        name: string
-    },
+    divisions?: { id: number; name: string },
     departments?: { id: number; name: string; division_id: number }[],
     sections?: { id: number; name: string; department_id: number }[],
     positions?: { id: number; name: string; section_id: number }[],
+    time_managements?: { id: number; name: string },
+    work_schedules?: { id: number; name: string },
     step: number,
     form: any,
 }>();
@@ -32,6 +31,8 @@ const formSchema = (props: any) => ({
         start_date: props.item?.start_date ?? new Date().toISOString().split('T')[0],
         end_date: props.item?.end_date ?? '',
         notes: props.item?.notes ?? '',
+        time_management_id: props.item?.time_management_id ?? '',
+        work_schedule_id: props.item?.work_schedule_id ?? '',
     },
     validationRules: {
         division_id: { required },
@@ -41,6 +42,8 @@ const formSchema = (props: any) => ({
         start_date: { required },
         end_date: { required },
         notes: { maxLength: maxLength(2000) },
+        time_management_id: { required },
+        work_schedule_id: { required },
     }
 })
 
@@ -124,6 +127,14 @@ defineExpose({ checkValidation })
         <SelectGroup v-model="form.position_id" :modelValueError="props.form?.errors?.position_id"
             :label="$t('position')" :placeholder="$t('please_select_a_position')" :vue-error="$v?.position_id"
             :options="positionOptions" />
+
+        <SelectGroup v-model="form.work_schedule_id" :modelValueError="props.form?.errors?.work_schedule_id"
+            :label="$t('work_schedule')" :placeholder="$t('please_select_a_work_schedule')"
+            :vue-error="$v?.work_schedule_id" :options="props.work_schedules" />
+
+        <SelectGroup v-model="form.time_management_id" :modelValueError="props.form?.errors?.time_management_id"
+            :label="$t('time_management')" :placeholder="$t('please_select_a_time_management')"
+            :vue-error="$v?.time_management_id" :options="props.time_managements" />
 
         <TextareaGroup v-model="form.notes" :modelValueError="props.form?.errors?.notes" :label="$t('notes')"
             :placeholder="$t('please_enter_a_notes')" :vue-error="$v?.notes"

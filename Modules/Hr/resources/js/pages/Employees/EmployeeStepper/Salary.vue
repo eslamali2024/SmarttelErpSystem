@@ -156,7 +156,7 @@ const getTotalOffCycleAllowance = () => {
 // Watch form to emit changes to parent
 watch(
     [form, () => props.item],
-    ([newForm, newItem], [prevForm, prevItem]) => {
+    ([newForm, newItem]) => {
         if (newItem && Object.keys(newItem).length > 0) {
             emit('update:form', newForm);
             return;
@@ -251,51 +251,75 @@ defineExpose({ checkValidation })
                 <TableBody>
                     <TableRow>
                         <TableCell class="text-center text-nowrap">{{ $t('net_salary') }}</TableCell>
-                        <TableCell class="text-center text-nowrap" v-text="form.net_salary"></TableCell>
+                        <TableCell class="text-center text-nowrap">
+                            <span v-text="form.net_salary"></span>
+                        </TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell class="text-center text-nowrap">{{ $t('gross_salary') }}</TableCell>
-                        <TableCell class="text-center text-nowrap" v-text="form.gross_salary"></TableCell>
+                        <TableCell class="text-center text-nowrap">
+                            <span v-text="form.gross_salary"></span>
+                        </TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell class="text-center text-nowrap">{{ $t('insurance_wage') }}</TableCell>
-                        <TableCell class="text-center text-nowrap" v-text="form.insurance_wage"></TableCell>
+                        <TableCell class="text-center text-nowrap">
+                            <span v-text="form.insurance_wage"></span>
+                        </TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell class="text-center text-nowrap">{{ $t('insurance_wage_rounded') }}</TableCell>
-                        <TableCell class="text-center text-nowrap" v-text="form.insurance_wage_rounded"></TableCell>
+                        <TableCell class="text-center text-nowrap">
+                            <span v-text="form.insurance_wage_rounded"></span>
+                        </TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell class="text-center text-nowrap">{{ $t('tax_monthly') }}</TableCell>
-                        <TableCell class="text-center text-nowrap" v-text="form.tax_monthly"></TableCell>
+                        <TableCell class="text-center text-nowrap">
+                            <span v-text="form.tax_monthly"></span>
+                        </TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell class="text-center text-nowrap">{{ $t('social_insurance') }}</TableCell>
-                        <TableCell class="text-center text-nowrap" v-text="form.social_insurance"></TableCell>
+                        <TableCell class="text-center text-nowrap">
+                            <span v-text="form.social_insurance"></span>
+                        </TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell class="text-center text-nowrap">{{ $t('martyrs_families_fund') }}</TableCell>
-                        <TableCell class="text-center text-nowrap" v-text="form.martyrs_families_fund"></TableCell>
+                        <TableCell class="text-center text-nowrap">
+                            <span v-text="form.martyrs_families_fund"></span>
+                        </TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell class="text-center text-nowrap">{{ $t('company_insurance') }}</TableCell>
-                        <TableCell class="text-center text-nowrap" v-text="form.company_insurance"></TableCell>
+                        <TableCell class="text-center text-nowrap">
+                            <span v-text="form.company_insurance"></span>
+                        </TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell class="text-center text-nowrap">{{ $t('salary_per_year') }}</TableCell>
-                        <TableCell class="text-center text-nowrap" v-text="form.salary_per_year"></TableCell>
+                        <TableCell class="text-center text-nowrap">
+                            <span v-text="form.salary_per_year"></span>
+                        </TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell class="text-center text-nowrap">{{ $t('salary_per_day') }}</TableCell>
-                        <TableCell class="text-center text-nowrap" v-text="form.salary_per_day"></TableCell>
+                        <TableCell class="text-center text-nowrap">
+                            <span v-text="form.salary_per_day"></span>
+                        </TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell class="text-center text-nowrap">{{ $t('salary_per_hour') }}</TableCell>
-                        <TableCell class="text-center text-nowrap" v-text="form.salary_per_hour"></TableCell>
+                        <TableCell class="text-center text-nowrap">
+                            <span v-text="form.salary_per_hour"></span>
+                        </TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell class="text-center text-nowrap">{{ $t('total_deductions') }}</TableCell>
-                        <TableCell class="text-center text-nowrap" v-text="form.total_deductions"></TableCell>
+                        <TableCell class="text-center text-nowrap">
+                            <span v-text="form.total_deductions"></span>
+                        </TableCell>
                     </TableRow>
                 </TableBody>
             </Table>
@@ -318,7 +342,8 @@ defineExpose({ checkValidation })
                             <TableHead class=" w-[100px] text-center text-nowrap" colspan="2">
                                 {{ $t('total_allowances') }}
                             </TableHead>
-                            <TableHead class="text-center text-nowrap" v-text="form.total_recurring_allowances">
+                            <TableHead class="text-center text-nowrap" >
+                                <span v-text="form.total_recurring_allowances"></span>
                             </TableHead>
                         </TableRow>
                         <TableRow>
@@ -354,7 +379,8 @@ defineExpose({ checkValidation })
                             <TableHead class=" w-[100px] text-center text-nowrap">
                                 {{ $t('total_off_cycle_allowances') }}
                             </TableHead>
-                            <TableHead class="text-center text-nowrap" v-text="form.total_off_cycle_allowances">
+                            <TableHead class="text-center text-nowrap">
+                                <span v-text="form.total_off_cycle_allowances"></span>
                             </TableHead>
                         </TableRow>
                         <TableRow>

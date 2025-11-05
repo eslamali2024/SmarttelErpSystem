@@ -76,6 +76,27 @@ class PermissionsTableSeeder extends Seeder
             // Master Data
             'hr_master_access',
 
+            // Time Managements
+            'time_management_access',
+            'time_management_create',
+            'time_management_edit',
+            'time_management_delete',
+            'time_management_show',
+
+            // Work Schedules
+            'work_schedule_access',
+            'work_schedule_create',
+            'work_schedule_edit',
+            'work_schedule_delete',
+            'work_schedule_show',
+
+            // Work Schedule Rules
+            'work_schedule_rule_access',
+            'work_schedule_rule_create',
+            'work_schedule_rule_edit',
+            'work_schedule_rule_delete',
+            'work_schedule_rule_show',
+
             // Allowance Types
             'allowance_type_access',
             'allowance_type_create',

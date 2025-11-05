@@ -29,16 +29,18 @@ class EmployeeFormResource extends JsonResource
             'national_id'      => $this->national_id,
             'address'          => $this->address,
             'notes'            => $this->notes,
-            'contract'        => [
-                'start_date'       => $this->currentContract?->start_date?->format('Y-m-d'),
-                'end_date'         => $this->currentContract?->end_date?->format('Y-m-d'),
-                'division_id'      => $this->currentContract?->currentPosition?->division_id,
-                'department_id'    => $this->currentContract?->currentPosition?->department_id,
-                'section_id'       => $this->currentContract?->currentPosition?->section_id,
-                'position_id'      => $this->currentContract?->currentPosition?->position_id,
-                'notes'            => $this->currentContract?->notes
+            'contract'         => [
+                'start_date'            => $this->currentContract?->start_date?->format('Y-m-d'),
+                'end_date'              => $this->currentContract?->end_date?->format('Y-m-d'),
+                'division_id'           => $this->currentContract?->currentPosition?->division_id,
+                'department_id'         => $this->currentContract?->currentPosition?->department_id,
+                'section_id'            => $this->currentContract?->currentPosition?->section_id,
+                'position_id'           => $this->currentContract?->currentPosition?->position_id,
+                'time_management_id'    => $this->currentContract?->time_management_id,
+                'work_schedule_id'      => $this->currentContract?->work_schedule_id,
+                'notes'                 => $this->currentContract?->notes
             ],
-            'salary'           => array_merge($this->initializeAllowances($this->currentContract?->allowances), $this->currentContract?->salary?->toArray()),
+            'salary'            => array_merge($this->initializeAllowances($this->currentContract?->allowances), $this->currentContract?->salary?->toArray()),
         ];
     }
 

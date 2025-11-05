@@ -46,7 +46,7 @@ class Employee extends Model
 
     public static function autoGenerateCode()
     {
-        return 'EMP-' . str_pad(Employee::count() + 1, 5, '0', STR_PAD_LEFT);
+        return str_pad(Employee::count() + 1, 5, '0', STR_PAD_LEFT);
     }
 
     /**
