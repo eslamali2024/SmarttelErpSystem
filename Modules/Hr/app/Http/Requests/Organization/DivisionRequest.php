@@ -12,6 +12,7 @@ class DivisionRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'code'          => ['nullable', 'string', 'max:255'],
             'name'          => ['required', 'string', 'max:255'],
             'manager_id'    => ['nullable', 'exists:users,id'],
             'description'   => ['nullable', 'string', 'max:2000'],
@@ -24,5 +25,20 @@ class DivisionRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+    
+    /**
+     * Get the validation attributes that apply to the request.
+     *
+     * @return array
+     */
+    public function attributes(): array
+    {
+        return [
+            'code'          => __('hr.code'),
+            'name'          => __('hr.name'),
+            'manager_id'    => __('hr.manager'),
+            'description'   => __('hr.description'),
+        ];
     }
 }

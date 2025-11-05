@@ -15,6 +15,8 @@ import { useI18n } from 'vue-i18n'
 import { type BreadcrumbItem } from '@/types';
 import { dashboard } from '@/routes';
 import { useForm } from '@inertiajs/vue3'
+import { Head } from '@inertiajs/vue3';
+
 
 const { t } = useI18n()
 
@@ -26,6 +28,14 @@ const props = defineProps<{
     marital_statuess?: any,
     auto_generate_code?: string,
     insurance_companies?: {
+        id: number
+        name: string
+    },
+    time_managements?: {
+        id: number
+        name: string
+    },
+    work_schedules?: {
         id: number
         name: string
     },
@@ -188,6 +198,9 @@ const nextStep = async () => {
 </script>
 
 <template>
+
+    <Head :title="props.method_type === 'post' ? $t('add_employee') : $t('edit_employee')" />
+
     <AppLayout :breadcrumbs="breadcrumbs">
         <Card>
             <CardHeader class="flex justify-between items-center">
@@ -238,7 +251,8 @@ const nextStep = async () => {
 
                             <Contract v-show="stepIndex === 2" :step="2" v-model:form="steps[1].form" ref="step_2"
                                 :item="props.item?.contract" :divisions="divisions" :departments="departments"
-                                :sections="sections" :positions="positions" />
+                                :sections="sections" :positions="positions" :work_schedules="work_schedules"
+                                :time_managements="time_managements" />
 
                             <Salary v-show="stepIndex === 3" :step="3" v-model:form="steps[2].form" ref="step_3"
                                 :item="props.item?.salary" :allowances="allowances"

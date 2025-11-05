@@ -28,4 +28,21 @@ class PositionRequest extends FormRequest
     {
         return true;
     }
+    
+    /**
+     * Get the validation attributes that apply to the request.
+     *
+     * @return array
+     */
+    public function attributes(): array
+    {
+        return [
+            'code'          => __('hr.code'),
+            'name'          => __('hr.name'),
+            'description'   => __('hr.description'),
+            'department_id' => __('hr.department'),
+            'division_id'   => __('hr.division'),
+            'section_id'    => __('hr.section'),
+        ];
+    }
 }

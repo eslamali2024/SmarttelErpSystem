@@ -14,7 +14,9 @@ return new class extends Migration
     {
         Schema::create('employee_contracts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained('employees')->onDelete('cascade');
+            $table->foreignId('employee_id')->nullable()->constrained('employees')->onDelete('cascade');
+            $table->foreignId('time_management_id')->nullable()->constrained('time_managements')->onDelete('cascade');
+            $table->foreignId('work_schedule_id')->nullable()->constrained('work_schedules')->onDelete('cascade');
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->text('notes', 2000)->nullable();

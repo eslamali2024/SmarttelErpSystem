@@ -81,7 +81,12 @@ watch(search, () => {
 const showDeleteModal = ref(false)
 const isDeleting = ref(false)
 
-const deleteSection = () => {
+const toggleShowDeleteModal = (work_schedule: any) => {
+    currentItem.value = work_schedule
+    showDeleteModal.value = true
+}
+
+const deleteEmployee = () => {
     if (!currentItem.value) return
     isDeleting.value = true
 
@@ -199,7 +204,7 @@ const deleteSection = () => {
     </AppLayout>
 
     <Can permissions="employee_delete">
-        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteSection"
+        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteEmployee"
             :loading="isDeleting" />
     </Can>
 </template>

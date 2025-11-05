@@ -36,6 +36,8 @@ class EmployeeRequest extends FormRequest
             'step_2.start_date'             => ['required', 'date'],
             'step_2.end_date'               => ['required', 'date'],
             'step_2.notes'                  => ['nullable', 'max:2000'],
+            'step_2.time_management_id'     => ['required', 'exists:time_managements,id'],
+            'step_2.work_schedule_id'       => ['required', 'exists:work_schedules,id'],
 
             'step_3'            => ['required', 'array'],
             'step_3.basic_salary'               => ['required', 'numeric', 'min:0'],
@@ -88,9 +90,11 @@ class EmployeeRequest extends FormRequest
             'step_2.start_date'             => __('hr.start_date'),
             'step_2.end_date'               => __('hr.end_date'),
             'step_2.notes'                  => __('hr.notes'),
+            'step_2.time_management_id'     => __('hr.time_management'),
+            'step_2.work_schedule_id'       => __('hr.work_schedule'),
 
             'step_3.net_salary'                 => __('hr.net_salary'),
-            'step_3.gross_salary'              => __('hr.gross_salary'),
+            'step_3.gross_salary'               => __('hr.gross_salary'),
             'step_3.insurance_wage'             => __('hr.insurance_wage'),
             'step_3.insurance_wage_rounded'     => __('hr.insurance_wage_rounded'),
             'step_3.tax_monthly'                => __('hr.tax_monthly'),
