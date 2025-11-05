@@ -4,13 +4,14 @@ import { Label } from '@/components/ui/label'
 import { computed } from 'vue'
 
 interface Props {
-    modelValue?: string
+    modelValue?: string | number
     modelValueError?: string
     label?: string
     placeholder?: string
     type?: string
     disabled?: boolean
     vueError?: any
+    minValue?: number
 }
 
 const props = defineProps<Props>()
@@ -26,7 +27,7 @@ const model = computed({
     <div class="w-full">
         <Label>{{ props.label }}</Label>
         <Input :type="props.type || 'text'" :placeholder="props.placeholder" v-model="model" :disabled="props.disabled"
-            @blur="vueError ? vueError?.$touch() : ''" />
+            :min="props.minValue" @blur="vueError ? vueError?.$touch() : ''" />
         <p v-if="props.modelValueError || vueError?.$errors[0]?.$message" class="text-sm text-red-500 mt-2">
             {{ props.modelValueError || vueError?.$errors[0]?.$message }}
         </p>

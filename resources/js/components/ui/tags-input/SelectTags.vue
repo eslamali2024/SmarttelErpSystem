@@ -20,7 +20,7 @@ import {
 import { Label } from "@/components/ui/label"
 
 const props = defineProps<{
-    items: { label: string; value: string }[]
+    options: { label: string; value: string }[]
     modelValue?: string[]
     modelValueError?: string
     label?: string
@@ -41,7 +41,7 @@ const searchTerm = ref("")
 const { contains } = useFilter({ sensitivity: "base" })
 
 const filteredFrameworks = computed(() => {
-    const options = props.items.filter(i => !internalValue.value.includes(i.label))
+    const options = props.options.filter(i => !internalValue.value.includes(i.label))
     return searchTerm.value
         ? options.filter(option => contains(option.label, searchTerm.value))
         : options

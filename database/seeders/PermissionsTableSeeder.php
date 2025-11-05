@@ -73,6 +73,23 @@ class PermissionsTableSeeder extends Seeder
             'position_delete',
             'position_show',
 
+            // Master Data
+            'hr_master_access',
+
+            // Allowance Types
+            'allowance_type_access',
+            'allowance_type_create',
+            'allowance_type_edit',
+            'allowance_type_delete',
+            'allowance_type_show',
+
+            // Insurance Companies
+            'insurance_company_access',
+            'insurance_company_create',
+            'insurance_company_edit',
+            'insurance_company_delete',
+            'insurance_company_show',
+
             // Employees
             'employee_access',
             'employee_create',

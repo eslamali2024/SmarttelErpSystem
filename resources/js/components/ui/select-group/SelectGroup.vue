@@ -1,41 +1,24 @@
 <script setup lang="ts">
-import { computed, watch, ref, nextTick } from 'vue'
-import { Label } from '@/components/ui/label'
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
+import { computed } from "vue"
+import { Check, Search } from "lucide-vue-next"
+import { Combobox, ComboboxAnchor, ComboboxEmpty, ComboboxGroup, ComboboxInput, ComboboxItem, ComboboxItemIndicator, ComboboxList } from "@/components/ui/combobox"
+import { Label } from "@/components/ui/label"
 
 interface Props {
-    modelValue?: string | number,
-    modelValueError?: string,
-    label?: string,
-    placeholder?: string,
-    options?: Record<string, string> | Array<{ value: string | number, label: string }> | undefined | any[],
+    modelValue?: string | number
+    modelValueError?: string
+    label?: string
+    placeholder?: string
+    options?: Record<string, string> | Array<{ value: string | number; label: string }>
     vueError?: any
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits(['update:modelValue'])
 
-// Computed for sending value
-const model = computed({
-    get: () => {
-        const val = props.modelValue != null ? String(props.modelValue) : ''
-        if (!optionsArray.value.find(opt => opt.value === val)) return ''
-        return val
-    },
-    set: (val: string) => emit('update:modelValue', val)
-})
-
-// This For Convert Object To Array
+// Convert options to array of objects
 const optionsArray = computed(() => {
     if (!props.options) return []
-
     if (Array.isArray(props.options)) {
         return props.options.map(opt => ({ value: String(opt.value), label: opt.label }))
     } else {
@@ -43,46 +26,47 @@ const optionsArray = computed(() => {
     }
 })
 
-//
-watch(optionsArray, (newOptions) => {
-    if (!newOptions.find(opt => opt.value === model.value)) {
-        model.value = ''
-    }
-})
-
-// We add This For Warning User If Select Is Open and empty
-const isOpen = ref(false)
-watch(isOpen, (open) => {
-    props.vueError?.$touch()
-    if (!open) {
-        nextTick(() => {
-            const active = document.activeElement as HTMLElement | null
-            if (active && active.tagName === 'BUTTON') active.blur()
-        })
+const selectedValue = computed({
+    get() {
+        return optionsArray.value.find(opt => opt.value === String(props.modelValue)) ?? null
+    },
+    set(val: { value: string; label: string } | null) {
+        emit('update:modelValue', val?.value ?? null)
     }
 })
 </script>
+
 <template>
-    <div>
+    <Combobox by="label" :model-value="selectedValue" @update:model-value="val => selectedValue = val">
         <Label v-if="props.label">{{ props.label }}</Label>
+        <ComboboxAnchor>
+            <div class="relative w-full items-center">
+                <ComboboxInput class="pl-9 w-full" :display-value="(val) => val?.label ?? ''"
+                    :placeholder="props.placeholder ?? 'Select framework'" />
+                <span class="absolute start-0 inset-y-0 flex items-center justify-center px-3">
+                    <Search class="size-4 text-muted-foreground" />
+                </span>
+            </div>
+        </ComboboxAnchor>
 
-        <Select v-model="model" @open-change="isOpen = $event">
-            <SelectTrigger class="bg-transparent hover:bg-gray-600/20 cursor-pointer" :disabled="!optionsArray.length">
-                <SelectValue :placeholder="props.placeholder || 'Select an option'" />
-            </SelectTrigger>
+        <ComboboxList>
+            <ComboboxEmpty>
+                {{ $t?.('no_results') ?? 'No results found' }}
+            </ComboboxEmpty>
 
-            <SelectContent class="bg-white dark:bg-gray-800" v-if="optionsArray.length > 0">
-                <SelectGroup>
-                    <SelectItem v-for="option in optionsArray" :key="option.value" :value="option.value"
-                        class="cursor-pointer">
-                        {{ option.label }}
-                    </SelectItem>
-                </SelectGroup>
-            </SelectContent>
-        </Select>
+            <ComboboxGroup>
+                <ComboboxItem v-for="option in optionsArray" :key="option.value" :value="option">
+                    {{ option.label }}
 
-        <p v-if="props.modelValueError || vueError?.$errors[0]?.$message" class="text-sm text-red-500 mt-2">
-            {{ props.modelValueError || vueError?.$errors[0]?.$message }}
+                    <ComboboxItemIndicator>
+                        <Check class="ml-auto h-4 w-4" />
+                    </ComboboxItemIndicator>
+                </ComboboxItem>
+            </ComboboxGroup>
+        </ComboboxList>
+
+        <p v-if="props.modelValueError || vueError?.$errors?.[0]?.$message" class="text-sm text-red-500 mt-2">
+            {{ props.modelValueError || vueError?.$errors?.[0]?.$message }}
         </p>
-    </div>
+    </Combobox>
 </template>
