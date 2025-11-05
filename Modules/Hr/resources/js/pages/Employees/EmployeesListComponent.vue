@@ -169,10 +169,10 @@ const deleteSection = () => {
                             <TableCell class="text-center">{{ employee.name ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ employee.name_ar ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ employee.email ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.gender ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ employee.gender_label ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ employee.phone ?? '-' }}</TableCell>
                             <TableCell class="text-center">{{ employee.address ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.status ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ employee.status_label ?? '-' }}</TableCell>
                             <TableCell class="text-center flex">
                                 <TableActions class="text-center flex justify-center" canShow="employee_show"
                                     :show="employeesRoute.show(employee.id).url" canEdit="employee_edit"

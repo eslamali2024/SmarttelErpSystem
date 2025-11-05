@@ -38,7 +38,7 @@ function hasPermission(module: Module) {
                         <div class="flex items-center gap-2">
                             <i v-if="module.icon" :class="module.icon"></i>
                             <span class="text-nowrap">
-                                {{ $t(module.name) }}
+                                {{ $t(module.name).substring(0, 20) }}
                             </span>
                         </div>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200"
@@ -65,7 +65,7 @@ function hasPermission(module: Module) {
                 'bg-gray-200 dark:bg-gray-600/50': page.url.includes(module.path),
             }">
             <i v-if="module.icon" :class="module.icon"></i>
-            {{ $t(module.name) }}
+            <span class="text-nowrap">{{ $t(module.name).substring(0, 20) }}</span>
             </Link>
         </SidebarMenuButton>
     </SidebarMenuItem>

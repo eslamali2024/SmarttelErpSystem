@@ -62,4 +62,26 @@ class EmployeeContract extends Model
     {
         return $this->hasOne(ContractPosition::class, 'contract_id')->where('status', ContractStatusEnum::ACTIVE);
     }
+
+    /**
+     * Get the contract salary that belongs to the employee contract.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function salary(): HasOne
+    {
+        return $this->hasOne(ContractSalary::class, 'contract_id');
+    }
+
+    /**
+     * Get the contract allowances that belong to the employee contract.
+     *
+     * The contract allowances are the allowances that are assigned to the employee contract.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function allowances(): HasMany
+    {
+        return $this->hasMany(ContractAllowance::class, 'contract_id');
+    }
 }

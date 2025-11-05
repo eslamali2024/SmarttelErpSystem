@@ -29,7 +29,7 @@ const formSchema = (props: any) => ({
         department_id: props.item?.department_id ?? '',
         section_id: props.item?.section_id ?? '',
         position_id: props.item?.position_id ?? '',
-        start_date: props.item?.start_date ?? '',
+        start_date: props.item?.start_date ?? new Date().toISOString().split('T')[0],
         end_date: props.item?.end_date ?? '',
         notes: props.item?.notes ?? '',
     },
@@ -45,6 +45,7 @@ const formSchema = (props: any) => ({
 })
 
 const { form, $v } = useDynamicForm(props, formSchema)
+
 
 // Computed options
 const departmentOptions = computed(() => {
@@ -67,12 +68,27 @@ const positionOptions = computed(() => {
 
 // Watch form to emit changes to parent
 watch(
-    form,
-    (newVal) => {
-        emit('update:form', newVal);
+    [form, () => props.item],
+    ([newForm, newItem]) => {
+        if (newItem && Object.keys(newItem).length > 0) {
+            emit('update:form', newForm);
+            return;
+        }
+
+        if (JSON.stringify(newForm) !== JSON.stringify(props.form)) {
+            emit('update:form', newForm);
+        }
+
+        // Calculate end date
+        if (form.start_date && !isNaN(new Date(form.start_date).getTime())) {
+            const start = new Date(form.start_date);
+            const end = new Date(start);
+            end.setFullYear(start.getFullYear() + 1);
+            form.end_date = end.toISOString().split('T')[0];
+        }
     },
-    { deep: true }
-)
+    { deep: true, immediate: true }
+);
 
 // Validation check
 const checkValidation = async () => {

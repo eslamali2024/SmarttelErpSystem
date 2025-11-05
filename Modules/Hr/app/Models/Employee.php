@@ -31,14 +31,18 @@ class Employee extends Model
         'joining_date',
         'notes',
         'national_id',
+        'status',
     ];
 
     protected $casts = [
         'gender'            => GenderEnum::class,
         'marital_status'    => MaritalStatusEnum::class,
+        'status'            => ContractStatusEnum::class,
         'joining_date'      => 'date',
         'dob'               => 'date',
     ];
+
+    protected $appends = ['status_label', 'gender_label', 'marital_status_label'];
 
     public static function autoGenerateCode()
     {
@@ -63,5 +67,45 @@ class Employee extends Model
     public function currentContract(): HasOne
     {
         return $this->hasOne(EmployeeContract::class, 'employee_id')->where('status', ContractStatusEnum::ACTIVE);
+    }
+
+    /**
+     * Get the current active contract position of the employee.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function currentPosition(): HasOne
+    {
+        return $this->hasOne(ContractPosition::class, 'contract_id')->where('status', ContractStatusEnum::ACTIVE);
+    }
+
+    /**
+     * Get the label of the status of the employee.
+     *
+     * @return string|null
+     */
+    public function getStatusLabelAttribute()
+    {
+        return $this->status?->label();
+    }
+
+    /**
+     * Get the label of the gender of the employee.
+     *
+     * @return string|null
+     */
+    public function getGenderLabelAttribute()
+    {
+        return $this->gender?->label();
+    }
+
+    /**
+     * Get the label of the marital status of the employee.
+     *
+     * @return string|null
+     */
+    public function getMaritalStatusLabelAttribute()
+    {
+        return $this->marital_status?->label();
     }
 }

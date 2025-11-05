@@ -6,7 +6,7 @@ import RoleModules from './RoleModules.vue'
 const props = defineProps<{
     module?: Record<string, any>
     level?: number
-    permKey?: string
+    permKey?: number | string
     modelValue?: string[]
     isReadOnly?: boolean
 }>()

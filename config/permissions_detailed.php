@@ -77,6 +77,28 @@ return [
                     ],
                 ]
             ],
+            'Master Data' => [
+                'id'                        => 'master-data',
+                'title'                     => 'Master Data',
+                'access'                    => 'hr_master_access',
+
+                'children'                  => [
+                    'Allowance Types' => [
+                        'Create'                    => 'allowance_type_create',
+                        'Edit'                      => 'allowance_type_edit',
+                        'Show'                      => 'allowance_type_show',
+                        'Delete'                    => 'allowance_type_delete',
+                        'List'                      => 'allowance_type_access',
+                    ],
+                    'Insurance Companies' => [
+                        'Create'                    => 'insurance_company_create',
+                        'Edit'                      => 'insurance_company_edit',
+                        'Show'                      => 'insurance_company_show',
+                        'Delete'                    => 'insurance_company_delete',
+                        'List'                      => 'insurance_company_access',
+                    ],
+                ]
+            ],
             'Employees' => [
                 'Create'                    => 'employee_create',
                 'Edit'                      => 'employee_edit',

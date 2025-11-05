@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import AppLayout from "@/layouts/AppLayout.vue";
 import Card from "@/components/ui/card/Card.vue";
-import { CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import A from "@/components/ui/a/A.vue";
 import employeesRoute from "@/routes/hr/employees";
 import { Check, Circle, Dot } from "lucide-vue-next"
@@ -10,11 +10,11 @@ import { Button } from "@/components/ui/button"
 import { Stepper, StepperItem, StepperSeparator, StepperTitle, StepperTrigger } from "@/components/ui/stepper"
 import BasicData from "./EmployeeStepper/BasicData.vue"
 import Contract from "./EmployeeStepper/Contract.vue"
+import Salary from "./EmployeeStepper/Salary.vue"
 import { useI18n } from 'vue-i18n'
 import { type BreadcrumbItem } from '@/types';
 import { dashboard } from '@/routes';
 import { useForm } from '@inertiajs/vue3'
-
 
 const { t } = useI18n()
 
@@ -25,6 +25,10 @@ const props = defineProps<{
     genders?: any,
     marital_statuess?: any,
     auto_generate_code?: string,
+    insurance_companies?: {
+        id: number
+        name: string
+    },
     divisions?: {
         id: number
         name: string
@@ -44,9 +48,19 @@ const props = defineProps<{
         name: string
         section_id: number
     }[],
+    allowances?: {
+        off_cycle: {
+            id: number
+            name: string
+            taxable: boolean,
+        }[],
+        recurring: {
+            id: number
+            name: string
+            taxable: boolean
+        }[]
+    },
 }>();
-
-
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
@@ -56,16 +70,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 const stepIndex = ref(1);
 
-const steps = ref([
+const steps = ref<Array<{ step: number; title: string; status: string; form: Record<string, any> | null }>>([
     { step: 1, title: t('basic_data'), status: 'active', form: null },
     { step: 2, title: t('contract'), status: 'inactive', form: null },
-    // { step: 3, title: t('salary'), status: 'inactive', form: null },
+    { step: 3, title: t('salary'), status: 'inactive', form: null },
 ]);
-
-watch(steps, () => {
-    console.log(steps.value)
-
-}, { deep: true })
 
 // Disable "Next" button if current step is not complete or it's the last step
 const isNextDisabledComputed = computed(() => {
@@ -74,7 +83,7 @@ const isNextDisabledComputed = computed(() => {
 
 // Handle form submission
 const data = ref({});
-const form = ref(null);
+const form = ref<any>(null);
 
 const mergeSteps = () => {
     steps.value.forEach(step => {
@@ -104,8 +113,8 @@ const submitForm = async () => {
     mergeSteps();
 
     if (stepIndex.value === steps.value.length) {
-        console.log(steps.value)
-        const canSubmit = await validateAllSteps();
+        const canSubmit = await nextStep();
+
         if (canSubmit) {
             const options = {
                 onSuccess: () => {
@@ -114,21 +123,24 @@ const submitForm = async () => {
                         if (step.form) step.form.errors = {};
                     });
                 },
-                onError: (serverErrors) => {
+                onError: (serverErrors: any) => {
                     Object.keys(serverErrors).forEach(key => {
                         // key = "step_1.name" -> split to stepKey & field
                         const [stepKey, field] = key.split('.');
                         const stepNumber = parseInt(stepKey.replace('step_', ''), 10);
                         stepIndex.value = stepNumber;
 
-                        const step = steps.value.find(s => s.step === stepNumber);
-                        if (step && step.form) {
-                            if (!step.form.errors) step.form.errors = {};
-                            step.form.errors[field] = serverErrors[key];
-                        } else {
-                            if (!step.form) step.form = {};
-                            if (!step.form.errors) step.form.errors = {};
+                        let step = steps.value.find(s => s.step === stepNumber);
+                        if (!step) {
+                            // create a placeholder step if it doesn't exist yet
+                            step = { step: stepNumber, title: '', status: 'inactive', form: { errors: {} } } as any;
+                            steps.value.push(step);
+                        }
 
+                        if (!step?.form) step.form = {};
+                        if (!step?.form?.errors) step.form.errors = {};
+
+                        if (step?.form) {
                             step.form.errors = {
                                 ...step.form.errors,
                                 [field]: serverErrors[key]
@@ -148,33 +160,31 @@ const submitForm = async () => {
     }
 };
 
-
 // Validation
 const step_1 = ref<{ checkValidation?: () => Promise<boolean> | boolean } | null>(null);
 const step_2 = ref<{ checkValidation?: () => Promise<boolean> | boolean } | null>(null);
+const step_3 = ref<{ checkValidation?: () => Promise<boolean> | boolean } | null>(null);
+const stepsRef = ref([step_1, step_2, step_3]);
 
-const validateAllSteps = async () => {
-    const results = await Promise.all([
-        step_1.value && typeof step_1.value.checkValidation === 'function'
-            ? Promise.resolve(step_1.value.checkValidation())
-            : Promise.resolve(false),
-        step_2.value && typeof step_2.value.checkValidation === 'function'
-            ? Promise.resolve(step_2.value.checkValidation())
-            : Promise.resolve(false),
-    ]);
+// Next step
+const nextStep = async () => {
+    const stepComponent = stepsRef.value[stepIndex.value - 1];
 
+    const results = await (
+        stepComponent?.value && typeof stepComponent.value.checkValidation === 'function'
+            ? Promise.resolve(stepComponent.value.checkValidation())
+            : Promise.resolve(false)
+    );
 
-    if (results.every(r => r === true)) {
+    if (results) {
+        if (stepIndex.value < steps.value.length) {
+            stepIndex.value++;
+        }
         return true;
-    } else {
-        results.forEach((result, index) => {
-            if (result === false) {
-                stepIndex.value = index + 1;
-            }
-        })
-        return false;
     }
-}
+    return false;
+};
+
 </script>
 
 <template>
@@ -192,7 +202,7 @@ const validateAllSteps = async () => {
                 </CardAction>
             </CardHeader>
             <CardContent>
-                <Stepper v-slot="{ isPrevDisabled, nextStep, prevStep }" v-model="stepIndex" class="block w-full">
+                <Stepper v-slot="{ isPrevDisabled, prevStep }" v-model="stepIndex" class="block w-full">
                     <form @submit.prevent="submitForm">
                         <div class="flex w-full flex-start gap-2">
                             <StepperItem v-for="step in steps" :key="step.step" v-slot="{ state }"
@@ -230,8 +240,9 @@ const validateAllSteps = async () => {
                                 :item="props.item?.contract" :divisions="divisions" :departments="departments"
                                 :sections="sections" :positions="positions" />
 
-                            <!-- <BasicData v-if="stepIndex === 2" />
-                            <BasicData v-if="stepIndex === 3" /> -->
+                            <Salary v-show="stepIndex === 3" :step="3" v-model:form="steps[2].form" ref="step_3"
+                                :item="props.item?.salary" :allowances="allowances"
+                                :insurance_companies="insurance_companies" />
                         </div>
 
                         <div class="flex items-center justify-between mt-4">
@@ -253,9 +264,6 @@ const validateAllSteps = async () => {
                     </form>
                 </Stepper>
             </CardContent>
-            <CardFooter>
-
-            </CardFooter>
         </Card>
     </AppLayout>
 </template>

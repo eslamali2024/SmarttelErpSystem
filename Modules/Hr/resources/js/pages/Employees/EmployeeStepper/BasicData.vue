@@ -20,7 +20,7 @@ const emit = defineEmits(['update:form']);
 // Vuelidate
 const formSchema = (props: any) => ({
     formStructure: {
-        employee_code: props.form?.employee_code ?? props.auto_generate_code ?? props.item?.code ?? '',
+        code: props.form?.employee_code ?? props.auto_generate_code ?? props.item?.code ?? '',
         name: props.form?.name ?? props.item?.name ?? '',
         name_ar: props.form?.name_ar ?? props.item?.name_ar ?? '',
         email: props.form?.email ?? props.item?.email ?? '',
@@ -34,7 +34,7 @@ const formSchema = (props: any) => ({
         notes: props.form?.notes ?? props.item?.notes ?? '',
     },
     validationRules: {
-        employee_code: { required, minLength: minLength(2), maxLength: maxLength(255) },
+        code: { required, minLength: minLength(2), maxLength: maxLength(255) },
         name: { required, minLength: minLength(5), maxLength: maxLength(255) },
         name_ar: { required, minLength: minLength(5), maxLength: maxLength(255) },
         email: { required, minLength: minLength(5), maxLength: maxLength(255), email },
@@ -50,17 +50,23 @@ const formSchema = (props: any) => ({
 })
 
 const { form, $v } = useDynamicForm(props, formSchema)
+form.joining_date = new Date().toISOString().split('T')[0];
 
-
+// Watch
 watch(
-    form,
-    (newVal) => {
-        if (JSON.stringify(newVal) !== JSON.stringify(props.form)) {
-            emit('update:form', newVal);
+    [form, () => props.item],
+    ([newForm, newItem]) => {
+        if (newItem && Object.keys(newItem).length > 0) {
+            emit('update:form', newForm);
+            return;
+        }
+
+        if (JSON.stringify(newForm) !== JSON.stringify(props.form)) {
+            emit('update:form', newForm);
         }
     },
-    { deep: true }
-)
+    { deep: true, immediate: true }
+);
 
 const checkValidation = async () => {
     $v.value.$touch();
@@ -76,9 +82,8 @@ defineExpose({ checkValidation })
 </script>
 <template>
     <div class="grid grid-cols-2 gap-3 py-4">
-        <InputGroup v-model="form.employee_code" :modelValueError="props.form?.errors.employee_code"
-            :label="$t('employee_code')" :placeholder="$t('please_enter_a_employee_code')" type="text"
-            :vue-error="$v?.employee_code" class="col-span-2" />
+        <InputGroup v-model="form.code" :modelValueError="props.form?.errors.code" :label="$t('employee_code')"
+            :placeholder="$t('please_enter_a_employee_code')" type="text" :vue-error="$v?.code" class="col-span-2" />
 
         <InputGroup v-model="form.name" :modelValueError="props.form?.errors.name" :label="$t('name')"
             :placeholder="$t('please_enter_a_name')" type="text" :vue-error="$v?.name" />

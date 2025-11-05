@@ -3,12 +3,14 @@
 namespace Modules\Hr\Http\Controllers;
 
 use Inertia\Inertia;
+use GuzzleHttp\Psr7\Request;
 use Modules\Hr\Models\Employee;
 use Illuminate\Support\Facades\Gate;
 use Modules\Hr\Services\EmployeeService;
 use Modules\Hr\Http\Requests\EmployeeRequest;
+use Modules\Hr\Transformers\EmployeeFormResource;
 use App\Http\Controllers\TransactionController;
-use Modules\Hr\Transformers\EmployeeResource;
+use Modules\Hr\Http\Requests\GrossUpSalaryRequest;
 
 class EmployeeController extends TransactionController
 {
@@ -24,7 +26,7 @@ class EmployeeController extends TransactionController
         abort_if(Gate::denies('employee_access'), 403);
 
         return Inertia::render($this->path . 'EmployeesListComponent', [
-            'employees'     => Employee::filter(request()->query() ?? [])->paginate(request('perPage', 10)),
+            'employees'     =>  Employee::filter(request()->query() ?? [])->paginate(request('perPage', 10)),
         ]);
     }
 
@@ -73,6 +75,19 @@ class EmployeeController extends TransactionController
     }
 
     /**
+     * Returns the gross salary of an employee given their net salary.
+     *
+     * @param GrossUpSalaryRequest $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getGrossUp(GrossUpSalaryRequest $request)
+    {
+        return response()->json(
+            $this->employeeService->getGrossUp($request->validated()['net_salary'] ?? 0)
+        );
+    }
+
+    /**
      * Show the form for editing the given employee.
      *
      * @param  \Modules\Hr\Models\Employee  $employee
@@ -86,7 +101,7 @@ class EmployeeController extends TransactionController
         ]);
 
         return Inertia::render($this->path . 'EmployeeFormComponent', [
-            'item'               => new EmployeeResource($employee),
+            'item'               => new EmployeeFormResource($employee),
             'method_type'        => 'put',
             'action'             => route('hr.employees.update', $employee),
             ...$this->employeeService->getInitilizeData()
