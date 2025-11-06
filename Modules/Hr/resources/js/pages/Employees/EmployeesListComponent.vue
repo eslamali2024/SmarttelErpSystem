@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { reactive, watch, ref } from 'vue';
+import { ref } from 'vue';
 import {
     Table,
     TableBody,
@@ -33,6 +33,8 @@ import {
 import A from '@/components/ui/a/A.vue';
 import TableActions from '@/components/ui/table/TableActions.vue';
 import employeesRoute from '@/routes/hr/employees';
+import { strLimit } from '@/utils/strLimit';
+import { useSearchTable } from '@/composables/useSearchTable';
 
 // Master Data
 const { t } = useI18n();
@@ -54,28 +56,16 @@ const props = defineProps<{
 }>()
 
 // reactive search
-const urlParams = new URLSearchParams(window.location.search);
-
-const search = reactive({
-    name: urlParams.get('name') ?? '',
-    name_ar: urlParams.get('name_ar') ?? '',
-    code: urlParams.get('code') ?? '',
-    email: urlParams.get('email') ?? '',
-    phone: urlParams.get('phone') ?? '',
-    address: urlParams.get('address') ?? '',
-    status: urlParams.get('status') ?? '',
-    gender: urlParams.get('gender') ?? '',
-
+const { search } = useSearchTable(employeesRoute.index().url, {
+    name: '',
+    code: '',
+    name_ar: '',
+    email: '',
+    gender: '',
+    phone: '',
+    address: '',
+    status: ''
 });
-
-// watch search changes
-watch(search, () => {
-    router.get(employeesRoute.index().url, search, {
-        preserveState: true,
-        replace: true,
-    })
-}, { deep: true });
-
 
 // Delete Modal
 const showDeleteModal = ref(false)
@@ -170,14 +160,14 @@ const deleteEmployee = () => {
                             <TableCell class="font-medium text-center">
                                 <TablePaginationNumbers :items="props.employees" :index="index" />
                             </TableCell>
-                            <TableCell class="text-center">{{ employee.code ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.name_ar ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.email ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.gender_label ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.phone ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.address ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.status_label ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.code, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.name, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.name_ar, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.email, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.gender_label, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.phone, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.address, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.status_label, 15) }}</TableCell>
                             <TableCell class="text-center flex">
                                 <TableActions class="text-center flex justify-center" canShow="employee_show"
                                     :show="employeesRoute.show(employee.id).url" canEdit="employee_edit"

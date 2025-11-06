@@ -35,7 +35,7 @@ import {
     CardFooter
 } from '@/components/ui/card';
 import { useSearchTable } from '@/composables/useSearchTable';
-import { useStrLimit } from '@/composables/useStrLimit';
+import { strLimit } from '@/utils/strLimit';
 
 // Master Data
 const { t } = useI18n();
@@ -170,13 +170,13 @@ const toggleShowDialog = (insurance_company: any) => {
                             <TableCell class="font-medium text-center">
                                 <TablePaginationNumbers :items="props.insurance_companies" :index="index" />
                             </TableCell>
-                            <TableCell class="text-center">{{ useStrLimit(insurance_company.name, 15) }}</TableCell>
-                            <TableCell class="text-center">{{ useStrLimit(insurance_company.email, 15) }}</TableCell>
-                            <TableCell class="text-center">{{ useStrLimit(insurance_company.phone, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(insurance_company.name, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(insurance_company.email, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(insurance_company.phone, 15) }}</TableCell>
                             <TableCell class="text-center">
                                 <a v-if="insurance_company.website" :href="insurance_company.website" target="_blank"
                                     rel="noopener noreferrer" class="text-blue-400 hover:text-blue-800 duration-200">
-                                    {{ useStrLimit(insurance_company.website, 15) }}
+                                    {{ strLimit(insurance_company.website, 15) }}
                                 </a>
                                 <span v-else>-</span>
                             </TableCell>

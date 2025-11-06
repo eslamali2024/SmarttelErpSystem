@@ -17,7 +17,7 @@ import PaginationUse from '@/components/ui/pagination-use/PaginationUse.vue';
 import TableEmpty from '@/components/ui/table/TableEmpty.vue';
 import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
-import { reactive, watch, ref } from 'vue';
+import { ref } from 'vue';
 import rolesRoute from '@/routes/user-management/roles';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
@@ -35,6 +35,7 @@ import {
     CardContent,
     CardFooter
 } from '@/components/ui/card';
+import { useSearchTable } from '@/composables/useSearchTable';
 
 const { t } = useI18n();
 const breadcrumbs: BreadcrumbItem[] = [
@@ -54,20 +55,7 @@ const props = defineProps<{
 }>()
 
 // reactive search
-const urlParams = new URLSearchParams(window.location.search);
-
-const search = reactive({
-    name: urlParams.get('name') ?? '',
-    page: urlParams.get('page') ?? 1
-});
-
-// watch search changes
-watch(search, () => {
-    router.get(rolesRoute.index().url, search, {
-        preserveState: true,
-        replace: true,
-    })
-}, { deep: true });
+const { search } = useSearchTable(rolesRoute.index().url);
 
 
 // Form Data

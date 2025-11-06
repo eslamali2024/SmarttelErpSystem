@@ -17,7 +17,7 @@ import PaginationUse from '@/components/ui/pagination-use/PaginationUse.vue';
 import TableEmpty from '@/components/ui/table/TableEmpty.vue';
 import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
-import { reactive, watch, ref } from 'vue';
+import { ref } from 'vue';
 import departmentsRoute from '@/routes/hr/organization/departments';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
@@ -35,6 +35,8 @@ import {
     CardContent,
     CardFooter
 } from '@/components/ui/card';
+import { strLimit } from '@/utils/strLimit';
+import { useSearchTable } from '@/composables/useSearchTable';
 
 // Master Data
 const { t } = useI18n();
@@ -70,23 +72,12 @@ const props = defineProps<{
 }>()
 
 // reactive search
-const urlParams = new URLSearchParams(window.location.search);
-
-const search = reactive({
-    name: urlParams.get('name') ?? '',
-    code: urlParams.get('code') ?? '',
-    manager: { name: urlParams.get('manager') ?? '' },
-    division: { name: urlParams.get('division') ?? '' }
-});
-
-// watch search changes
-watch(search, () => {
-    router.get(departmentsRoute.index().url, search, {
-        preserveState: true,
-        replace: true,
-    })
-}, { deep: true });
-
+const { search } = useSearchTable(departmentsRoute.index().url, {
+    name: '',
+    code: '',
+    manager: { name: '' },
+    division: { name: '' }
+})
 
 /**
  * Toggle the form dialog for adding or editing a department
@@ -198,10 +189,10 @@ const toggleShowDialog = (poisiton: any) => {
                             <TableCell class="font-medium text-center">
                                 <TablePaginationNumbers :items="props.departments" :index="index" />
                             </TableCell>
-                            <TableCell class="text-center">{{ department.code ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ department.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ department.division?.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ department.manager?.name ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(department.code, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(department.name, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(department.division?.name, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(department.manager?.name, 15) }}</TableCell>
                             <TableCell>
                                 <TableActionsDialog class="text-center flex justify-center" canShow="department_show"
                                     :show="() => toggleShowDialog(department)" canEdit="department_edit"
