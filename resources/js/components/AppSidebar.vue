@@ -12,23 +12,17 @@ import {
 } from '@/components/ui/sidebar'
 import { dashboard } from '@/routes'
 import { type NavItem } from '@/types'
-import { Link, usePage } from '@inertiajs/vue3'
+import { Link } from '@inertiajs/vue3'
 import { BookOpen, Folder } from 'lucide-vue-next'
 import AppLogo from './AppLogo.vue'
 import SidebarModuleItem from './SidebarModuleItem.vue'
-import { AuthPermissions, Module } from '@/types';
 
+import { useAppStore } from '@/stores/appStore'
+import { storeToRefs } from 'pinia'
+import Spinner from './ui/spinner/Spinner.vue'
 
-interface Props {
-    auth_permissions: AuthPermissions[]
-}
-
-withDefaults(defineProps<Props>(), {
-    auth_permissions: () => [],
-});
-
-const page = usePage()
-const modules = (page.props.modules ?? []) as Module[]
+const appStore = useAppStore()
+const { permissions, modules, loaded } = storeToRefs(appStore)
 
 const footerNavItems: NavItem[] = [
     {
@@ -61,8 +55,13 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
-            <SidebarModuleItem v-for="module in modules" :key="module.id" :module="module"
-                :auth_permissions="auth_permissions" />
+            <div v-if="loaded">
+                <SidebarModuleItem v-for="module in modules" :key="module.id" :module="module"
+                    :permissions="permissions" />
+            </div>
+            <div v-else class="flex justify-center items-center mt-4">
+                <Spinner class="size-6" />
+            </div>
         </SidebarContent>
 
         <SidebarFooter>
