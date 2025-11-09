@@ -36,13 +36,16 @@ import {
     CardFooter
 } from '@/components/ui/card';
 import { useSearchTable } from '@/composables/useSearchTable';
+import { useToast } from '@/composables/useToast';
 
 const { t } = useI18n();
+const { showToast } = useToast();
 const showLoading = ref(false)
 const showFormDialog = ref(false)
 const currentItem = ref<any>(null)
 const method_type = ref("post");
 const action = ref(permissionsRoute.store().url);
+const { search } = useSearchTable(permissionsRoute.index().url);
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
@@ -59,9 +62,6 @@ const props = defineProps<{
         current_page?: number
     }
 }>()
-
-// reactive search
-const { search } = useSearchTable(permissionsRoute.index().url);
 
 
 const toggleFormDialog = (item?: any) => {
@@ -98,9 +98,17 @@ const deletePermission = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+            showToast({
+                title: t('permission_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+            showToast({
+                title: t('permission_delete_failed'),
+                type: 'error'
+            })
         }
     })
 }

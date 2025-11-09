@@ -4,6 +4,8 @@ import AppLayout from '@/layouts/app/AppSidebarLayout.vue'
 import { useAppStore } from '@/stores/appStore'
 import type { BreadcrumbItemType } from '@/types'
 import Spinner from '@/components/ui/spinner/Spinner.vue';
+import { Toaster } from 'vue-sonner'
+import 'vue-sonner/style.css'
 
 interface Props { breadcrumbs?: BreadcrumbItemType[] }
 withDefaults(defineProps<Props>(), { breadcrumbs: () => [] })
@@ -13,6 +15,7 @@ const appStore = useAppStore()
 onMounted(() => {
     appStore.load()
 })
+
 </script>
 
 <template>
@@ -25,5 +28,7 @@ onMounted(() => {
                 <Spinner class="size-8" />
             </div>
         </div>
+
+        <Toaster rich-colors expand />
     </AppLayout>
 </template>

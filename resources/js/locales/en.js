@@ -52,5 +52,13 @@ export default {
     work_schedules: 'Work Schedules',
     action: 'Action',
     edit: 'Edit',
+    update_failed: 'Update failed',
+    updated_successfully: 'Update successfully',
+    delete: 'Delete',
+    delete_failed: 'Delete failed',
+    delete_success: 'Delete success',
+    create: 'Create',
+    added_failed: 'Create failed',
+    added_successfully: 'Create successfully',
 
 }

@@ -4,6 +4,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import ButtonSubmit from '@/components/ui/button/ButtonSubmit.vue';
 import { required, minLength, maxLength } from '@vuelidate/validators'
 import { useDynamicForm } from '@/composables/useDynamicForm';
+import { useI18n } from 'vue-i18n';
+import { useToast } from '@/composables/useToast';
 
 const props = defineProps<{
     show: boolean,
@@ -13,7 +15,8 @@ const props = defineProps<{
     loading?: boolean
 }>();
 
-
+const { t } = useI18n();
+const { showToast } = useToast();
 const emit = defineEmits(['update:show']);
 
 // Vuelidate
@@ -39,6 +42,16 @@ const submitForm = () => {
             emit('update:show', false)
             form.reset();
             $v.value.$reset();
+            showToast({
+                title: props.method_type === 'post' ? t('added_successfully') : t('updated_successfully'),
+                type: 'success'
+            })
+        },
+        onError: () => {
+            showToast({
+                title: props.method_type === 'post' ? t('add_failed') : t('update_failed'),
+                type: 'error'
+            })
         }
     };
 

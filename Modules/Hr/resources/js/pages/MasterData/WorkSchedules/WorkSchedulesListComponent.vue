@@ -34,10 +34,12 @@ import { useSearchTable } from '@/composables/useSearchTable';
 import TableActions from '@/components/ui/table/TableActions.vue';
 import A from '@/components/ui/a/A.vue';
 import { strLimit } from '@/utils/strLimit';
+import { useToast } from '@/composables/useToast';
 
 // Master Data
 const { t } = useI18n();
 const currentItem = ref<any>(null)
+const { showToast } = useToast();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
@@ -79,9 +81,17 @@ const deleteTimeMaangement = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+            showToast({
+                title: t('work_schedule_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+            showToast({
+                title: t('work_schedule_deleted_failed'),
+                type: 'error'
+            })
         }
     })
 }

@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/card';
 import { useSearchTable } from '@/composables/useSearchTable';
 import { strLimit } from '@/utils/strLimit';
+import { useToast } from '@/composables/useToast';
 
 // Master Data
 const { t } = useI18n();
@@ -44,6 +45,7 @@ const currentItem = ref<any>(null)
 const method_type = ref("post");
 const action = ref(timeManagementsRoute.store().url);
 const showLoading = ref(false)
+const { showToast } = useToast();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
@@ -61,7 +63,6 @@ const props = defineProps<{
         current_page?: number
     }
 }>()
-
 
 /**
  * Toggle the form dialog for adding or editing a time_management
@@ -106,9 +107,17 @@ const deleteTimeMaangement = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+            showToast({
+                title: t('time_management_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+            showToast({
+                title: t('time_management_deleted_failed'),
+                type: 'error'
+            })
         }
     })
 }

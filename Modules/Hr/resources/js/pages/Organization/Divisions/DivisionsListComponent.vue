@@ -36,9 +36,11 @@ import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers
 import Can from '@/components/ui/Auth/Can.vue';
 import { strLimit } from '@/utils/strLimit';
 import { useSearchTable } from '@/composables/useSearchTable';
+import { useToast } from '@/composables/useToast';
 
 // Master Data
 const { t } = useI18n();
+const { showToast } = useToast();
 const showFormDialog = ref(false)
 const currentItem = ref<any>(null)
 const method_type = ref("post");
@@ -118,13 +120,20 @@ const deleteDivision = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+            showToast({
+                title: t('division_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+            showToast({
+                title: t('division_deleted_failed'),
+                type: 'error'
+            })
         }
     })
 }
-
 
 // Show Modal
 const showShowDialog = ref(false)

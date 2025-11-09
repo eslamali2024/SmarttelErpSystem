@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/card';
 import { useSearchTable } from '@/composables/useSearchTable';
 import { strLimit } from '@/utils/strLimit';
+import { useToast } from '@/composables/useToast';
 
 // Master Data
 const { t } = useI18n();
@@ -44,6 +45,8 @@ const currentItem = ref<any>(null)
 const method_type = ref("post");
 const action = ref(insuranceCompaniesRoute.store().url);
 const showLoading = ref(false)
+const { showToast } = useToast();
+
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
@@ -103,9 +106,17 @@ const deleteAllowanceType = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+            showToast({
+                title: t('insurance_company_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+            showToast({
+                title: t('insurance_company_deleted_failed'),
+                type: 'error'
+            })
         }
     })
 }
