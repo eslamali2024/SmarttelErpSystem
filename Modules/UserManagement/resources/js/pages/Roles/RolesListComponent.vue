@@ -36,8 +36,10 @@ import {
     CardFooter
 } from '@/components/ui/card';
 import { useSearchTable } from '@/composables/useSearchTable';
+import { useToast } from '@/composables/useToast';
 
 const { t } = useI18n();
+const { showToast } = useToast();
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
     { title: t('user_management'), href: null },
@@ -149,9 +151,17 @@ const deleteRole = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+            showToast({
+                title: t('role_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+            showToast({
+                title: t('role_delete_failed'),
+                type: 'error'
+            })
         }
     })
 }

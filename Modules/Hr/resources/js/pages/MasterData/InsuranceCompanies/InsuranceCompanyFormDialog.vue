@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import ButtonSubmit from '@/components/ui/button/ButtonSubmit.vue';
 import { required, minLength, maxLength, email, url } from '@vuelidate/validators'
 import { useDynamicForm } from '@/composables/useDynamicForm';
 import TextareaGroup from '@/components/ui/textarea-group/TextareaGroup.vue';
+import { useToast } from '@/composables/useToast';
 
 const props = defineProps<{
     show: boolean,
@@ -14,7 +16,9 @@ const props = defineProps<{
     loading?: boolean
 }>();
 
+const { t } = useI18n()
 const emit = defineEmits(['update:show']);
+const { showToast } = useToast();
 
 // Vuelidate
 const formSchema = (props: any) => ({
@@ -45,6 +49,17 @@ const submitForm = () => {
             emit('update:show', false)
             form.reset();
             $v.value.$reset();
+
+            showToast({
+                title: props.method_type === 'post' ? t('added_successfully') : t('updated_successfully'),
+                type: 'success'
+            })
+        },
+        onError: () => {
+            showToast({
+                title: props.method_type === 'post' ? t('add_failed') : t('update_failed'),
+                type: 'error'
+            })
         }
     };
 

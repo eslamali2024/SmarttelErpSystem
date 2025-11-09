@@ -16,9 +16,10 @@ import { type BreadcrumbItem } from '@/types';
 import { dashboard } from '@/routes';
 import { useForm } from '@inertiajs/vue3'
 import { Head } from '@inertiajs/vue3';
+import { useToast } from "@/composables/useToast";
 
-
-const { t } = useI18n()
+const { t } = useI18n();
+const { showToast } = useToast();
 
 const props = defineProps<{
     method_type: string,
@@ -132,6 +133,11 @@ const submitForm = async () => {
                     steps.value.forEach(step => {
                         if (step.form) step.form.errors = {};
                     });
+
+                    showToast({
+                        title: props.method_type === 'post' ? t('added_successfully') : t('updated_successfully'),
+                        type: 'success'
+                    })
                 },
                 onError: (serverErrors: any) => {
                     Object.keys(serverErrors).forEach(key => {
@@ -158,6 +164,10 @@ const submitForm = async () => {
                         }
                     });
 
+                    showToast({
+                        title: props.method_type === 'post' ? t('add_failed') : t('update_failed'),
+                        type: 'error'
+                    })
                 }
             };
 
@@ -192,6 +202,11 @@ const nextStep = async () => {
         }
         return true;
     }
+
+    showToast({
+        title: t('validation_failed'),
+        type: 'error'
+    })
     return false;
 };
 

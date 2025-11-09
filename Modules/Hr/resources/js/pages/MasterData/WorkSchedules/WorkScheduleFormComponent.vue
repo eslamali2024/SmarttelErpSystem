@@ -30,6 +30,7 @@ import { Switch } from "@/components/ui/switch"
 import WorkScheduleRulesFormComponent from './WorkScheduleRulesFormComponent.vue';
 import { computed } from "vue";
 import Can from '@/components/ui/Auth/Can.vue';
+import { useToast } from '@/composables/useToast';
 
 const props = defineProps<{
     method_type: string,
@@ -45,6 +46,7 @@ const props = defineProps<{
 
 // Master Data
 const { t } = useI18n();
+const { showToast } = useToast();
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
     { title: t('hr'), href: null },
@@ -84,6 +86,17 @@ const submitForm = () => {
         onSuccess: () => {
             form.reset();
             $v.value.$reset();
+
+            showToast({
+                title: props.method_type === 'post' ? t('added_successfully') : t('updated_successfully'),
+                type: 'success'
+            })
+        },
+        onError: () => {
+            showToast({
+                title: props.method_type === 'post' ? t('add_failed') : t('update_failed'),
+                type: 'error'
+            })
         }
     };
 

@@ -10,6 +10,8 @@ import en from './locales/en';
 import ar from './locales/ar';
 import { useLang } from './composables/useLang';
 import { createPinia } from 'pinia';
+import { toast } from 'vue-sonner'
+
 
 // Sit General Messages
 const generalMessages = { en, ar };
@@ -81,6 +83,13 @@ createInertiaApp({
             .use(plugin)
             .use(i18n)
             .use(pinia)
+            .provide('showToast', (payload: { title: string; type?: 'success' | 'error' | 'info' | 'warning' }) => {
+                const type = payload.type || 'success'
+                toast[type](payload.title, {
+                    duration: 3000,
+                    closeButton: true,
+                })
+            })
             .mount(el);
     },
 

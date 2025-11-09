@@ -35,9 +35,11 @@ import TableActions from '@/components/ui/table/TableActions.vue';
 import employeesRoute from '@/routes/hr/employees';
 import { strLimit } from '@/utils/strLimit';
 import { useSearchTable } from '@/composables/useSearchTable';
+import { useToast } from '@/composables/useToast';
 
 // Master Data
 const { t } = useI18n();
+const { showToast } = useToast();
 const currentItem = ref<any>(null)
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
@@ -85,9 +87,19 @@ const deleteEmployee = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+
+            showToast({
+                title: t('employee_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+
+            showToast({
+                title: t('employee_delete_failed'),
+                type: 'error'
+            })
         }
     })
 }

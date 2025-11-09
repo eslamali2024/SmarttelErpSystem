@@ -19,6 +19,7 @@ import {
 import RoleModules from '@modules/UserManagement/resources/js/components/RoleModules.vue';
 import { required, email, minLength, maxLength } from '@vuelidate/validators'
 import { useDynamicForm } from '@/composables/useDynamicForm';
+import { useToast } from '@/composables/useToast';
 
 const props = defineProps<{
     show: boolean,
@@ -35,6 +36,7 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
+const { showToast } = useToast();
 const emit = defineEmits(['update:show']);
 let roleOptions = props.roles?.map((role) => ({ value: role, label: role })) || [];
 const isReadOnly = computed(() => props.method_type === 'show')
@@ -81,9 +83,16 @@ const submitForm = () => {
             emit('update:show', false);
             form.reset();
             $v.value.$reset();
+            showToast({
+                title: props.method_type === 'post' ? t('added_successfully') : t('updated_successfully'),
+                type: 'success'
+            })
         },
-        onError: (e: any) => {
-            console.error(e);
+        onError: () => {
+            showToast({
+                title: props.method_type === 'post' ? t('add_failed') : t('update_failed'),
+                type: 'error'
+            })
         },
         preserveScroll: true,
     };

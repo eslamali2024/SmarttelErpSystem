@@ -37,6 +37,7 @@ import {
 import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
 import { strLimit } from '@/utils/strLimit';
 import { useSearchTable } from '@/composables/useSearchTable';
+import { useToast } from '@/composables/useToast';
 
 // Master Data
 const { t } = useI18n();
@@ -45,6 +46,7 @@ const currentItem = ref<any>(null)
 const method_type = ref("post");
 const action = ref(allowanceTypesRoute.store().url);
 const showLoading = ref(false)
+const { showToast } = useToast();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
@@ -120,9 +122,17 @@ const deleteAllowanceType = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+            showToast({
+                title: t('allowance_type_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+            showToast({
+                title: t('allowance_type_deleted_failed'),
+                type: 'error'
+            })
         }
     })
 }
