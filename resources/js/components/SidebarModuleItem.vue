@@ -16,7 +16,7 @@ const page = usePage();
 
 const props = defineProps<{
     module: Module,
-    auth_permissions: AuthPermissions[]
+    permissions: AuthPermissions[]
 }>()
 
 // Import the recursive component
@@ -24,7 +24,7 @@ import SidebarModuleItem from './SidebarModuleItem.vue'
 
 function hasPermission(module: Module) {
     if (!module.permission_title) return true;
-    const permValues = props.auth_permissions;
+    const permValues = props.permissions;
     return permValues.includes(module.permission_title);
 }
 
@@ -71,7 +71,7 @@ const shouldBeOpen = isInModulePath(props.module);
             <CollapsibleContent>
                 <SidebarMenuSub>
                     <SidebarModuleItem v-for="child in module.children" :key="child.id" :module="child"
-                        :auth_permissions="auth_permissions" />
+                        :permissions="permissions" />
                 </SidebarMenuSub>
             </CollapsibleContent>
         </SidebarMenuItem>

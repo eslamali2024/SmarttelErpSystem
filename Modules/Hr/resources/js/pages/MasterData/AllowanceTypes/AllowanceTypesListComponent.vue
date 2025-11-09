@@ -16,7 +16,7 @@ import PaginationUse from '@/components/ui/pagination-use/PaginationUse.vue';
 import TableEmpty from '@/components/ui/table/TableEmpty.vue';
 import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
-import { reactive, watch, ref } from 'vue';
+import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import allowanceTypesRoute from '@/routes/hr/master-data/allowance-types';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
@@ -35,7 +35,8 @@ import {
     CardFooter
 } from '@/components/ui/card';
 import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
-import { useStrLimit } from '@/composables/useStrLimit';
+import { strLimit } from '@/utils/strLimit';
+import { useSearchTable } from '@/composables/useSearchTable';
 
 // Master Data
 const { t } = useI18n();
@@ -92,21 +93,14 @@ const toggleFormDialog = (item?: any) => {
 }
 
 // reactive search
-const urlParams = new URLSearchParams(window.location.search);
-
-const search = reactive({
-    name: urlParams.get('name') ?? '',
-    type: urlParams.get('type') ?? '',
-    taxable: urlParams.get('taxable') ?? '',
+const { search } = useSearchTable(allowanceTypesRoute.index().url, {
+    name: '',
+    type: '',
+    taxable: { // Just For Select Operator
+        value: '',
+        operator: '='
+    },
 });
-
-// watch search changes
-watch(search, () => {
-    router.get(allowanceTypesRoute.index().url, search, {
-        preserveState: true,
-        replace: true,
-    })
-}, { deep: true });
 
 // Delete Modal
 const showDeleteModal = ref(false)
@@ -178,7 +172,7 @@ const toggleShowDialog = (allowance_type: any) => {
                                     :options="props.types || []" />
                             </TableHead>
                             <TableHead class="p-2">
-                                <SelectGroup v-model="search.taxable" :placeholder="$t('please_select_a_taxable')"
+                                <SelectGroup v-model="search.taxable.value" :placeholder="$t('please_select_a_taxable')"
                                     :options="props.taxables || []" />
                             </TableHead>
                             <TableHead></TableHead>
@@ -191,10 +185,10 @@ const toggleShowDialog = (allowance_type: any) => {
                             <TableCell class="font-medium text-center">
                                 <TablePaginationNumbers :items="props.allowance_types" :index="index" />
                             </TableCell>
-                            <TableCell class="text-center">{{ useStrLimit(allowance_type.name, 15) }}</TableCell>
-                            <TableCell class="text-center">{{ useStrLimit(allowance_type.allowance_type, 15) }}
+                            <TableCell class="text-center">{{ strLimit(allowance_type.name, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(allowance_type.allowance_type, 15) }}
                             </TableCell>
-                            <TableCell class="text-center">{{ useStrLimit(allowance_type.allowance_taxable, 15) }}
+                            <TableCell class="text-center">{{ strLimit(allowance_type.allowance_taxable, 15) }}
                             </TableCell>
                             <TableCell>
                                 <TableActionsDialog class="text-center flex justify-center"

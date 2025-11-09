@@ -1,21 +1,23 @@
 <script setup lang="ts">
-import { usePage } from '@inertiajs/vue3'
+import { useAppStore } from '@/stores/appStore';
+import { storeToRefs } from 'pinia';
 
 const props = defineProps<{
     permissions?: string | string[]
 }>()
 
-const page = usePage()
-const authPermissions = (page.props.auth?.auth_permissions ?? []) as string[]
+const appStore = useAppStore()
+const { permissions: authPermissions } = storeToRefs(appStore)
 
 const hasPermission = (): boolean => {
+    const perms = authPermissions.value ?? []
     if (!props.permissions) return false
 
     if (Array.isArray(props.permissions)) {
-        return props.permissions.some(p => authPermissions.includes(p))
+        return props.permissions.some(p => perms.includes(p))
     }
 
-    return authPermissions.includes(props.permissions)
+    return perms.includes(props.permissions)
 }
 </script>
 

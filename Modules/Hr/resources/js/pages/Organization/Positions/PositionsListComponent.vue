@@ -16,7 +16,7 @@ import PaginationUse from '@/components/ui/pagination-use/PaginationUse.vue';
 import TableEmpty from '@/components/ui/table/TableEmpty.vue';
 import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
-import { reactive, watch, ref } from 'vue';
+import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import positionsRoute from '@/routes/hr/organization/positions';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
@@ -34,6 +34,8 @@ import {
     CardContent,
     CardFooter
 } from '@/components/ui/card';
+import { useSearchTable } from '@/composables/useSearchTable';
+import { strLimit } from '@/utils/strLimit';
 
 // Master Data
 const { t } = useI18n();
@@ -72,7 +74,6 @@ const props = defineProps<{
         name: string
         department_id: number
     }
-
 }>()
 
 
@@ -97,23 +98,19 @@ const toggleFormDialog = (item?: any) => {
 }
 
 // reactive search
-const urlParams = new URLSearchParams(window.location.search);
-
-const search = reactive({
-    name: urlParams.get('name') ?? '',
-    code: urlParams.get('code') ?? '',
-    department: { name: urlParams.get('department') ?? '' },
-    section: { name: urlParams.get('section') ?? '' },
-    division: { name: urlParams.get('division') ?? '' }
+const { search } = useSearchTable(positionsRoute.index().url, {
+    name: '',
+    code: '',
+    department: {
+        name: ''
+    },
+    division: {
+        name: ''
+    },
+    section: {
+        name: ''
+    },
 });
-
-// watch search changes
-watch(search, () => {
-    router.get(positionsRoute.index().url, search, {
-        preserveState: true,
-        replace: true,
-    })
-}, { deep: true });
 
 // Delete Modal
 const showDeleteModal = ref(false)
@@ -183,6 +180,9 @@ const toggleShowDialog = (position: any) => {
                                 <Input :placeholder="$t('code')" v-model="search.code" />
                             </TableHead>
                             <TableHead class="p-2">
+                                <Input :placeholder="$t('name')" v-model="search.name" />
+                            </TableHead>
+                            <TableHead class="p-2">
                                 <Input :placeholder="$t('section')" v-model="search.section.name" />
                             </TableHead>
                             <TableHead class="p-2">
@@ -190,9 +190,6 @@ const toggleShowDialog = (position: any) => {
                             </TableHead>
                             <TableHead class="p-2">
                                 <Input :placeholder="$t('division')" v-model="search.division.name" />
-                            </TableHead>
-                            <TableHead class="p-2">
-                                <Input :placeholder="$t('name')" v-model="search.name" />
                             </TableHead>
                             <TableHead></TableHead>
                         </TableRow>
@@ -203,11 +200,12 @@ const toggleShowDialog = (position: any) => {
                             <TableCell class="font-medium text-center">
                                 <TablePaginationNumbers :items="props.positions" :index="index" />
                             </TableCell>
-                            <TableCell class="text-center">{{ position.code ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ position.section?.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ position.department?.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ position.division?.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ position.name }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(position.code, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(position.name, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(position.section?.name, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(position.department?.name, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(position.division?.name, 15) }}
+                            </TableCell>
                             <TableCell>
                                 <TableActionsDialog class="text-center flex justify-center" canShow="position_show"
                                     :show="() => toggleShowDialog(position)" canEdit="position_edit"

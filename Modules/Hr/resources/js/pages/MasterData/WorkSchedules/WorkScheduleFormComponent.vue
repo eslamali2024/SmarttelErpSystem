@@ -76,6 +76,7 @@ const formSchema = (props: any) => ({
 const { form, $v } = useDynamicForm(props, formSchema)
 
 const submitForm = () => {
+    if (!props.action || !props.method_type) return;
     $v.value.$touch()
     if ($v.value.$invalid) return;
 

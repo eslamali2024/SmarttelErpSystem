@@ -1,25 +1,29 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/app/AppSidebarLayout.vue';
-import type { BreadcrumbItemType } from '@/types';
-import { usePage } from '@inertiajs/vue3';
-import { AuthPermissions } from '@/types';
+import { onMounted } from 'vue'
+import AppLayout from '@/layouts/app/AppSidebarLayout.vue'
+import { useAppStore } from '@/stores/appStore'
+import type { BreadcrumbItemType } from '@/types'
+import Spinner from '@/components/ui/spinner/Spinner.vue';
 
-interface Props {
-    breadcrumbs?: BreadcrumbItemType[];
-}
+interface Props { breadcrumbs?: BreadcrumbItemType[] }
+withDefaults(defineProps<Props>(), { breadcrumbs: () => [] })
 
-withDefaults(defineProps<Props>(), {
-    breadcrumbs: () => [],
-});
+const appStore = useAppStore()
 
-const page = usePage()
-const auth_permissions = (page.props.auth.auth_permissions ?? []) as AuthPermissions[]
+onMounted(() => {
+    appStore.load()
+})
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="breadcrumbs" :auth_permissions="auth_permissions">
-        <div class="p-3">
+    <AppLayout :breadcrumbs="breadcrumbs" :loading="appStore.loaded">
+        <div v-if="appStore.loaded" class="p-3">
             <slot />
+        </div>
+        <div v-else class="h-25 p-4">
+            <div class="bg-muted rounded-lg flex items-center justify-center h-full">
+                <Spinner class="size-8" />
+            </div>
         </div>
     </AppLayout>
 </template>

@@ -30,10 +30,10 @@ import {
     CardContent,
     CardFooter
 } from '@/components/ui/card';
-import { useStrLimit } from '@/composables/useStrLimit';
 import { useSearchTable } from '@/composables/useSearchTable';
 import TableActions from '@/components/ui/table/TableActions.vue';
 import A from '@/components/ui/a/A.vue';
+import { strLimit } from '@/utils/strLimit';
 
 // Master Data
 const { t } = useI18n();
@@ -57,7 +57,9 @@ const props = defineProps<{
 }>()
 
 // reactive search
-const { search } = useSearchTable(workSchedulesRoute.index().url);
+const { search } = useSearchTable(workSchedulesRoute.index().url, {
+    name: '',
+});
 
 // Delete Modal
 const showDeleteModal = ref(false)
@@ -133,7 +135,7 @@ const deleteTimeMaangement = () => {
                                 <TablePaginationNumbers :items="props.work_schedules" :index="index" />
                             </TableCell>
                             <TableCell class="text-center">
-                                {{ useStrLimit(work_schedule.name, 15) }}
+                                {{ strLimit(work_schedule.name, 15) }}
                             </TableCell>
                             <TableCell class="text-center">
                                 {{ work_schedule.start_time }}

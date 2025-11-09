@@ -16,7 +16,6 @@ import PaginationUse from '@/components/ui/pagination-use/PaginationUse.vue';
 import TableEmpty from '@/components/ui/table/TableEmpty.vue';
 import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
-import { reactive, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import divisionsRoute from '@/routes/hr/organization/divisions';
 import {
@@ -35,6 +34,8 @@ import { useI18n } from 'vue-i18n';
 import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
 import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
 import Can from '@/components/ui/Auth/Can.vue';
+import { strLimit } from '@/utils/strLimit';
+import { useSearchTable } from '@/composables/useSearchTable';
 
 // Master Data
 const { t } = useI18n();
@@ -66,21 +67,11 @@ const props = defineProps<{
 }>()
 
 // reactive search
-const urlParams = new URLSearchParams(window.location.search);
-
-const search = reactive({
-    name: urlParams.get('name') ?? '',
-    code: urlParams.get('code') ?? '',
-    manager: { name: urlParams.get('manager') ?? '' }
-});
-
-// watch search changes
-watch(search, () => {
-    router.get(divisionsRoute.index().url, search, {
-        preserveState: true,
-        replace: true,
-    })
-}, { deep: true });
+const { search } = useSearchTable(divisionsRoute.index().url, {
+    name: '',
+    code: '',
+    manager: { name: '' }
+})
 
 /**
  * Toggle the form dialog for adding or editing a division
@@ -191,9 +182,9 @@ const toggleShowDialog = (poisiton: any) => {
                             <TableCell class="font-medium text-center">
                                 <TablePaginationNumbers :items="props.divisions" :index="index" />
                             </TableCell>
-                            <TableCell class="text-center">{{ division.code ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ division.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ division.manager?.name ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(division.code, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(division.name, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(division.manager?.name, 15) }}</TableCell>
                             <TableCell class="text-center flex">
                                 <TableActionsDialog class="text-center flex justify-center" canShow="division_show"
                                     :show="() => toggleShowDialog(division)" canEdit="division_edit"
