@@ -1,10 +1,5 @@
 import { toast } from 'vue-sonner'
-
-interface ToastPayload {
-    title: string;
-    type?: 'success' | 'error' | 'info' | 'warning';
-    duration?: number;
-}
+import { ToastPayload } from '@/interfaces/ToastPayload'
 
 export const useToast = () => {
     const showToast = (payload: ToastPayload) => {
