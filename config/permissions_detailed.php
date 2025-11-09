@@ -33,6 +33,20 @@ return [
                 'Delete'                    => 'user_delete',
                 'List'                      => 'user_access',
             ],
+            'Approval Flow' => [
+                'Create'                    => 'approval_flow_create',
+                'Edit'                      => 'approval_flow_edit',
+                'Show'                      => 'approval_flow_show',
+                'Delete'                    => 'approval_flow_delete',
+                'List'                      => 'approval_flow_access',
+            ],
+            'Approval Flow Step' => [
+                'Create'                    => 'approval_flow_step_create',
+                'Edit'                      => 'approval_flow_step_edit',
+                'Show'                      => 'approval_flow_step_show',
+                'Delete'                    => 'approval_flow_step_delete',
+                'List'                      => 'approval_flow_step_access',
+            ],
         ]
     ],
 
@@ -117,6 +131,27 @@ return [
                         'Show'                      => 'insurance_company_show',
                         'Delete'                    => 'insurance_company_delete',
                         'List'                      => 'insurance_company_access',
+                    ],
+                    'Public Holidays' => [
+                        'Create'                    => 'public_holiday_create',
+                        'Edit'                      => 'public_holiday_edit',
+                        'Show'                      => 'public_holiday_show',
+                        'Delete'                    => 'public_holiday_delete',
+                        'List'                      => 'public_holiday_access',
+                    ],
+                    'Bonus Types' => [
+                        'Create'                    => 'bonus_type_create',
+                        'Edit'                      => 'bonus_type_edit',
+                        'Show'                      => 'bonus_type_show',
+                        'Delete'                    => 'bonus_type_delete',
+                        'List'                      => 'bonus_type_access',
+                    ],
+                    'Deduction Types' => [
+                        'Create'                    => 'deduction_type_create',
+                        'Edit'                      => 'deduction_type_edit',
+                        'Show'                      => 'deduction_type_show',
+                        'Delete'                    => 'deduction_type_delete',
+                        'List'                      => 'deduction_type_access',
                     ],
                 ]
             ],

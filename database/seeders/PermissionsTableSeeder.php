@@ -23,10 +23,15 @@ class PermissionsTableSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create([
-                'name'          => $permission,
-                'guard_name'    => 'web'
-            ]);
+            Permission::updateOrCreate(
+                [
+                    'name' => $permission
+                ],
+                [
+                    'name'          => $permission,
+                    'guard_name'    => 'web'
+                ]
+            );
         }
     }
 
@@ -111,6 +116,27 @@ class PermissionsTableSeeder extends Seeder
             'insurance_company_delete',
             'insurance_company_show',
 
+            // Public Holidays
+            'public_holiday_access',
+            'public_holiday_create',
+            'public_holiday_edit',
+            'public_holiday_delete',
+            'public_holiday_show',
+
+            // Bonus Types
+            'bonus_type_access',
+            'bonus_type_create',
+            'bonus_type_edit',
+            'bonus_type_delete',
+            'bonus_type_show',
+
+            // Deduction Types
+            'deduction_type_access',
+            'deduction_type_create',
+            'deduction_type_edit',
+            'deduction_type_delete',
+            'deduction_type_show',
+
             // Employees
             'employee_access',
             'employee_create',
@@ -142,6 +168,20 @@ class PermissionsTableSeeder extends Seeder
             'user_edit',
             'user_delete',
             'user_show',
+
+            // Approval flow
+            'approval_flow_access',
+            'approval_flow_create',
+            'approval_flow_edit',
+            'approval_flow_delete',
+            'approval_flow_show',
+
+            // Approval flow Step
+            'approval_flow_step_access',
+            'approval_flow_step_create',
+            'approval_flow_step_edit',
+            'approval_flow_step_delete',
+            'approval_flow_step_show',
         ];
     }
 }

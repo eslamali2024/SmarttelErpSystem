@@ -3,13 +3,14 @@ import { computed } from "vue"
 import { Check, Search } from "lucide-vue-next"
 import { Combobox, ComboboxAnchor, ComboboxEmpty, ComboboxGroup, ComboboxInput, ComboboxItem, ComboboxItemIndicator, ComboboxList } from "@/components/ui/combobox"
 import { Label } from "@/components/ui/label"
+import ScrollArea from "../scroll-area/ScrollArea.vue"
 
 interface Props {
     modelValue?: string | number
     modelValueError?: string
     label?: string
     placeholder?: string
-    options?: Record<string, string> | Array<{ value: string | number; label: string }>
+    options?: Record<string, string> | Array<{ value: string | number; label: string }> | { id: number; name: string };
     vueError?: any
 }
 
@@ -54,15 +55,17 @@ const selectedValue = computed({
                 {{ $t?.('no_results') ?? 'No results found' }}
             </ComboboxEmpty>
 
-            <ComboboxGroup>
-                <ComboboxItem v-for="option in optionsArray" :key="option.value" :value="option">
-                    {{ option.label }}
+            <ScrollArea class="h-[300px] w-full">
+                <ComboboxGroup class=" w-full">
+                    <ComboboxItem v-for="option in optionsArray" :key="option.value" :value="option">
+                        {{ option.label }}
 
-                    <ComboboxItemIndicator>
-                        <Check class="ml-auto h-4 w-4" />
-                    </ComboboxItemIndicator>
-                </ComboboxItem>
-            </ComboboxGroup>
+                        <ComboboxItemIndicator>
+                            <Check class="ml-auto h-4 w-4" />
+                        </ComboboxItemIndicator>
+                    </ComboboxItem>
+                </ComboboxGroup>
+            </ScrollArea>
         </ComboboxList>
 
         <p v-if="props.modelValueError || vueError?.$errors?.[0]?.$message" class="text-sm text-red-500 mt-2">

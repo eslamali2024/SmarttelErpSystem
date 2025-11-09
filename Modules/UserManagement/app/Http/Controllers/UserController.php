@@ -6,7 +6,6 @@ use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Gate;
 use Modules\UserManagement\Models\Role;
-use Modules\UserManagement\Models\Permission;
 use App\Http\Controllers\TransactionController;
 use Modules\UserManagement\Services\RoleService;
 use Modules\UserManagement\Services\UserService;

@@ -93,6 +93,21 @@ watch(
     { deep: true, immediate: true }
 );
 
+watch(() => form.division_id, () => {
+    form.department_id = '';
+    form.section_id = '';
+    form.position_id = '';
+})
+
+watch(() => form.department_id, () => {
+    form.section_id = '';
+    form.position_id = '';
+})
+
+watch(() => form.section_id, () => {
+    form.position_id = '';
+})
+
 // Validation check
 const checkValidation = async () => {
     $v.value.$touch();
