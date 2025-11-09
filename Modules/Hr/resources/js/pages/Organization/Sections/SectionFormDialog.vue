@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import TextareaGroup from '@/components/ui/textarea-group/TextareaGroup.vue';
 import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
@@ -94,6 +94,10 @@ const departmentOptions = computed(() => {
         })) ?? [];
 
     return result;
+});
+
+watch(() => form.division_id, () => {
+    form.department_id = '';
 });
 </script>
 

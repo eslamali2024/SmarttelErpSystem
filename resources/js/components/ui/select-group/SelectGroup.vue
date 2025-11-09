@@ -9,7 +9,7 @@ interface Props {
     modelValueError?: string
     label?: string
     placeholder?: string
-    options?: Record<string, string> | Array<{ value: string | number; label: string }>
+    options?: Record<string, string> | Array<{ value: string | number; label: string }> | { id: number; name: string };
     vueError?: any
 }
 

@@ -10,10 +10,12 @@ use Modules\Hr\Enums\ContractStatusEnum;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Employee extends Model
+class Employee extends Model implements HasMedia
 {
-    use ScopeFilter, SoftDeletes;
+    use ScopeFilter, SoftDeletes, InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -107,5 +109,15 @@ class Employee extends Model
     public function getMaritalStatusLabelAttribute()
     {
         return $this->marital_status?->label();
+    }
+
+    /**
+     * Get the URL of the avatar image of the employee.
+     *
+     * @return string|null
+     */
+    public function getAvatarAttribute()
+    {
+        return $this->getFirstMediaUrl('avatar');
     }
 }

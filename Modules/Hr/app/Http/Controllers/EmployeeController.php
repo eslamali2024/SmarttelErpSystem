@@ -10,7 +10,11 @@ use Modules\Hr\Services\EmployeeService;
 use Modules\Hr\Http\Requests\EmployeeRequest;
 use Modules\Hr\Transformers\EmployeeFormResource;
 use App\Http\Controllers\TransactionController;
+use Modules\Hr\Enums\ContractStatusEnum;
+use Modules\Hr\Enums\GenderEnum;
+use Modules\Hr\Http\Requests\EmployeeUpdateAvaterRequest;
 use Modules\Hr\Http\Requests\GrossUpSalaryRequest;
+use Modules\Hr\Transformers\EmployeeResource;
 
 class EmployeeController extends TransactionController
 {
@@ -27,6 +31,8 @@ class EmployeeController extends TransactionController
 
         return Inertia::render($this->path . 'EmployeesListComponent', [
             'employees'     =>  Employee::filter(request()->query() ?? [])->paginate(request('perPage', 10)),
+            'statuses'      =>  ContractStatusEnum::items(),
+            'genders'       =>  GenderEnum::items()
         ]);
     }
 
@@ -70,7 +76,8 @@ class EmployeeController extends TransactionController
         abort_if(Gate::denies('employee_show'), 403);
 
         return Inertia::render($this->path . 'EmployeeShowComponent', [
-            'employee' => $employee
+            'employee'              => new EmployeeResource($employee),
+            'canEditAvataer'        => Gate::check('employee_edit_avatar', $employee),
         ]);
     }
 
@@ -118,6 +125,23 @@ class EmployeeController extends TransactionController
         return $this->withTransaction(function () use ($request, $employee) {
             $this->employeeService->update($employee, $request->validated());
             return redirect()->route('hr.employees.index');
+        });
+    }
+
+    /**
+     * Update the avatar of the given employee.
+     *
+     * @param  \Illuminate\Http\EmployeeUpdateAvaterRequest  $request
+     * @param  \Modules\Hr\Models\Employee  $employee
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateAvatar(EmployeeUpdateAvaterRequest $request, Employee $employee)
+    {
+        abort_if(Gate::denies('employee_edit_avatar', $employee), 403);
+
+        return $this->withTransaction(function () use ($request, $employee) {
+            $this->employeeService->updateAvatar($employee, $request->validated());
+            return redirect()->route('hr.employees.show', $employee);
         });
     }
 

@@ -36,7 +36,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('insurance-companies',  InsuranceCompanyController::class)->except(['show', 'edit', 'create']);
         });
 
-        Route::resource('employees',                EmployeeController::class);
+        Route::resource('employees',                           EmployeeController::class);
+        Route::post('employees/{employee}/update-avatar',     [EmployeeController::class, 'updateAvatar'])->name('employees.update-avatar');
         Route::post('gross-up', [EmployeeController::class, 'getGrossUp'])->name('employees.gross-up');
     });
 });

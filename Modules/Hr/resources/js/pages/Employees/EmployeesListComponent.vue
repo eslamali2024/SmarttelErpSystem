@@ -36,18 +36,9 @@ import employeesRoute from '@/routes/hr/employees';
 import { strLimit } from '@/utils/strLimit';
 import { useSearchTable } from '@/composables/useSearchTable';
 import { useToast } from '@/composables/useToast';
+import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
 
-// Master Data
-const { t } = useI18n();
-const { showToast } = useToast();
-const currentItem = ref<any>(null)
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: t('dashboard'), href: dashboard().url },
-    { title: t('hr'), href: null },
-    { title: t('employees'), href: null },
-];
-
-const props = defineProps<{
+interface Props {
     employees?: {
         data?: any[],
         links?: any[],
@@ -55,18 +46,37 @@ const props = defineProps<{
         per_page?: number,
         current_page?: number
     },
-}>()
+    genders?: {
+        id: number
+        name: string
+    },
+    statuses?: {
+        id: number
+        name: string
+    }
+}
+
+// Master Data
+const { t } = useI18n();
+const { showToast } = useToast();
+const currentItem = ref<any>(null)
+const props = defineProps<Props>()
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: t('dashboard'), href: dashboard().url },
+    { title: t('hr'), href: null },
+    { title: t('employees'), href: null },
+];
 
 // reactive search
 const { search } = useSearchTable(employeesRoute.index().url, {
-    name: '',
-    code: '',
-    name_ar: '',
-    email: '',
-    gender: '',
-    phone: '',
-    address: '',
-    status: ''
+    gender: {
+        value: '',
+        operator: '='
+    },
+    status: {
+        value: '',
+        operator: '='
+    }
 });
 
 // Delete Modal
@@ -152,7 +162,8 @@ const deleteEmployee = () => {
                                 <Input :placeholder="$t('email')" v-model="search.email" />
                             </TableHead>
                             <TableHead class="p-2">
-                                <Input :placeholder="$t('gender')" v-model="search.gender" />
+                                <SelectGroup v-model="search.gender.value" :placeholder="$t('please_select_a_gender')"
+                                    :options="props.genders || []" />
                             </TableHead>
                             <TableHead class="p-2">
                                 <Input :placeholder="$t('phone')" v-model="search.phone" />
@@ -161,7 +172,8 @@ const deleteEmployee = () => {
                                 <Input :placeholder="$t('address')" v-model="search.address" />
                             </TableHead>
                             <TableHead class="p-2">
-                                <Input :placeholder="$t('status')" v-model="search.status" />
+                                <SelectGroup v-model="search.status.value" :placeholder="$t('please_select_a_status')"
+                                    :options="props.statuses || []" />
                             </TableHead>
                             <TableHead></TableHead>
                         </TableRow>

@@ -185,6 +185,11 @@ export default {
     validation_failed: 'Validation Failed',
     employee_deleted_successfully: 'Employee Deleted Successfully',
     employee_deleted_failed: 'Employee Deleted Failed',
-
+    please_select_a_gender: 'Please select a gender',
+    please_select_a_status: 'Please select a status',
+    show_employee: 'Show Employee',
+    employee_photo: 'Employee Photo',
+    uploaded_photo_successfully: 'Uploaded Photo Successfully',
+    upload_photo_failed: 'Upload Photo Failed',
 
 }

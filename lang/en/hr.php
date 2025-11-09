@@ -79,5 +79,6 @@ return [
     'allow_early_sign_out'      => 'Allow Early Sign Out',
     'start_time'                => 'Start Time',
     'end_time'                  => 'End Time',
+    'in_active'                 => 'In Active',
 
 ];

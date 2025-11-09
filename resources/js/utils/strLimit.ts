@@ -10,7 +10,8 @@
 export function strLimit(
     input: string | null | undefined,
     limit: number = 15,
-    fallback: string = '-'
+    fallback: string = '-',
+    character: string = '...'
 ): string {
 
     if (!input) {
@@ -18,7 +19,7 @@ export function strLimit(
     }
 
     if (input.length > limit) {
-        return input.slice(0, limit) + '...';
+        return input.slice(0, limit) + character;
     }
 
     return input;
