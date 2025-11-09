@@ -20,6 +20,7 @@ import Button from '@/components/ui/button/Button.vue';
 import { required, minLength, maxLength } from '@vuelidate/validators'
 import { useDynamicForm } from '@/composables/useDynamicForm';
 import { useToast } from '@/composables/useToast';
+import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
 
 const props = defineProps<{
     show: boolean,
@@ -141,7 +142,7 @@ const title = computed(() => {
                                         {{ key }}
                                     </TabsTrigger>
                                 </TabsList>
-                                <div class="w-full md:w-2/3">
+                                <ScrollArea class="w-full md:w-2/3  h-[500px]">
                                     <TabsContent v-for="(module, key) in props.permissions" :key="'content-' + key"
                                         :value="key">
                                         <Card>
@@ -151,7 +152,7 @@ const title = computed(() => {
                                             </CardContent>
                                         </Card>
                                     </TabsContent>
-                                </div>
+                                </ScrollArea>
                             </Tabs>
                         </div>
                     </div>

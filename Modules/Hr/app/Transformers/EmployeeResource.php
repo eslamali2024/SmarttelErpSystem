@@ -35,8 +35,8 @@ class EmployeeResource extends JsonResource
                 'department'            => $this->currentContract?->currentPosition?->department?->name,
                 'section'               => $this->currentContract?->currentPosition?->section?->name,
                 'position'              => $this->currentContract?->currentPosition?->position?->name,
-                'time_management'       => $this->currentContract?->time_management?->name,
-                'work_schedule'         => $this->currentContract?->work_schedule?->name,
+                'time_management'       => $this->currentContract?->timeManagement?->name,
+                'work_schedule'         => $this->currentContract?->workSchedule?->name,
                 'notes'                 => $this->currentContract?->notes
             ],
         ];

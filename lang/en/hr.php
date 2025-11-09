@@ -80,5 +80,10 @@ return [
     'start_time'                => 'Start Time',
     'end_time'                  => 'End Time',
     'in_active'                 => 'In Active',
+    'avatar'                    => 'Avatar',
+    'actual_start_date'         => 'Actual Start Date',
+    'actual_end_date'           => 'Actual End Date',
+    'days'                      => 'Days',
+    'import_file'               => 'Import File',
 
 ];

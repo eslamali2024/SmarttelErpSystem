@@ -14,7 +14,10 @@ use Modules\Hr\Http\Controllers\Organization\{
 use Modules\Hr\Http\Controllers\MasterData\{
     TimeManagementController,
     AllowanceTypeController,
+    BonusTypeController,
+    DeductionTypeController,
     InsuranceCompanyController,
+    PublicHolidayController,
     WorkScheduleController
 };
 
@@ -34,6 +37,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('work-schedules',       WorkScheduleController::class);
             Route::resource('allowance-types',      AllowanceTypeController::class)->except(['show', 'edit', 'create']);
             Route::resource('insurance-companies',  InsuranceCompanyController::class)->except(['show', 'edit', 'create']);
+
+            // Public Holiday
+            Route::resource('public-holidays',      PublicHolidayController::class)->except(['show', 'edit', 'create']);
+            Route::post('public-holidays-import',   [PublicHolidayController::class, 'import'])->name('public-holidays.import');
+            Route::get('public-holidays-download-template',   [PublicHolidayController::class, 'downloadTemplate'])->name('public-holidays.downloadTemplate');
+
+            // Bonus Type
+            Route::resource('bonus-types',          BonusTypeController::class)->except(['show', 'edit', 'create']);
+            Route::post('bonus-types-import',       [BonusTypeController::class, 'import'])->name('bonus-types.import');
+            Route::get('bonus-types-download-template',   [BonusTypeController::class, 'downloadTemplate'])->name('bonus-types.downloadTemplate');
+
+            // Deduction Type
+            Route::resource('deduction-types',          DeductionTypeController::class)->except(['show', 'edit', 'create']);
+            Route::post('deduction-types-import',       [DeductionTypeController::class, 'import'])->name('deduction-types.import');
+            Route::get('deduction-types-download-template',   [DeductionTypeController::class, 'downloadTemplate'])->name('deduction-types.downloadTemplate');
         });
 
         Route::resource('employees',                           EmployeeController::class);

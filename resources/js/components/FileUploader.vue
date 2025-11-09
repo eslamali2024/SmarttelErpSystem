@@ -10,7 +10,7 @@ interface Props {
     preview?: string;
 }
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const props = withDefaults(defineProps<Props>(), {
     accept: 'image/*'
@@ -30,13 +30,15 @@ const handleFileChange = (event: Event) => {
 
     file.value = Array.from(target.files);
 
-    if (file.value.length > 0 && file.value[0].type.startsWith('image/')) {
-        preview.value = URL.createObjectURL(file.value[0]);
+    const selectedFile = file.value[0];
+
+    if (selectedFile && selectedFile.type.startsWith('image/')) {
+        preview.value = URL.createObjectURL(selectedFile);
     } else {
         preview.value = null;
     }
 
-    emit('update:modelValue', file.value[0]);
+    emit('update:modelValue', selectedFile);
 };
 </script>
 
@@ -48,9 +50,16 @@ const handleFileChange = (event: Event) => {
         <!-- Show preview if file exists and is an image -->
         <img v-if="preview" :src="preview" alt="Preview" class="max-w-full max-h-64 object-contain" />
 
+        <!-- Show file name if not image -->
+        <div v-else-if="file.length > 0" class="text-gray-600 text-center">
+            <p class="font-medium">{{ file[0].name }}</p>
+            <p class="text-sm text-gray-400">{{ file[0].type || 'Unknown file type' }}</p>
+        </div>
+
         <!-- Placeholder text when no file selected -->
-        <p v-else class="text-gray-400">{{ props.placeholder || 'Click to upload an image' }}</p>
+        <p v-else class="text-gray-400">{{ props.placeholder || 'Click to upload a file' }}</p>
     </div>
+
     <p v-if="props.modelValueError || props.vueError?.$errors?.[0]?.$message" class="text-sm text-red-500 mt-2">
         {{ props.modelValueError || props.vueError?.$errors?.[0]?.$message }}
     </p>

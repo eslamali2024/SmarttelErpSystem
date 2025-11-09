@@ -88,46 +88,47 @@ const togglePhotoDialog = () => {
                             </CardHeader>
                             <CardContent class="space-y-2">
                                 <div class="grid grid-cols-2 gap-3 py-4">
-                                    <InputGroup :disabled="true" v-model="props.employee.code"
+                                    <InputGroup :disabled="true" :modelValue="props.employee.code"
                                         :label="$t('employee_code')" :placeholder="$t('please_enter_a_employee_code')"
                                         type="text" class="col-span-2" />
 
-                                    <InputGroup :disabled="true" v-model="props.employee.name" :label="$t('name')"
+                                    <InputGroup :disabled="true" :modelValue="props.employee.name" :label="$t('name')"
                                         :placeholder="$t('please_enter_a_name')" type="text" />
 
-                                    <InputGroup :disabled="true" v-model="props.employee.name_ar" :label="$t('name_ar')"
-                                        :placeholder="$t('please_enter_a_name_ar')" type="text" />
+                                    <InputGroup :disabled="true" :modelValue="props.employee.name_ar"
+                                        :label="$t('name_ar')" :placeholder="$t('please_enter_a_name_ar')"
+                                        type="text" />
 
-                                    <InputGroup :disabled="true" v-model="props.employee.email" :label="$t('email')"
+                                    <InputGroup :disabled="true" :modelValue="props.employee.email" :label="$t('email')"
                                         :placeholder="$t('please_enter_a_email')" type="email" />
 
-                                    <InputGroup :disabled="true" v-model="props.employee.phone" :label="$t('phone')"
+                                    <InputGroup :disabled="true" :modelValue="props.employee.phone" :label="$t('phone')"
                                         :placeholder="$t('please_enter_a_phone')" type="text" />
 
-                                    <InputGroup :disabled="true" v-model="props.employee.gender_label"
+                                    <InputGroup :disabled="true" :modelValue="props.employee.gender_label"
                                         :label="$t('gender')" :placeholder="$t('please_select_a_department')" />
 
-                                    <InputGroup :disabled="true" v-model="props.employee.marital_status_label"
+                                    <InputGroup :disabled="true" :modelValue="props.employee.marital_status_label"
                                         :label="$t('marital_status')"
                                         :placeholder="$t('please_select_a_marital_status')" />
 
-                                    <InputGroup :disabled="true" v-model="props.employee.national_id"
+                                    <InputGroup :disabled="true" :modelValue="props.employee.national_id"
                                         :label="$t('national_id')" :placeholder="$t('please_enter_a_national_id')"
                                         type="text" />
 
-                                    <InputGroup :disabled="true" v-model="props.employee.joining_date"
+                                    <InputGroup :disabled="true" :modelValue="props.employee.joining_date"
                                         :label="$t('joining_date')" :placeholder="$t('please_enter_a_joining_date')"
                                         type="date" />
 
-                                    <InputGroup :disabled="true" v-model="props.employee.dob" :label="$t('dob')"
+                                    <InputGroup :disabled="true" :modelValue="props.employee.dob" :label="$t('dob')"
                                         :placeholder="$t('please_enter_a_dob')" type="date" />
 
-                                    <TextareaGroup v-model="props.employee.address" :label="$t('address')"
+                                    <TextareaGroup :modelValue="props.employee.address" :label="$t('address')"
                                         :disabled="true" :placeholder="$t('please_enter_a_address')"
                                         :placeholder_message="$t('please_enter_a_address')" class="col-span-2" />
 
-                                    <TextareaGroup v-model="props.employee.notes" :label="$t('notes')" :disabled="true"
-                                        :placeholder="$t('please_enter_a_notes')"
+                                    <TextareaGroup :modelValue="props.employee.notes" :label="$t('notes')"
+                                        :disabled="true" :placeholder="$t('please_enter_a_notes')"
                                         :placeholder_message="$t('please_enter_a_notes')" class="col-span-2" />
                                 </div>
                             </CardContent>
@@ -140,34 +141,35 @@ const togglePhotoDialog = () => {
                             </CardHeader>
                             <CardContent class="space-y-2">
                                 <div class="grid grid-cols-2 gap-3 py-4">
-                                    <InputGroup v-model="props.employee.contract.start_date" :label="$t('start_date')"
-                                        :placeholder="$t('please_enter_a_start_date')" type="date" />
+                                    <InputGroup :modelValue="props.employee.contract.start_date"
+                                        :label="$t('start_date')" :placeholder="$t('please_enter_a_start_date')"
+                                        type="date" />
 
-                                    <InputGroup v-model="props.employee.contract.end_date" :disabled="true"
+                                    <InputGroup :modelValue="props.employee.contract.end_date" :disabled="true"
                                         :label="$t('end_date')" :placeholder="$t('please_enter_a_end_date')"
                                         type="date" />
 
-                                    <InputGroup v-model="props.employee.contract.division" :disabled="true"
+                                    <InputGroup :modelValue="props.employee.contract.division" :disabled="true"
                                         :label="$t('division')" :placeholder="$t('please_select_a_division')" />
 
-                                    <InputGroup v-model="props.employee.contract.department" :disabled="true"
+                                    <InputGroup :modelValue="props.employee.contract.department" :disabled="true"
                                         :label="$t('department')" :placeholder="$t('please_select_a_department')" />
 
-                                    <InputGroup v-model="props.employee.contract.section" :disabled="true"
+                                    <InputGroup :modelValue="props.employee.contract.section" :disabled="true"
                                         :label="$t('section')" :placeholder="$t('please_select_a_section')" />
 
-                                    <InputGroup v-model="props.employee.contract.position" :disabled="true"
+                                    <InputGroup :modelValue="props.employee.contract.position" :disabled="true"
                                         :label="$t('position')" :placeholder="$t('please_select_a_position')" />
 
-                                    <InputGroup v-model="props.employee.contract.work_schedule"
+                                    <InputGroup :modelValue="props.employee.contract.work_schedule"
                                         :label="$t('work_schedule')" :disabled="true"
                                         :placeholder="$t('please_select_a_work_schedule')" />
 
-                                    <InputGroup v-model="props.employee.contract.time_management"
+                                    <InputGroup :modelValue="props.employee.contract.time_management"
                                         :label="$t('time_management')" :disabled="true"
                                         :placeholder="$t('please_select_a_time_management')" />
 
-                                    <TextareaGroup v-model="props.employee.contract.notes" :label="$t('notes')"
+                                    <TextareaGroup :modelValue="props.employee.contract.notes" :label="$t('notes')"
                                         :disabled="true" :placeholder="$t('please_enter_a_notes')"
                                         :placeholder_message="$t('please_enter_a_notes')" class="col-span-2" />
                                 </div>

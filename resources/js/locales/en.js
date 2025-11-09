@@ -60,5 +60,11 @@ export default {
     create: 'Create',
     added_failed: 'Create failed',
     added_successfully: 'Create successfully',
-
+    public_holidays: 'Public Holidays',
+    import: 'Import',
+    download_sample: 'Download Sample',
+    bonus_types: 'Bonus Types',
+    deduction_types: 'Deduction Types',
+    approval_flows: 'Approval Flows',
+    add_failed: 'Add failed',
 }

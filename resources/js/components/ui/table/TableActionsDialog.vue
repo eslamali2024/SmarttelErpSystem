@@ -38,5 +38,6 @@ const props = defineProps<{
             </Button>
         </Can>
 
+        <slot />
     </TableCell>
 </template>

@@ -185,6 +185,30 @@ class ModuleSeeder extends Seeder
                 'parent_key'        => 'master-data',
             ],
             [
+                'name'              => 'public_holidays',
+                'icon'              => 'ri-folder-open-fill',
+                'path'              => 'hr/master-data/public-holidays',
+                'permission_title'  => 'public_holiday_access',
+                'status'            => true,
+                'parent_key'        => 'master-data',
+            ],
+            [
+                'name'              => 'bonus_types',
+                'icon'              => 'ri-gift-fill',
+                'path'              => 'hr/master-data/bonus-types',
+                'permission_title'  => 'bonus_type_access',
+                'status'            => true,
+                'parent_key'        => 'master-data',
+            ],
+            [
+                'name'              => 'deduction_types',
+                'icon'              => 'ri-eraser-fill',
+                'path'              => 'hr/master-data/deduction-types',
+                'permission_title'  => 'deduction_type_access',
+                'status'            => true,
+                'parent_key'        => 'master-data',
+            ],
+            [
                 'name'              => 'employees',
                 'icon'              => 'ri-user-fill',
                 'path'              => 'hr/employees',
@@ -199,7 +223,6 @@ class ModuleSeeder extends Seeder
     {
         return [
             [
-                'key'               => 'roles',
                 'name'              => 'roles',
                 'icon'              => 'ri-shield-user-line',
                 'path'              => 'user-management/roles',
@@ -208,7 +231,6 @@ class ModuleSeeder extends Seeder
                 'parent_key'        => 'user-management',
             ],
             [
-                'key'               => 'permissions',
                 'name'              => 'permissions',
                 'icon'              => 'ri-lock-line',
                 'path'              => 'user-management/permissions',
@@ -217,11 +239,18 @@ class ModuleSeeder extends Seeder
                 'parent_key'        => 'user-management',
             ],
             [
-                'key'               => 'users',
                 'name'              => 'users',
                 'icon'              => 'ri-user-search-line',
                 'path'              => 'user-management/users',
                 'permission_title'  => 'user_access',
+                'status'            => true,
+                'parent_key'        => 'user-management',
+            ],
+            [
+                'name'              => 'approval_flows',
+                'icon'              => 'ri-group-line',
+                'path'              => 'user-management/approval-flows',
+                'permission_title'  => 'approval_flow_access',
                 'status'            => true,
                 'parent_key'        => 'user-management',
             ],
