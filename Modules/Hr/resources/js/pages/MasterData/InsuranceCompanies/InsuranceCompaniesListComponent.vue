@@ -35,7 +35,8 @@ import {
     CardFooter
 } from '@/components/ui/card';
 import { useSearchTable } from '@/composables/useSearchTable';
-import { useStrLimit } from '@/composables/useStrLimit';
+import { strLimit } from '@/utils/strLimit';
+import { useToast } from '@/composables/useToast';
 
 // Master Data
 const { t } = useI18n();
@@ -44,6 +45,8 @@ const currentItem = ref<any>(null)
 const method_type = ref("post");
 const action = ref(insuranceCompaniesRoute.store().url);
 const showLoading = ref(false)
+const { showToast } = useToast();
+
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
@@ -103,9 +106,17 @@ const deleteAllowanceType = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+            showToast({
+                title: t('insurance_company_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+            showToast({
+                title: t('insurance_company_deleted_failed'),
+                type: 'error'
+            })
         }
     })
 }
@@ -170,13 +181,13 @@ const toggleShowDialog = (insurance_company: any) => {
                             <TableCell class="font-medium text-center">
                                 <TablePaginationNumbers :items="props.insurance_companies" :index="index" />
                             </TableCell>
-                            <TableCell class="text-center">{{ useStrLimit(insurance_company.name, 15) }}</TableCell>
-                            <TableCell class="text-center">{{ useStrLimit(insurance_company.email, 15) }}</TableCell>
-                            <TableCell class="text-center">{{ useStrLimit(insurance_company.phone, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(insurance_company.name, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(insurance_company.email, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(insurance_company.phone, 15) }}</TableCell>
                             <TableCell class="text-center">
                                 <a v-if="insurance_company.website" :href="insurance_company.website" target="_blank"
                                     rel="noopener noreferrer" class="text-blue-400 hover:text-blue-800 duration-200">
-                                    {{ useStrLimit(insurance_company.website, 15) }}
+                                    {{ strLimit(insurance_company.website, 15) }}
                                 </a>
                                 <span v-else>-</span>
                             </TableCell>

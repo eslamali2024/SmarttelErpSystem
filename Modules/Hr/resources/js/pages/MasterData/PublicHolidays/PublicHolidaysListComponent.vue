@@ -1,0 +1,274 @@
+<script setup lang="ts">
+import AppLayout from '@/layouts/AppLayout.vue';
+import { dashboard } from '@/routes';
+import { type BreadcrumbItem } from '@/types';
+import { Head } from '@inertiajs/vue3';
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import PaginationUse from '@/components/ui/pagination-use/PaginationUse.vue';
+import TableEmpty from '@/components/ui/table/TableEmpty.vue';
+import TableFooter from '@/components/ui/table/TableFooter.vue';
+import Input from '@/components/ui/input/Input.vue';
+import { ref } from 'vue';
+import { router } from '@inertiajs/vue3';
+import publicHolidaysRoute from '@/routes/hr/master-data/public-holidays';
+import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
+import Button from '@/components/ui/button/Button.vue';
+import PublicHolidayFormDialog from './PublicHolidayFormDialog.vue';
+import PublicHolidayShowDialog from './PublicHolidayShowDialog.vue';
+import { useI18n } from 'vue-i18n';
+import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
+import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
+import Can from '@/components/ui/Auth/Can.vue';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardFooter
+} from '@/components/ui/card';
+import { strLimit } from '@/utils/strLimit';
+import { useSearchTable } from '@/composables/useSearchTable';
+import { useToast } from '@/composables/useToast';
+import { DropdownMenu } from '@/components/ui/dropdown-menu';
+import DropdownMenuTrigger from '@/components/ui/dropdown-menu/DropdownMenuTrigger.vue';
+import DropdownMenuContent from '@/components/ui/dropdown-menu/DropdownMenuContent.vue';
+import DropdownMenuItem from '@/components/ui/dropdown-menu/DropdownMenuItem.vue';
+import DropdownMenuSeparator from '@/components/ui/dropdown-menu/DropdownMenuSeparator.vue';
+import ImportDialog from '@/components/ImportDialog.vue';
+
+// Master Data
+const { t } = useI18n();
+const showFormDialog = ref(false)
+const showImportDialog = ref(false)
+const currentItem = ref<any>(null)
+const method_type = ref("post");
+const action = ref(publicHolidaysRoute.store().url);
+const showLoading = ref(false)
+const { showToast } = useToast();
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: t('dashboard'), href: dashboard().url },
+    { title: t('hr'), href: null },
+    { title: t('master_data'), href: null },
+    { title: t('public_holidays'), href: null },
+];
+
+const props = defineProps<{
+    public_holidays?: {
+        data?: any[],
+        links?: any[],
+        total?: number,
+        per_page?: number,
+        current_page?: number
+    },
+}>()
+
+
+/**
+ * Toggle the form dialog for adding or editing a public_holiday
+ * @param {any} item - The item to be edited, or null for adding a new item
+ */
+const toggleFormDialog = (item?: any) => {
+    showLoading.value = true
+    showFormDialog.value = true;
+    currentItem.value = item;
+
+    if (item) {
+        method_type.value = "put";
+        action.value = publicHolidaysRoute.update(item.id).url;
+    } else {
+        method_type.value = "post";
+        action.value = publicHolidaysRoute.store().url;
+    }
+
+    showLoading.value = false
+}
+
+// reactive search
+const { search } = useSearchTable(publicHolidaysRoute.index().url);
+
+// Delete Modal
+const showDeleteModal = ref(false)
+const isDeleting = ref(false)
+
+const toggleShowDeleteModal = (public_holiday: any) => {
+    currentItem.value = public_holiday
+    showDeleteModal.value = true
+}
+
+const deletePublicHoliday = () => {
+    if (!currentItem.value) return
+    isDeleting.value = true
+
+    router.delete(publicHolidaysRoute.destroy(currentItem.value.id).url, {
+        onFinish: () => {
+            showDeleteModal.value = false
+            currentItem.value = null
+            isDeleting.value = false
+            showToast({
+                title: t('public_holiday_deleted_successfully'),
+                type: 'success'
+            })
+        },
+        onError: () => {
+            isDeleting.value = false
+            showToast({
+                title: t('public_holiday_deleted_failed'),
+                type: 'error'
+            })
+        }
+    })
+}
+
+// Show Modal
+const showShowDialog = ref(false)
+const toggleShowDialog = (public_holiday: any) => {
+    currentItem.value = public_holiday
+    showShowDialog.value = true
+}
+
+/**
+ * Toggle the import dialog for importing public holidays
+ */
+const toggleImportialog = () => {
+    showImportDialog.value = true;
+
+    action.value = publicHolidaysRoute.import().url
+    method_type.value = "post"
+}
+</script>
+
+<template>
+
+    <Head :title="$t('public_holidays')" />
+
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <Card>
+            <CardHeader class="flex justify-between items-center">
+                <CardTitle>{{ $t('public_holidays') }}</CardTitle>
+                <Can permissions="public_holiday_create">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <Button
+                                class="cursor-pointer bg-gray-600/70 hover:bg-gray-600/80 dark:bg-gray-50/70 dark:hover:bg-gray-50/80 ">
+                                <i class="ri ri-settings-3-line"></i>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem>
+                                <button v-on:click="toggleFormDialog(null)" class="cursor-pointer">
+                                    <i class="ri ri-add-line"></i> {{ $t("add_public_holiday") }}
+                                </button>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                                <a :href="publicHolidaysRoute.downloadTemplate().url" rel="noopener"
+                                    class="btn btn-outline-primary">
+                                    <i class="ri ri-download-2-line me-2"></i>
+                                    {{ $t('download_sample') }}
+                                </a>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <button v-on:click="toggleImportialog()" class="cursor-pointer">
+                                    <i class="ri ri-file-excel-2-line"></i> {{ $t("import_public_holidays") }}
+                                </button>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </Can>
+            </CardHeader>
+
+            <CardContent>
+                <Table>
+                    <TableCaption>{{ $t('public_holidays') }}</TableCaption>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead class="w-[100px] text-center">{{ $t('no') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('name') }}</TableHead>
+                            <TableHead class="text-center text-nowrap">{{ $t('start_date') }}</TableHead>
+                            <TableHead class="text-center text-nowrap">{{ $t('end_date') }}</TableHead>
+                            <TableHead class="text-center text-nowrap">{{ $t('actual_start_date') }}</TableHead>
+                            <TableHead class="text-center text-nowrap">{{ $t('actual_end_date') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('days') }}</TableHead>
+                            <TableHead class="text-center">{{ $t('actions') }}</TableHead>
+                        </TableRow>
+                        <TableRow>
+                            <TableHead class="w-[100px]"></TableHead>
+                            <TableHead class="p-2">
+                                <Input :placeholder="$t('name')" v-model="search.name" />
+                            </TableHead>
+                            <TableHead colspan="6"></TableHead>
+                        </TableRow>
+                    </TableHeader>
+
+                    <TableBody>
+                        <TableRow v-for="(public_holiday, index) in props.public_holidays?.data || []"
+                            :key="public_holiday.id">
+                            <TableCell class="font-medium text-center">
+                                <TablePaginationNumbers :items="props.public_holidays" :index="index" />
+                            </TableCell>
+                            <TableCell class="text-center">{{ strLimit(public_holiday.name, 15) }}</TableCell>
+                            <TableCell class="text-center">
+                                {{ strLimit(public_holiday.start_date, 15) }}
+                            </TableCell>
+                            <TableCell class="text-center">
+                                {{ strLimit(public_holiday.end_date, 15) }}
+                            </TableCell>
+                            <TableCell class="text-center">
+                                {{ strLimit(public_holiday.actual_start_date, 15) }}
+                            </TableCell>
+                            <TableCell class="text-center">
+                                {{ strLimit(public_holiday.actual_end_date, 15) }}
+                            </TableCell>
+                            <TableCell class="text-center">
+                                {{ strLimit(public_holiday.days, 15) }}
+                            </TableCell>
+                            <TableCell>
+                                <TableActionsDialog class="text-center flex justify-center"
+                                    canShow="public_holiday_show" :show="() => toggleShowDialog(public_holiday)"
+                                    canEdit="public_holiday_edit" :edit="() => toggleFormDialog(public_holiday)"
+                                    canDelete="public_holiday_delete"
+                                    :delete="() => toggleShowDeleteModal(public_holiday)" />
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
+
+                    <TableFooter>
+                        <TableEmpty v-if="!props.public_holidays?.data?.length" :colspan="8">
+                            {{ $t('no_data') }}
+                        </TableEmpty>
+                    </TableFooter>
+                </Table>
+            </CardContent>
+            <CardFooter>
+                <PaginationUse :items="props.public_holidays?.links || []" :total="props.public_holidays?.total || 0"
+                    :itemsPerPage="props.public_holidays?.per_page || 10"
+                    :currentPage="props.public_holidays?.current_page || 1" :defaultPage="1" />
+            </CardFooter>
+        </Card>
+    </AppLayout>
+
+    <Can permissions="public_holiday_delete">
+        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deletePublicHoliday"
+            :loading="isDeleting" />
+    </Can>
+
+    <Can permissions="public_holiday_show">
+        <PublicHolidayShowDialog v-model:show="showShowDialog" :item="currentItem" />
+    </Can>
+
+    <Can :permissions="['public_holiday_create', 'public_holiday_edit']">
+        <PublicHolidayFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
+            :item="currentItem" :loading="showLoading" />
+
+        <ImportDialog v-model:show="showImportDialog" :action="action" :item="currentItem" />
+    </Can>
+</template>

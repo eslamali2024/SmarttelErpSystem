@@ -34,8 +34,9 @@ import {
     CardContent,
     CardFooter
 } from '@/components/ui/card';
-import { useStrLimit } from '@/composables/useStrLimit';
 import { useSearchTable } from '@/composables/useSearchTable';
+import { strLimit } from '@/utils/strLimit';
+import { useToast } from '@/composables/useToast';
 
 // Master Data
 const { t } = useI18n();
@@ -44,6 +45,7 @@ const currentItem = ref<any>(null)
 const method_type = ref("post");
 const action = ref(timeManagementsRoute.store().url);
 const showLoading = ref(false)
+const { showToast } = useToast();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
@@ -61,7 +63,6 @@ const props = defineProps<{
         current_page?: number
     }
 }>()
-
 
 /**
  * Toggle the form dialog for adding or editing a time_management
@@ -84,7 +85,9 @@ const toggleFormDialog = (item?: any) => {
 }
 
 // reactive search
-const { search } = useSearchTable(timeManagementsRoute.index().url);
+const { search } = useSearchTable(timeManagementsRoute.index().url, {
+    name: '',
+});
 
 // Delete Modal
 const showDeleteModal = ref(false)
@@ -104,9 +107,17 @@ const deleteTimeMaangement = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+            showToast({
+                title: t('time_management_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+            showToast({
+                title: t('time_management_deleted_failed'),
+                type: 'error'
+            })
         }
     })
 }
@@ -142,9 +153,9 @@ const toggleShowDialog = (time_management: any) => {
                         <TableRow>
                             <TableHead class="w-[100px] text-center">{{ $t('no') }}</TableHead>
                             <TableHead class="text-center">{{ $t('name') }}</TableHead>
-                            <TableHead class="text-center">{{ $t('payroll') }}</TableHead>
-                            <TableHead class="text-center">{{ $t('fingerprint_in') }}</TableHead>
-                            <TableHead class="text-center">{{ $t('fingerprint_out') }}</TableHead>
+                            <TableHead class="text-center text-nowrap">{{ $t('payroll') }}</TableHead>
+                            <TableHead class="text-center text-nowrap">{{ $t('fingerprint_in') }}</TableHead>
+                            <TableHead class="text-center text-nowrap">{{ $t('fingerprint_out') }}</TableHead>
                             <TableHead class="text-center">{{ $t('factors') }}</TableHead>
                             <TableHead class="text-center">{{ $t('actions') }}</TableHead>
                         </TableRow>
@@ -167,7 +178,7 @@ const toggleShowDialog = (time_management: any) => {
                                 <TablePaginationNumbers :items="props.time_managements" :index="index" />
                             </TableCell>
                             <TableCell class="text-center">
-                                {{ useStrLimit(time_management.name, 15) }}
+                                {{ strLimit(time_management.name, 15) }}
                             </TableCell>
                             <TableCell class="text-center">
                                 {{ time_management.payroll ? $t('yes') : $t('no') }}

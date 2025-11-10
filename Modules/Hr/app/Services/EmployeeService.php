@@ -239,4 +239,16 @@ class EmployeeService
         $contract->allowances()->delete();
         $contract->allowances()->createMany($this->optimizeAllowances($data));
     }
+
+    /**
+     * Updates the avatar of the given employee.
+     *
+     * @param \Modules\Hr\Models\Employee $employee The employee to update the avatar for.
+     * @param array $data The data to update the avatar with. The array should contain a single key 'avatar' with the value of the new avatar.
+     */
+    public function updateAvatar(Employee $employee, array $data)
+    {
+        $employee->clearMediaCollection('avatar');
+        $employee->addMedia($data['avatar'] ?? null)->toMediaCollection('avatar');
+    }
 }

@@ -17,7 +17,7 @@ import PaginationUse from '@/components/ui/pagination-use/PaginationUse.vue';
 import TableEmpty from '@/components/ui/table/TableEmpty.vue';
 import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
-import { reactive, watch, ref } from 'vue';
+import { ref } from 'vue';
 import permissionsRoute from '@/routes/user-management/permissions';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
@@ -35,14 +35,17 @@ import {
     CardContent,
     CardFooter
 } from '@/components/ui/card';
+import { useSearchTable } from '@/composables/useSearchTable';
+import { useToast } from '@/composables/useToast';
 
 const { t } = useI18n();
+const { showToast } = useToast();
 const showLoading = ref(false)
 const showFormDialog = ref(false)
 const currentItem = ref<any>(null)
 const method_type = ref("post");
 const action = ref(permissionsRoute.store().url);
-const urlParams = new URLSearchParams(window.location.search);
+const { search } = useSearchTable(permissionsRoute.index().url);
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
@@ -59,19 +62,6 @@ const props = defineProps<{
         current_page?: number
     }
 }>()
-
-// reactive search
-const search = reactive({
-    name: urlParams.get('name') ?? '',
-});
-
-// watch search changes
-watch(search, () => {
-    router.get(permissionsRoute.index().url, search, {
-        preserveState: true,
-        replace: true,
-    })
-}, { deep: true });
 
 
 const toggleFormDialog = (item?: any) => {
@@ -108,9 +98,17 @@ const deletePermission = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+            showToast({
+                title: t('permission_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+            showToast({
+                title: t('permission_delete_failed'),
+                type: 'error'
+            })
         }
     })
 }

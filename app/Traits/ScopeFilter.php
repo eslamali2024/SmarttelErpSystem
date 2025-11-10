@@ -33,9 +33,9 @@ trait ScopeFilter
                         $q->where(...$this->checkFromSeparator($relationColumn[1] ?? 'LIKE', $relationColumn[0], $filter));
                     });
                 } else {
-                    $column = explode(',', $column, 2);
+                    $filter = explode(',', $filter, 2);
 
-                    $query->where(...$this->checkFromSeparator($column[1] ?? 'LIKE', $column[0], $filter));
+                    $query->where(...$this->checkFromSeparator($filter[1] ?? 'LIKE', $column, $filter[0]));
                 }
             });
         });

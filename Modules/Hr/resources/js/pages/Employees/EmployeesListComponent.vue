@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import { reactive, watch, ref } from 'vue';
+import { ref } from 'vue';
 import {
     Table,
     TableBody,
@@ -33,17 +33,12 @@ import {
 import A from '@/components/ui/a/A.vue';
 import TableActions from '@/components/ui/table/TableActions.vue';
 import employeesRoute from '@/routes/hr/employees';
+import { strLimit } from '@/utils/strLimit';
+import { useSearchTable } from '@/composables/useSearchTable';
+import { useToast } from '@/composables/useToast';
+import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
 
-// Master Data
-const { t } = useI18n();
-const currentItem = ref<any>(null)
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: t('dashboard'), href: dashboard().url },
-    { title: t('hr'), href: null },
-    { title: t('employees'), href: null },
-];
-
-const props = defineProps<{
+interface Props {
     employees?: {
         data?: any[],
         links?: any[],
@@ -51,31 +46,38 @@ const props = defineProps<{
         per_page?: number,
         current_page?: number
     },
-}>()
+    genders?: {
+        id: number
+        name: string
+    },
+    statuses?: {
+        id: number
+        name: string
+    }
+}
+
+// Master Data
+const { t } = useI18n();
+const { showToast } = useToast();
+const currentItem = ref<any>(null)
+const props = defineProps<Props>()
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: t('dashboard'), href: dashboard().url },
+    { title: t('hr'), href: null },
+    { title: t('employees'), href: null },
+];
 
 // reactive search
-const urlParams = new URLSearchParams(window.location.search);
-
-const search = reactive({
-    name: urlParams.get('name') ?? '',
-    name_ar: urlParams.get('name_ar') ?? '',
-    code: urlParams.get('code') ?? '',
-    email: urlParams.get('email') ?? '',
-    phone: urlParams.get('phone') ?? '',
-    address: urlParams.get('address') ?? '',
-    status: urlParams.get('status') ?? '',
-    gender: urlParams.get('gender') ?? '',
-
+const { search } = useSearchTable(employeesRoute.index().url, {
+    gender: {
+        value: '',
+        operator: '='
+    },
+    status: {
+        value: '',
+        operator: '='
+    }
 });
-
-// watch search changes
-watch(search, () => {
-    router.get(employeesRoute.index().url, search, {
-        preserveState: true,
-        replace: true,
-    })
-}, { deep: true });
-
 
 // Delete Modal
 const showDeleteModal = ref(false)
@@ -95,9 +97,19 @@ const deleteEmployee = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+
+            showToast({
+                title: t('employee_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+
+            showToast({
+                title: t('employee_delete_failed'),
+                type: 'error'
+            })
         }
     })
 }
@@ -150,7 +162,8 @@ const deleteEmployee = () => {
                                 <Input :placeholder="$t('email')" v-model="search.email" />
                             </TableHead>
                             <TableHead class="p-2">
-                                <Input :placeholder="$t('gender')" v-model="search.gender" />
+                                <SelectGroup v-model="search.gender.value" :placeholder="$t('please_select_a_gender')"
+                                    :options="props.genders || []" />
                             </TableHead>
                             <TableHead class="p-2">
                                 <Input :placeholder="$t('phone')" v-model="search.phone" />
@@ -159,7 +172,8 @@ const deleteEmployee = () => {
                                 <Input :placeholder="$t('address')" v-model="search.address" />
                             </TableHead>
                             <TableHead class="p-2">
-                                <Input :placeholder="$t('status')" v-model="search.status" />
+                                <SelectGroup v-model="search.status.value" :placeholder="$t('please_select_a_status')"
+                                    :options="props.statuses || []" />
                             </TableHead>
                             <TableHead></TableHead>
                         </TableRow>
@@ -170,14 +184,14 @@ const deleteEmployee = () => {
                             <TableCell class="font-medium text-center">
                                 <TablePaginationNumbers :items="props.employees" :index="index" />
                             </TableCell>
-                            <TableCell class="text-center">{{ employee.code ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.name_ar ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.email ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.gender_label ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.phone ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.address ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ employee.status_label ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.code, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.name, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.name_ar, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.email, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.gender_label, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.phone, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.address, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(employee.status_label, 15) }}</TableCell>
                             <TableCell class="text-center flex">
                                 <TableActions class="text-center flex justify-center" canShow="employee_show"
                                     :show="employeesRoute.show(employee.id).url" canEdit="employee_edit"

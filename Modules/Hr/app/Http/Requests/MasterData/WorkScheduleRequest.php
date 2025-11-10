@@ -43,8 +43,8 @@ class WorkScheduleRequest extends FormRequest
             'allow_early_sign_out'              => __('hr.allow_early_sign_out'),
             'days.*.day'                        => __('hr.day'),
             'days.*.work'                       => __('hr.work'),
-            'rules.*.deducation_after_time'     => __('hr.deduction_after_time'),
-            'rules.*.deducation_percentage'     => __('hr.deduction_percentage'),
+            'rules.*.deducation_after_time'     => __('hr.deducation_after_time'),
+            'rules.*.deducation_percentage'     => __('hr.deducation_percentage'),
         ];
     }
 }

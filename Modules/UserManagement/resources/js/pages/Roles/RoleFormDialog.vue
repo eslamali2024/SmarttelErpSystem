@@ -19,6 +19,8 @@ import { useI18n } from 'vue-i18n';
 import Button from '@/components/ui/button/Button.vue';
 import { required, minLength, maxLength } from '@vuelidate/validators'
 import { useDynamicForm } from '@/composables/useDynamicForm';
+import { useToast } from '@/composables/useToast';
+import ScrollArea from '@/components/ui/scroll-area/ScrollArea.vue';
 
 const props = defineProps<{
     show: boolean,
@@ -32,7 +34,9 @@ const props = defineProps<{
     loading?: boolean
 }>();
 
+
 const { t } = useI18n();
+const { showToast } = useToast();
 const emit = defineEmits(['update:show']);
 const isReadOnly = computed(() => props.method_type === 'show')
 
@@ -69,9 +73,16 @@ const submitForm = () => {
             emit('update:show', false);
             form.reset();
             $v.value.$reset();
+            showToast({
+                title: props.method_type === 'post' ? t('added_successfully') : t('updated_successfully'),
+                type: 'success'
+            })
         },
-        onError: (e: any) => {
-            console.error(e);
+        onError: () => {
+            showToast({
+                title: props.method_type === 'post' ? t('add_failed') : t('update_failed'),
+                type: 'error'
+            })
         },
         preserveScroll: true,
     };
@@ -131,7 +142,7 @@ const title = computed(() => {
                                         {{ key }}
                                     </TabsTrigger>
                                 </TabsList>
-                                <div class="w-full md:w-2/3">
+                                <ScrollArea class="w-full md:w-2/3  h-[500px]">
                                     <TabsContent v-for="(module, key) in props.permissions" :key="'content-' + key"
                                         :value="key">
                                         <Card>
@@ -141,7 +152,7 @@ const title = computed(() => {
                                             </CardContent>
                                         </Card>
                                     </TabsContent>
-                                </div>
+                                </ScrollArea>
                             </Tabs>
                         </div>
                     </div>

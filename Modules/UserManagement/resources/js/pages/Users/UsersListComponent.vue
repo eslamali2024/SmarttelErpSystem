@@ -17,7 +17,7 @@ import PaginationUse from '@/components/ui/pagination-use/PaginationUse.vue';
 import TableEmpty from '@/components/ui/table/TableEmpty.vue';
 import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
-import { reactive, watch, ref } from 'vue';
+import { ref } from 'vue';
 import userRoute from '@/routes/user-management/users';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import UserFormDialog from './UserFormDialog.vue';
@@ -34,8 +34,12 @@ import {
     CardContent,
     CardFooter
 } from '@/components/ui/card';
+import { useSearchTable } from '@/composables/useSearchTable';
+import { strLimit } from '@/utils/strLimit';
+import { useToast } from '@/composables/useToast';
 
 const { t } = useI18n();
+const { showToast } = useToast();
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
     { title: t('user_management'), href: null },
@@ -53,25 +57,13 @@ const props = defineProps<{
 }>()
 
 // reactive search
-const urlParams = new URLSearchParams(window.location.search);
-
-const search = reactive({
-    name: urlParams.get('name') ?? '',
-    email: urlParams.get('email') ?? '',
+const { search } = useSearchTable(userRoute.index().url, {
+    name: '',
+    email: '',
     roles: {
-        name: urlParams.get('roles') ?? ''
-    },
-    page: urlParams.get('page') ?? 1
+        name: ''
+    }
 });
-
-// watch search changes
-watch(search, () => {
-    router.get(userRoute.index().url, search, {
-        preserveState: true,
-        replace: true,
-    })
-}, { deep: true });
-
 
 // Form Data
 const showFormDialog = ref(false)
@@ -165,9 +157,17 @@ const deleteUser = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+            showToast({
+                title: t('user_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+            showToast({
+                title: t('user_delete_failed'),
+                type: 'error'
+            })
         }
     })
 }
@@ -220,8 +220,7 @@ const deleteUser = () => {
                             <TableCell class="text-center">{{ user.email ?? '-' }}</TableCell>
                             <TableCell class="text-center">
                                 {{
-                                    user.roles.map((role: any) => role.name).join(', ').toString().substring(0,
-                                        20).concat('...')
+                                    strLimit(user.roles?.map((role: any) => role?.name).join(', ').toString(), 15)
                                 }}
                             </TableCell>
                             <TableCell>

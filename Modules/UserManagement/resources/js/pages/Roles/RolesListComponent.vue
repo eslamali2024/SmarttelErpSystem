@@ -17,7 +17,7 @@ import PaginationUse from '@/components/ui/pagination-use/PaginationUse.vue';
 import TableEmpty from '@/components/ui/table/TableEmpty.vue';
 import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
-import { reactive, watch, ref } from 'vue';
+import { ref } from 'vue';
 import rolesRoute from '@/routes/user-management/roles';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
@@ -35,8 +35,11 @@ import {
     CardContent,
     CardFooter
 } from '@/components/ui/card';
+import { useSearchTable } from '@/composables/useSearchTable';
+import { useToast } from '@/composables/useToast';
 
 const { t } = useI18n();
+const { showToast } = useToast();
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
     { title: t('user_management'), href: null },
@@ -54,20 +57,7 @@ const props = defineProps<{
 }>()
 
 // reactive search
-const urlParams = new URLSearchParams(window.location.search);
-
-const search = reactive({
-    name: urlParams.get('name') ?? '',
-    page: urlParams.get('page') ?? 1
-});
-
-// watch search changes
-watch(search, () => {
-    router.get(rolesRoute.index().url, search, {
-        preserveState: true,
-        replace: true,
-    })
-}, { deep: true });
+const { search } = useSearchTable(rolesRoute.index().url);
 
 
 // Form Data
@@ -161,9 +151,17 @@ const deleteRole = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+            showToast({
+                title: t('role_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+            showToast({
+                title: t('role_delete_failed'),
+                type: 'error'
+            })
         }
     })
 }

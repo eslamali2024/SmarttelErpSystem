@@ -17,7 +17,7 @@ import PaginationUse from '@/components/ui/pagination-use/PaginationUse.vue';
 import TableEmpty from '@/components/ui/table/TableEmpty.vue';
 import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
-import { reactive, watch, ref } from 'vue';
+import { ref } from 'vue';
 import sectionsRoute from '@/routes/hr/organization/sections';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
@@ -35,9 +35,13 @@ import {
     CardContent,
     CardFooter
 } from '@/components/ui/card';
+import { strLimit } from '@/utils/strLimit';
+import { useSearchTable } from '@/composables/useSearchTable';
+import { useToast } from '@/composables/useToast';
 
 // Master Data
 const { t } = useI18n();
+const { showToast } = useToast();
 const showFormDialog = ref(false)
 const currentItem = ref<any>(null)
 const method_type = ref("post");
@@ -75,24 +79,13 @@ const props = defineProps<{
 }>()
 
 // reactive search
-const urlParams = new URLSearchParams(window.location.search);
-
-const search = reactive({
-    name: urlParams.get('name') ?? '',
-    code: urlParams.get('code') ?? '',
-    manager: { name: urlParams.get('manager') ?? '' },
-    division: { name: urlParams.get('division') ?? '' },
-    department: { name: urlParams.get('department') ?? '' }
+const { search } = useSearchTable(sectionsRoute.index().url, {
+    name: '',
+    code: '',
+    manager: { name: '' },
+    division: { name: '' },
+    department: { name: '' }
 });
-
-// watch search changes
-watch(search, () => {
-    router.get(sectionsRoute.index().url, search, {
-        preserveState: true,
-        replace: true,
-    })
-}, { deep: true });
-
 
 const toggleFormDialog = (item?: any) => {
     showLoading.value = true
@@ -128,9 +121,17 @@ const deleteSection = () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
+            showToast({
+                title: t('section_deleted_successfully'),
+                type: 'success'
+            })
         },
         onError: () => {
             isDeleting.value = false
+            showToast({
+                title: t('section_deleted_failed'),
+                type: 'error'
+            })
         }
     })
 }
@@ -198,11 +199,11 @@ const toggleShowDialog = (poisiton: any) => {
                             <TableCell class="font-medium text-center">
                                 <TablePaginationNumbers :items="props.sections" :index="index" />
                             </TableCell>
-                            <TableCell class="text-center">{{ section.code ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ section.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ section.division?.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ section.department?.name ?? '-' }}</TableCell>
-                            <TableCell class="text-center">{{ section.manager?.name ?? '-' }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(section.code, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(section.name, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(section.division?.name, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(section.department?.name, 15) }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(section.manager?.name, 15) }}</TableCell>
                             <TableCell class="text-center flex">
                                 <TableActionsDialog class="text-center flex justify-center" canShow="section_show"
                                     :show="() => toggleShowDialog(section)" canEdit="section_edit"
@@ -239,7 +240,7 @@ const toggleShowDialog = (poisiton: any) => {
 
     <Can :permissions="['section_create', 'section_edit']">
         <SectionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
-            :divisions="props.divisions" :departments="props.departments" :managers="props.managers"
-            :item="currentItem" :loading="showLoading" />
+            :divisions="props.divisions" :departments="props.departments" :managers="props.managers" :item="currentItem"
+            :loading="showLoading" />
     </Can>
 </template>

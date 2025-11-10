@@ -15,7 +15,7 @@ enum ContractStatusEnum: int
         };
     }
 
-    public function items(): array
+    public static function items(): array
     {
         return [
             self::ACTIVE->value => self::ACTIVE->label(),

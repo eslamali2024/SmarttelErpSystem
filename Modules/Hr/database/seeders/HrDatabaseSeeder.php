@@ -21,7 +21,10 @@ class HrDatabaseSeeder extends Seeder
             InsuranceCompanySeeder::class,
             AllowanceTypeSeeder::class,
             TimeManagmentSeeder::class,
-            WorkScheduleSeeder::class
+            WorkScheduleSeeder::class,
+            PublicHolidaySeeder::class,
+            BonusTypeSeeder::class,
+            DeductionTypeSeeder::class
         ]);
     }
 }

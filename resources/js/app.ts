@@ -9,11 +9,14 @@ import { createI18n } from 'vue-i18n';
 import en from './locales/en';
 import ar from './locales/ar';
 import { useLang } from './composables/useLang';
+import { createPinia } from 'pinia';
 
 // Sit General Messages
 const generalMessages = { en, ar };
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 const { lang } = useLang();
+
+const pinia = createPinia();
 
 // Sit Language for Site
 export const i18n = createI18n({
@@ -77,6 +80,7 @@ createInertiaApp({
         createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(i18n)
+            .use(pinia)
             .mount(el);
     },
 
