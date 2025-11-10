@@ -24,7 +24,7 @@ const delegatedProps = computed(() => {
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
 </script>
 
-<template>
+<template >
     <DialogPortal>
         <DialogOverlay />
         <DialogContent data-slot="dialog-content" v-bind="forwarded" :class="cn(

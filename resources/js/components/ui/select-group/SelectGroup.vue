@@ -55,7 +55,7 @@ const selectedValue = computed({
                 {{ $t?.('no_results') ?? 'No results found' }}
             </ComboboxEmpty>
 
-            <ScrollArea class="h-[300px] w-full">
+            <ScrollArea class="max-h-[300px] w-full">
                 <ComboboxGroup class=" w-full">
                     <ComboboxItem v-for="option in optionsArray" :key="option.value" :value="option">
                         {{ option.label }}

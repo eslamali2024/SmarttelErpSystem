@@ -21,8 +21,8 @@ import { router } from '@inertiajs/vue3';
 import deductionTypesRoute from '@/routes/hr/master-data/deduction-types';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import Button from '@/components/ui/button/Button.vue';
-import PublicHolidayFormDialog from './DeductionTypeFormDialog.vue';
-import PublicHolidayShowDialog from './DeductionTypeShowDialog.vue';
+import DeductionTypeFormDialog from './DeductionTypeFormDialog.vue';
+import DeductionTypeShowDialog from './DeductionTypeShowDialog.vue';
 import { useI18n } from 'vue-i18n';
 import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
 import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
@@ -104,7 +104,7 @@ const toggleShowDeleteModal = (deduction_type: any) => {
     showDeleteModal.value = true
 }
 
-const deletePublicHoliday = () => {
+const deleteDeductionType = () => {
     if (!currentItem.value) return
     isDeleting.value = true
 
@@ -237,16 +237,16 @@ const toggleImportialog = () => {
     </AppLayout>
 
     <Can permissions="deduction_type_delete">
-        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deletePublicHoliday"
+        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteDeductionType"
             :loading="isDeleting" />
     </Can>
 
     <Can permissions="deduction_type_show">
-        <PublicHolidayShowDialog v-model:show="showShowDialog" :item="currentItem" />
+        <DeductionTypeShowDialog v-model:show="showShowDialog" :item="currentItem" />
     </Can>
 
     <Can :permissions="['deduction_type_create', 'deduction_type_edit']">
-        <PublicHolidayFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
+        <DeductionTypeFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
             :item="currentItem" :loading="showLoading" />
 
         <ImportDialog v-model:show="showImportDialog" :action="action" :item="currentItem" />

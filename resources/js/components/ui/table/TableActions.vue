@@ -17,6 +17,8 @@ const props = defineProps<{
 
 <template>
     <TableCell class="text-center">
+        <slot name="before" />
+
         <Can :permissions="canShow">
             <A size="sm" v-if="props.show && !props.disabled" :href="props.show"
                 class="mr-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
@@ -37,5 +39,8 @@ const props = defineProps<{
                 <i class="ri ri-delete-bin-line"></i>
             </Button>
         </Can>
+
+        <slot name="after" />
+        <slot />
     </TableCell>
 </template>

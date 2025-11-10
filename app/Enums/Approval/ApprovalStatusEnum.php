@@ -19,33 +19,13 @@ enum ApprovalStatusEnum: int
         };
     }
 
-    public function color(): string
+    public static function items(): array
     {
-        return match ($this) {
-            self::PENDING        => 'text-warning',
-            self::APPROVED       => 'text-success',
-            self::REJECTED       => 'text-danger',
-            self::IN_PROGRESS    => 'text-primary',
-        };
-    }
-
-    public function bgColor(): string
-    {
-        return match ($this) {
-            self::PENDING        => 'bg-warning',
-            self::APPROVED       => 'bg-success',
-            self::REJECTED       => 'bg-danger',
-            self::IN_PROGRESS    => 'bg-primary',
-        };
-    }
-
-    public function icon(): string
-    {
-        return match ($this) {
-            self::PENDING        => 'ri ri-time-line',
-            self::APPROVED       => 'ri ri-checkbox-circle-line',
-            self::REJECTED       => 'ri ri-close-circle-line',
-            self::IN_PROGRESS    => 'ri ri-play-circle-line',
-        };
+        return [
+            self::PENDING->value        => self::PENDING->label(),
+            self::APPROVED->value       => self::APPROVED->label(),
+            self::REJECTED->value       => self::REJECTED->label(),
+            self::IN_PROGRESS->value    => self::IN_PROGRESS->label(),
+        ];
     }
 }

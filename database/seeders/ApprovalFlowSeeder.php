@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
-use App\Enums\Approval\ApprovalTypeEnum;
 use App\Models\Approval\ApprovalFlow;
+use Modules\UserManagement\Models\Role;
+use App\Enums\Approval\ApprovalTypeEnum;
 
 class ApprovalFlowSeeder extends Seeder
 {
@@ -35,38 +35,50 @@ class ApprovalFlowSeeder extends Seeder
     private function models()
     {
         return [
-            // \Modules\Hr\Models\Bonus::class =>    [
-            //     'name'                    => 'Bonus Approval',
-            //     'approvable_type'         => \Modules\Hr\Models\Bonus::class,
-            //     'redirect_route'          => 'hr.bonuses.show',
-            // ],
+            \Modules\Hr\Models\Bonus::class =>    [
+                'name'                    => 'Bonus Approval',
+                'approvable_type'         => \Modules\Hr\Models\Bonus::class,
+                'redirect_route'          => 'hr.bonuses.show',
+            ],
+            \Modules\Hr\Models\Deduction::class =>    [
+                'name'                    => 'Deduction Approval',
+                'approvable_type'         => \Modules\Hr\Models\Deduction::class,
+                'redirect_route'          => 'hr.deductions.show',
+            ],
         ];
     }
 
     private function steps($roles)
     {
         return [
-            // \Modules\Hr\Models\EmployeeErrand::class =>    [
-            //     [
-            //         'name'           => "Section Manager Approval",
-            //         'manager_column' => 'manager_id',
-            //         'approver_type'  => ApprovalTypeEnum::SECTION->value,
-            //         'order'          => 1
-            //     ],
-            //     [
-            //         'name'           => "Department Manager Approval",
-            //         'manager_column' => 'manager_id',
-            //         'approver_type'  => ApprovalTypeEnum::DEPARTMENT->value,
-            //         'order'          => 2
-            //     ],
-            //     [
-            //         'name'          => "HR Manager Approval",
-            //         'roles'         => $roles->whereIn('name', ['hr-manager', 'hr-staff'])->pluck('id')->toArray(),
-            //         'approver_type' => ApprovalTypeEnum::ROLE->value,
-            //         'order'         => 3
-            //     ],
-            // ],
-
+            \Modules\Hr\Models\Bonus::class =>    [
+                [
+                    'name'           => "Department Manager Approval",
+                    'manager_column' => 'manager_id',
+                    'approver_type'  => ApprovalTypeEnum::DEPARTMENT->value,
+                    'order'          => 1
+                ],
+                [
+                    'name'          => "HR Manager Approval",
+                    'roles'         => $roles->whereIn('name', ['hr-manager', 'hr-staff'])->pluck('name')->toArray(),
+                    'approver_type' => ApprovalTypeEnum::ROLE->value,
+                    'order'         => 2
+                ],
+            ],
+            \Modules\Hr\Models\Deduction::class =>    [
+                [
+                    'name'           => "Department Manager Approval",
+                    'manager_column' => 'manager_id',
+                    'approver_type'  => ApprovalTypeEnum::DEPARTMENT->value,
+                    'order'          => 1
+                ],
+                [
+                    'name'          => "HR Manager Approval",
+                    'roles'         => $roles->whereIn('name', ['hr-manager', 'hr-staff'])->pluck('name')->toArray(),
+                    'approver_type' => ApprovalTypeEnum::ROLE->value,
+                    'order'         => 2
+                ],
+            ],
         ];
     }
 }

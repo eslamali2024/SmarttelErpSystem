@@ -19,6 +19,7 @@ class ApprovalRequest extends Model
 
     protected $casts = [
         'status' =>  ApprovalStatusEnum::class,
+        'created_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     public function approvable()

@@ -21,8 +21,8 @@ import { router } from '@inertiajs/vue3';
 import bonusTypesRoute from '@/routes/hr/master-data/bonus-types';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import Button from '@/components/ui/button/Button.vue';
-import PublicHolidayFormDialog from './BonusTypeFormDialog.vue';
-import PublicHolidayShowDialog from './BonusTypeShowDialog.vue';
+import BonusTypeFormDialog from './BonusTypeFormDialog.vue';
+import BonusTypeShowDialog from './BonusTypeShowDialog.vue';
 import { useI18n } from 'vue-i18n';
 import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
 import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
@@ -104,7 +104,7 @@ const toggleShowDeleteModal = (bonus_type: any) => {
     showDeleteModal.value = true
 }
 
-const deletePublicHoliday = () => {
+const deleteBonusType = () => {
     if (!currentItem.value) return
     isDeleting.value = true
 
@@ -235,16 +235,16 @@ const toggleImportialog = () => {
     </AppLayout>
 
     <Can permissions="bonus_type_delete">
-        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deletePublicHoliday"
+        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteBonusType"
             :loading="isDeleting" />
     </Can>
 
     <Can permissions="bonus_type_show">
-        <PublicHolidayShowDialog v-model:show="showShowDialog" :item="currentItem" />
+        <BonusTypeShowDialog v-model:show="showShowDialog" :item="currentItem" />
     </Can>
 
     <Can :permissions="['bonus_type_create', 'bonus_type_edit']">
-        <PublicHolidayFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
+        <BonusTypeFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
             :item="currentItem" :loading="showLoading" />
 
         <ImportDialog v-model:show="showImportDialog" :action="action" :item="currentItem" />

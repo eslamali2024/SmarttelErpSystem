@@ -55,13 +55,13 @@ const filteredFrameworks = computed(() => {
 
             <TagsInput v-model="internalValue" class="px-2 gap-2 w-full">
                 <div class="flex gap-2 flex-wrap items-center">
-                    <TagsInputItem v-for="item in internalValue" :key="item" :value="item">
+                    <TagsInputItem v-for="item in internalValue" :key="item" :value="item" :disabled="props.disabled">
                         <TagsInputItemText />
-                        <TagsInputItemDelete />
+                        <TagsInputItemDelete v-if="!props.disabled" />
                     </TagsInputItem>
                 </div>
 
-                <ComboboxInput v-model="searchTerm" :disabled="props.disabled" as-child>
+                <ComboboxInput v-model="searchTerm" as-child :disabled="props.disabled">
                     <TagsInputInput :placeholder="props.placeholder"
                         class="min-w-[200px] w-full p-0 border-none focus-visible:ring-0 h-auto"
                         @keydown.enter.prevent />

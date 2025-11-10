@@ -36,13 +36,13 @@ class ApprovalFlowStepRequest extends FormRequest
     public function attributes()
     {
         return [
-            'name'                 => __('dashboard.name'),
-            "roles"                => __('dashboard.roles'),
-            'permissions'          => __('dashboard.permissions'),
-            'column_name'          => __('dashboard.column_name'),
-            "user_id"              => __('dashboard.user'),
-            "approver_type"        => __('dashboard.approver_type'),
-            "order"                => __('dashboard.order'),
+            'name'                 => __('usermanagement.name'),
+            "roles"                => __('usermanagement.roles'),
+            'permissions'          => __('usermanagement.permissions'),
+            'column_name'          => __('usermanagement.column_name'),
+            "user_id"              => __('usermanagement.user'),
+            "approver_type"        => __('usermanagement.approver_type'),
+            "order"                => __('usermanagement.order'),
         ];
     }
 }

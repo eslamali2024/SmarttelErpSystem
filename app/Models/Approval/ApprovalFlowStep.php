@@ -29,6 +29,12 @@ class ApprovalFlowStep extends Model
         'roles'         => 'array',
         'permissions'   => 'array',
         'approver_type' => ApprovalTypeEnum::class,
+        'created_at' => 'datetime:Y-m-d H:i:s',
+
+    ];
+
+    protected $appends = [
+        'approver_type_label',
     ];
 
     public function approvalFlow()
@@ -39,5 +45,10 @@ class ApprovalFlowStep extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getApproverTypeLabelAttribute(): string
+    {
+        return $this->approver_type?->label() ?? '';
     }
 }
