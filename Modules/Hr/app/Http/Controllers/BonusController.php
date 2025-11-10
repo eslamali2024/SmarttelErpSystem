@@ -2,12 +2,12 @@
 
 namespace Modules\Hr\Http\Controllers;
 
-use App\Enums\Approval\ApprovalStatusEnum;
 use Inertia\Inertia;
 use Modules\Hr\Models\Bonus;
 use Modules\Hr\Models\BonusType;
 use Illuminate\Support\Facades\Gate;
 use Modules\Hr\Services\BonusService;
+use App\Enums\Approval\ApprovalStatusEnum;
 use Modules\Hr\Http\Requests\BonusRequest;
 use App\Http\Controllers\TransactionController;
 

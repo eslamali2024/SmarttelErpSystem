@@ -91,5 +91,6 @@ return [
     'date'                      => 'Date',
     'notes'                     => 'Notes',
     'reason'                    => 'Reason',
-    
+    'deduction_type'            => 'Deduction Type',
+
 ];

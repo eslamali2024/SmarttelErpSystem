@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Modules\Hr\Http\Controllers\{
     HrController,
     EmployeeController,
-    BonusController
+    BonusController,
+    DeductionController
 };
 use Modules\Hr\Http\Controllers\Organization\{
     DivisionController,
@@ -56,6 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         Route::resource('bonuses',                      BonusController::class)->except(['edit']);
+        Route::resource('deductions',                   DeductionController::class)->except(['edit']);
 
         // Employee
         Route::resource('employees',                           EmployeeController::class);

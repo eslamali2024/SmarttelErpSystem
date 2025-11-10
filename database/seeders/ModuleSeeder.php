@@ -224,6 +224,14 @@ class ModuleSeeder extends Seeder
                 'status'            => true,
                 'parent_key'        => 'hr',
             ],
+            [
+                'name'              => 'deductions',
+                'icon'              => 'ri-checkbox-indeterminate-fill',
+                'path'              => 'hr/deductions',
+                'permission_title'  => 'deduction_access',
+                'status'            => true,
+                'parent_key'        => 'hr',
+            ],
         ];
     }
 

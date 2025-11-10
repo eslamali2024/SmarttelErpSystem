@@ -168,6 +168,13 @@ return [
                 'Show'                      => 'bonuse_show',
                 'Delete'                    => 'bonuse_delete',
                 'List'                      => 'bonuse_access',
+            ],
+            'Deductions' => [
+                'Create'                    => 'deduction_create',
+                'Edit'                      => 'deduction_edit',
+                'Show'                      => 'deduction_show',
+                'Delete'                    => 'deduction_delete',
+                'List'                      => 'deduction_access',
             ]
         ]
     ],

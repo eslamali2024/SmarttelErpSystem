@@ -18,10 +18,10 @@ import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
-import bonusesRoute from '@/routes/hr/bonuses';
+import deductionsRoute from '@/routes/hr/deductions';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import Button from '@/components/ui/button/Button.vue';
-import BonuseFormDialog from './BonusFormDialog.vue';
+import DeductionFormDialog from './DeductionFormDialog.vue';
 import { useI18n } from 'vue-i18n';
 import TableActionsDialog from '@/components/ui/table/TableActionsDialog.vue';
 import TablePaginationNumbers from '@/components/ui/table/TablePaginationNumbers.vue';
@@ -47,7 +47,7 @@ const { t } = useI18n();
 const showFormDialog = ref(false)
 const currentItem = ref<any>(null)
 const method_type = ref("post");
-const action = ref(bonusesRoute.store().url);
+const action = ref(deductionsRoute.store().url);
 const showLoading = ref(false)
 const dataCached = ref<any[] | null>(null)
 
@@ -57,11 +57,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
     { title: t('hr'), href: null },
     { title: t('master_data'), href: null },
-    { title: t('bonuses'), href: null },
+    { title: t('deductions'), href: null },
 ];
 
 const props = defineProps<{
-    bonuses?: {
+    deductions?: {
         data?: any[],
         links?: any[],
         total?: number,
@@ -83,7 +83,7 @@ async function loadInitialData(): Promise<void> {
             return
         }
 
-        const response = await axios.get(bonusesRoute.create().url)
+        const response = await axios.get(deductionsRoute.create().url)
         dataCached.value = Array.isArray(response.data) ? response.data[0] : response.data
     } catch (error) {
         console.error('Error loading data:', error)
@@ -92,7 +92,7 @@ async function loadInitialData(): Promise<void> {
 
 
 /**
- * Toggle the form dialog for adding or editing a bonus
+ * Toggle the form dialog for adding or editing a deduction
  * @param {any} item - The item to be edited, or null for adding a new item
  */
 const toggleFormDialog = async (item?: any) => {
@@ -104,21 +104,21 @@ const toggleFormDialog = async (item?: any) => {
 
     if (item) {
         method_type.value = "put";
-        action.value = bonusesRoute.update(item.id).url;
+        action.value = deductionsRoute.update(item.id).url;
     } else {
         method_type.value = "post";
-        action.value = bonusesRoute.store().url;
+        action.value = deductionsRoute.store().url;
     }
 
     showLoading.value = false
 }
 
 // reactive search
-const { search } = useSearchTable(bonusesRoute.index().url, {
+const { search } = useSearchTable(deductionsRoute.index().url, {
     employee: {
         name: ''
     },
-    bonusType: {
+    deductionType: {
         name: ''
     },
     createdBy: {
@@ -134,29 +134,29 @@ const { search } = useSearchTable(bonusesRoute.index().url, {
 const showDeleteModal = ref(false)
 const isDeleting = ref(false)
 
-const toggleShowDeleteModal = (bonus: any) => {
-    currentItem.value = bonus
+const toggleShowDeleteModal = (deduction: any) => {
+    currentItem.value = deduction
     showDeleteModal.value = true
 }
 
-const deleteBonuse = () => {
+const deleteDeduction = () => {
     if (!currentItem.value) return
     isDeleting.value = true
 
-    router.delete(bonusesRoute.destroy(currentItem.value.id).url, {
+    router.delete(deductionsRoute.destroy(currentItem.value.id).url, {
         onFinish: () => {
             showDeleteModal.value = false
             currentItem.value = null
             isDeleting.value = false
             showToast({
-                title: t('bonus_deleted_successfully'),
+                title: t('deduction_deleted_successfully'),
                 type: 'success'
             })
         },
         onError: () => {
             isDeleting.value = false
             showToast({
-                title: t('bonus_deleted_failed'),
+                title: t('deduction_deleted_failed'),
                 type: 'error'
             })
         }
@@ -167,29 +167,29 @@ const deleteBonuse = () => {
 
 <template>
 
-    <Head :title="$t('bonuses')" />
+    <Head :title="$t('deductions')" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Card>
             <CardHeader class="flex justify-between items-center">
-                <CardTitle>{{ $t('bonuses') }}</CardTitle>
+                <CardTitle>{{ $t('deductions') }}</CardTitle>
 
                 <Can permissions="employee_create">
                     <Button v-on:click="toggleFormDialog(null)"
                         class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
-                        <i class="ri ri-add-line"></i> {{ $t("add_bonus") }}
+                        <i class="ri ri-add-line"></i> {{ $t("add_deduction") }}
                     </Button>
                 </Can>
             </CardHeader>
 
             <CardContent>
                 <Table>
-                    <TableCaption>{{ $t('bonuses') }}</TableCaption>
+                    <TableCaption>{{ $t('deductions') }}</TableCaption>
                     <TableHeader>
                         <TableRow>
                             <TableHead class="w-[100px] text-center">{{ $t('no') }}</TableHead>
                             <TableHead class="text-center">{{ $t('employee') }}</TableHead>
-                            <TableHead class="text-center text-nowrap">{{ $t('bonus_type') }}</TableHead>
+                            <TableHead class="text-center text-nowrap">{{ $t('deduction_type') }}</TableHead>
                             <TableHead class="text-center">{{ $t('amount') }}</TableHead>
                             <TableHead class="text-center">{{ $t('date') }}</TableHead>
                             <TableHead class="text-center text-nowrap">{{ $t('created_by') }}</TableHead>
@@ -202,7 +202,7 @@ const deleteBonuse = () => {
                                 <Input :placeholder="$t('employee')" v-model="search.employee.name" />
                             </TableHead>
                             <TableHead class="p-2">
-                                <Input :placeholder="$t('bonus_type')" v-model="search.bonusType.name" />
+                                <Input :placeholder="$t('deduction_type')" v-model="search.deductionType.name" />
                             </TableHead>
                             <TableHead>
                                 <Input :placeholder="$t('amount')" v-model="search.amount" type="number" />
@@ -222,32 +222,32 @@ const deleteBonuse = () => {
                     </TableHeader>
 
                     <TableBody>
-                        <TableRow v-for="(bonus, index) in props.bonuses?.data || []" :key="bonus.id">
+                        <TableRow v-for="(deduction, index) in props.deductions?.data || []" :key="deduction.id">
                             <TableCell class="font-medium text-center">
-                                <TablePaginationNumbers :items="props.bonuses" :index="index" />
+                                <TablePaginationNumbers :items="props.deductions" :index="index" />
                             </TableCell>
                             <TableCell class="text-center text-nowrap">
-                                {{ strLimit(bonus.employee?.name, 15) }}
+                                {{ strLimit(deduction.employee?.name, 15) }}
                             </TableCell>
                             <TableCell class="text-center text-nowrap">
-                                {{ strLimit(bonus.bonus_type?.name, 15) }}
+                                {{ strLimit(deduction.deduction_type?.name, 15) }}
                             </TableCell>
                             <TableCell class="text-center text-nowrap">
-                                {{ numberFormat(bonus.amount, 2, true) }}
+                                {{ numberFormat(deduction.amount, 2, true) }}
                             </TableCell>
-                            <TableCell class="text-center text-nowrap">{{ bonus.date }}</TableCell>
-                            <TableCell class="text-center">{{ strLimit(bonus.created_by?.name, 15) }}</TableCell>
+                            <TableCell class="text-center text-nowrap">{{ deduction.date }}</TableCell>
+                            <TableCell class="text-center">{{ strLimit(deduction.created_by?.name, 15) }}</TableCell>
                             <TableCell class="text-center">
-                                <TableBadge :status="bonus.status" :label="bonus.status_label" />
+                                <TableBadge :status="deduction.status" :label="deduction.status_label" />
                             </TableCell>
                             <TableCell>
-                                <TableActionsDialog class="text-center flex justify-center" canEdit="bonus_edit"
-                                    :edit="() => toggleFormDialog(bonus)" canDelete="bonus_delete"
-                                    :delete="() => toggleShowDeleteModal(bonus)">
+                                <TableActionsDialog class="text-center flex justify-center" canEdit="deduction_edit"
+                                    :edit="() => toggleFormDialog(deduction)" canDelete="deduction_delete"
+                                    :delete="() => toggleShowDeleteModal(deduction)">
                                     <template #before>
-                                        <Can permissions="bonus_show">
-                                            <A size="sm" :href="bonusesRoute.show(bonus.id).url"
-                                                class="ms-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
+                                        <Can permissions="deduction_show">
+                                            <A size="sm" :href="deductionsRoute.show(deduction.id).url"
+                                                class="me-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
                                                 <i class="ri ri-eye-line"></i>
                                             </A>
                                         </Can>
@@ -258,26 +258,27 @@ const deleteBonuse = () => {
                     </TableBody>
 
                     <TableFooter>
-                        <TableEmpty v-if="!props.bonuses?.data?.length" :colspan="8">
+                        <TableEmpty v-if="!props.deductions?.data?.length" :colspan="8">
                             {{ $t('no_data') }}
                         </TableEmpty>
                     </TableFooter>
                 </Table>
             </CardContent>
             <CardFooter>
-                <PaginationUse :items="props.bonuses?.links || []" :total="props.bonuses?.total || 0"
-                    :itemsPerPage="props.bonuses?.per_page || 10" :currentPage="props.bonuses?.current_page || 1"
+                <PaginationUse :items="props.deductions?.links || []" :total="props.deductions?.total || 0"
+                    :itemsPerPage="props.deductions?.per_page || 10" :currentPage="props.deductions?.current_page || 1"
                     :defaultPage="1" />
             </CardFooter>
         </Card>
     </AppLayout>
 
-    <Can permissions="bonus_delete">
-        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteBonuse" :loading="isDeleting" />
+    <Can permissions="deduction_delete">
+        <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteDeduction"
+            :loading="isDeleting" />
     </Can>
 
-    <Can :permissions="['bonus_create', 'bonus_edit']">
-        <BonuseFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action" :item="currentItem"
-            :loading="showLoading" :data="dataCached" />
+    <Can :permissions="['deduction_create', 'deduction_edit']">
+        <DeductionFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
+            :item="currentItem" :loading="showLoading" :data="dataCached" />
     </Can>
 </template>

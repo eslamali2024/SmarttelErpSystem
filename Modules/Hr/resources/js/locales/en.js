@@ -227,4 +227,12 @@ export default {
     please_enter_a_created_by: 'Please enter a created by',
     created_at: 'Created At',
     please_enter_a_created_at: 'Please enter a created at',
+    deduction_type: 'Deduction Type',
+    please_select_a_deduction_type: 'Please select a deduction type',
+    add_deduction: 'Add Deduction',
+    update_deduction: 'Update Deduction',
+    show_deduction: 'Show Deduction',
+    deduction_deleted_successfully: 'Deduction Deleted Successfully',
+    deduction_deleted_failed: 'Deduction Deleted Failed',
+   
 }

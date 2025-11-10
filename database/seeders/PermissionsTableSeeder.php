@@ -150,6 +150,13 @@ class PermissionsTableSeeder extends Seeder
             'bonus_edit',
             'bonus_delete',
             'bonus_show',
+
+            // Deductions
+            'deduction_access',
+            'deduction_create',
+            'deduction_edit',
+            'deduction_delete',
+            'deduction_show',
         ];
     }
     private function getUserManagementModules(): array

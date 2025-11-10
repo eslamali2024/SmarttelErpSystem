@@ -97,6 +97,7 @@ export default {
     cancel_approval_failed: 'Cancel approval failed',
     cancel_rejection_successfully: 'Cancel rejection successfully',
     cancel_rejection_failed: 'Cancel rejection failed',
+    deductions: 'Deductions',
 
 
 }
