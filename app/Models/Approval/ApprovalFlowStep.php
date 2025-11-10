@@ -31,6 +31,10 @@ class ApprovalFlowStep extends Model
         'approver_type' => ApprovalTypeEnum::class,
     ];
 
+    protected $appends = [
+        'approver_type_label',
+    ];
+
     public function approvalFlow()
     {
         return $this->belongsTo(ApprovalFlow::class);
@@ -40,4 +44,10 @@ class ApprovalFlowStep extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getApproverTypeLabelAttribute(): string
+    {
+        return $this->approver_type?->label() ?? '';
+    }
+
 }

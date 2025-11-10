@@ -17,7 +17,7 @@ import PaginationUse from '@/components/ui/pagination-use/PaginationUse.vue';
 import TableEmpty from '@/components/ui/table/TableEmpty.vue';
 import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import userRoute from '@/routes/user-management/users';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
 import UserFormDialog from './UserFormDialog.vue';
@@ -138,6 +138,16 @@ const toggleFormDialog = async (item?: any, actionType?: string) => {
 
     showLoading.value = false
 }
+
+// Watch for changes in showFormDialog and reset currentItem when it is closed
+watch(
+    () => showFormDialog.value,
+    (value) => {
+        if (value === false) {
+            currentItem.value = null
+        }
+    }
+)
 
 // Delete Modal
 const showDeleteModal = ref(false)

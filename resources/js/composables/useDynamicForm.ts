@@ -18,8 +18,8 @@ export function useDynamicForm<
     const $v = useVuelidate(validationRules, form);
 
     watch(
-        () => props.item?.id,
-    () => {
+        () => props.item,
+        () => {
             const { formStructure: newForm } = schemaFn({ item: props.item } as P);
 
             form.defaults(newForm as T);

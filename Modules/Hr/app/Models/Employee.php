@@ -2,16 +2,17 @@
 
 namespace Modules\Hr\Models;
 
+use App\Models\User;
 use App\Traits\ScopeFilter;
 use Modules\Hr\Enums\GenderEnum;
+use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Hr\Enums\MaritalStatusEnum;
 use Modules\Hr\Enums\ContractStatusEnum;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Employee extends Model implements HasMedia
 {
@@ -21,6 +22,7 @@ class Employee extends Model implements HasMedia
      * The attributes that are mass assignable.
      */
     protected $fillable = [
+        'user_id',
         'code',
         'name',
         'name_ar',
@@ -49,6 +51,16 @@ class Employee extends Model implements HasMedia
     public static function autoGenerateCode()
     {
         return str_pad(Employee::count() + 1, 5, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Get the user associated with the employee.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
     }
 
     /**
