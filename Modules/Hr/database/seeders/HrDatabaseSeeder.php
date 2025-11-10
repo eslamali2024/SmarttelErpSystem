@@ -19,7 +19,9 @@ class HrDatabaseSeeder extends Seeder
             SectionSeeder::class,
             PositionSeeder::class,
             InsuranceCompanySeeder::class,
-            AllowanceTypeSeeder::class
+            AllowanceTypeSeeder::class,
+            TimeManagmentSeeder::class,
+            WorkScheduleSeeder::class
         ]);
     }
 }

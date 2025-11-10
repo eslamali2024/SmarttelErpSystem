@@ -153,6 +153,22 @@ class ModuleSeeder extends Seeder
                 'parent_key'        => 'hr',
             ],
             [
+                'name'              => 'time_managements',
+                'icon'              => 'ri-time-zone-fill',
+                'path'              => 'hr/master-data/time-managements',
+                'permission_title'  => 'time_management_access',
+                'status'            => true,
+                'parent_key'        => 'master-data',
+            ],
+            [
+                'name'              => 'work_schedules',
+                'icon'              => 'ri-calendar-2-fill',
+                'path'              => 'hr/master-data/work-schedules',
+                'permission_title'  => 'work_schedule_access',
+                'status'            => true,
+                'parent_key'        => 'master-data',
+            ],
+            [
                 'name'              => 'allowance_types',
                 'icon'              => 'ri-user-fill',
                 'path'              => 'hr/master-data/allowance-types',

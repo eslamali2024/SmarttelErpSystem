@@ -9,10 +9,12 @@ use Modules\Hr\Models\Employee;
 use Modules\Hr\Models\Position;
 use Modules\Hr\Enums\GenderEnum;
 use Modules\Hr\Models\Department;
+use Modules\Hr\Models\WorkSchedule;
 use Modules\Hr\Traits\GrossUpTrait;
 use Illuminate\Support\Facades\Hash;
 use Modules\Hr\Models\AllowanceType;
 use Modules\Hr\Models\ContractSalary;
+use Modules\Hr\Models\TimeManagement;
 use Modules\Hr\Enums\MaritalStatusEnum;
 use Modules\Hr\Models\EmployeeContract;
 use Modules\Hr\Models\InsuranceCompany;
@@ -42,7 +44,7 @@ class EmployeeService
         $contract = $employee->contracts()->create($data['step_2'] ?? []);
         $contract->contractPositions()->create($data['step_2'] ?? []);
         $contract->salary()->create($data['step_3'] ?? []);
-        $allowances = array_merge($data['step_3']['off_cycle_allowances'] ?? [], $data['step_3']['recurring_allowances'] ?? []);
+        $allowances = array_replace($data['step_3']['off_cycle_allowances'] ?? [], $data['step_3']['recurring_allowances'] ?? []);
         $contract->allowances()->createMany($this->optimizeAllowances($allowances));
 
         return $employee;
@@ -110,6 +112,8 @@ class EmployeeService
             'positions'             => Position::get(['id', 'name', 'section_id']),
             'allowances'            => $this->initilizeAllowances($allowances),
             'insurance_companies'   => InsuranceCompany::pluck('name', 'id'),
+            'time_managements'      => TimeManagement::pluck('name', 'id'),
+            'work_schedules'        => WorkSchedule::pluck('name', 'id'),
         ];
     }
 
@@ -151,6 +155,7 @@ class EmployeeService
     private function optimizeAllowances(array $allowances): array
     {
         $resultAllowances = [];
+
         foreach ($allowances as $key => $allowance) {
             $resultAllowances[] = [
                 'allowance_id' => $key,

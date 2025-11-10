@@ -12,8 +12,10 @@ use Modules\Hr\Http\Controllers\Organization\{
     SectionController
 };
 use Modules\Hr\Http\Controllers\MasterData\{
+    TimeManagementController,
     AllowanceTypeController,
-    InsuranceCompanyController
+    InsuranceCompanyController,
+    WorkScheduleController
 };
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -28,12 +30,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         Route::prefix('master-data/')->as('master-data.')->group(function () {
+            Route::resource('time-managements',     TimeManagementController::class)->except(['show', 'edit', 'create']);
+            Route::resource('work-schedules',       WorkScheduleController::class);
             Route::resource('allowance-types',      AllowanceTypeController::class)->except(['show', 'edit', 'create']);
             Route::resource('insurance-companies',  InsuranceCompanyController::class)->except(['show', 'edit', 'create']);
         });
 
         Route::resource('employees',                EmployeeController::class);
-
         Route::post('gross-up', [EmployeeController::class, 'getGrossUp'])->name('employees.gross-up');
     });
 });

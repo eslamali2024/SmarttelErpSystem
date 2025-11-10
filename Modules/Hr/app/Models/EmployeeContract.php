@@ -18,6 +18,8 @@ class EmployeeContract extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
+        'time_management_id',
+        'work_schedule_id',
         'employee_id',
         'start_date',
         'end_date',
@@ -83,5 +85,29 @@ class EmployeeContract extends Model
     public function allowances(): HasMany
     {
         return $this->hasMany(ContractAllowance::class, 'contract_id');
+    }
+
+    /**
+     * Get the work schedule that the employee contract belongs to.
+     *
+     * The work schedule is the schedule that the employee contract is assigned to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function workSchedule(): HasOne
+    {
+        return $this->hasOne(WorkSchedule::class, 'id', 'work_schedule_id');
+    }
+
+    /**
+     * Get the time management that the employee contract belongs to.
+     *
+     * The time management is the time management that the employee contract is assigned to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function timeManagement(): HasOne
+    {
+        return $this->hasOne(TimeManagement::class, 'id', 'time_management_id');
     }
 }
