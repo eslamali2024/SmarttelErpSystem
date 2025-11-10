@@ -29,6 +29,8 @@ class ApprovalFlowStep extends Model
         'roles'         => 'array',
         'permissions'   => 'array',
         'approver_type' => ApprovalTypeEnum::class,
+        'created_at' => 'datetime:Y-m-d H:i:s',
+
     ];
 
     protected $appends = [
@@ -49,5 +51,4 @@ class ApprovalFlowStep extends Model
     {
         return $this->approver_type?->label() ?? '';
     }
-
 }

@@ -151,7 +151,7 @@ const title = computed(() => {
                                 :vue-error="$v?.user_id" />
 
                             <SelectTags v-if="ApprovalTypeEnum.ROLE == form.approver_type" v-model="form.roles"
-                                :modelValueError="form.errors.roles" :label="$t('roles')" :options="props?.data?.roles"
+                                :modelValueError="form.errors.roles" :label="$t('roles')" :options="props?.data?.roles "
                                 :placeholder="$t('please_enter_roles')" type="text" :disabled="isReadOnly"
                                 :vue-error="$v?.roles" />
 

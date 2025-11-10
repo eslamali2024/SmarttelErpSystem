@@ -161,6 +161,13 @@ return [
                 'Show'                      => 'employee_show',
                 'Delete'                    => 'employee_delete',
                 'List'                      => 'employee_access',
+            ],
+            'Bonuses' => [
+                'Create'                    => 'bonuse_create',
+                'Edit'                      => 'bonuse_edit',
+                'Show'                      => 'bonuse_show',
+                'Delete'                    => 'bonuse_delete',
+                'List'                      => 'bonuse_access',
             ]
         ]
     ],

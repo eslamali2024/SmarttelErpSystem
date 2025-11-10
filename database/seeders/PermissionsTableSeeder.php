@@ -143,6 +143,13 @@ class PermissionsTableSeeder extends Seeder
             'employee_edit',
             'employee_delete',
             'employee_show',
+
+            // Bonuses
+            'bonus_access',
+            'bonus_create',
+            'bonus_edit',
+            'bonus_delete',
+            'bonus_show',
         ];
     }
     private function getUserManagementModules(): array

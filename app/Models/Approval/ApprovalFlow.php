@@ -17,6 +17,10 @@ class ApprovalFlow extends Model
         'approvable_type',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+    ];
+
     /**
      * Retrieves all approval requests associated with this approval flow.
      *
