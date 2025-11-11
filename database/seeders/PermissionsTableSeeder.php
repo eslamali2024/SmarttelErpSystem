@@ -144,6 +144,13 @@ class PermissionsTableSeeder extends Seeder
             'employee_delete',
             'employee_show',
 
+            // Employee Contract
+            'employee_contract_access',
+            'employee_contract_create',
+            'employee_contract_edit',
+            'employee_contract_delete',
+            'employee_contract_show',
+
             // Bonuses
             'bonus_access',
             'bonus_create',

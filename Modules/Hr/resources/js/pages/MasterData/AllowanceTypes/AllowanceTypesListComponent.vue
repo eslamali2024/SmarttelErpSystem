@@ -38,6 +38,14 @@ import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
 import { strLimit } from '@/utils/strLimit';
 import { useSearchTable } from '@/composables/useSearchTable';
 import { useToast } from '@/composables/useToast';
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator
+} from '@/components/ui/dropdown-menu';
+import ImportDialog from '@/components/ImportDialog.vue';
 
 // Master Data
 const { t } = useI18n();
@@ -46,6 +54,7 @@ const currentItem = ref<any>(null)
 const method_type = ref("post");
 const action = ref(allowanceTypesRoute.store().url);
 const showLoading = ref(false)
+const showImportDialog = ref(false)
 const { showToast } = useToast();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -143,6 +152,16 @@ const toggleShowDialog = (allowance_type: any) => {
     currentItem.value = allowance_type
     showShowDialog.value = true
 }
+
+/**
+ * Toggle the import dialog for importing public holidays
+ */
+const toggleImportialog = () => {
+    showImportDialog.value = true;
+
+    action.value = allowanceTypesRoute.import().url
+    method_type.value = "post"
+}
 </script>
 
 <template>
@@ -154,10 +173,34 @@ const toggleShowDialog = (allowance_type: any) => {
             <CardHeader class="flex justify-between items-center">
                 <CardTitle>{{ $t('allowance_types') }}</CardTitle>
                 <Can permissions="allowance_type_create">
-                    <Button v-on:click="toggleFormDialog(null)"
-                        class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
-                        <i class="ri ri-add-line"></i> {{ $t("add_allowance_type") }}
-                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <Button
+                                class="cursor-pointer bg-gray-600/70 hover:bg-gray-600/80 dark:bg-gray-50/70 dark:hover:bg-gray-50/80 ">
+                                <i class="ri ri-settings-3-line"></i>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem>
+                                <button v-on:click="toggleFormDialog(null)" class="cursor-pointer">
+                                    <i class="ri ri-add-line"></i> {{ $t("add_allowance_type") }}
+                                </button>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                                <a :href="allowanceTypesRoute.downloadTemplate().url" rel="noopener"
+                                    class="btn btn-outline-primary">
+                                    <i class="ri ri-download-2-line me-2"></i>
+                                    {{ $t('download_sample') }}
+                                </a>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <button v-on:click="toggleImportialog()" class="cursor-pointer">
+                                    <i class="ri ri-file-excel-2-line"></i> {{ $t("import_allowance_types") }}
+                                </button>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </Can>
             </CardHeader>
 
@@ -237,5 +280,7 @@ const toggleShowDialog = (allowance_type: any) => {
     <Can :permissions="['allowance_type_create', 'allowance_type_edit']">
         <AllowanceTypeFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
             :types="props?.types" :taxables="props.taxables" :item="currentItem" :loading="showLoading" />
+
+        <ImportDialog v-model:show="showImportDialog" :action="action" :item="currentItem" />
     </Can>
 </template>

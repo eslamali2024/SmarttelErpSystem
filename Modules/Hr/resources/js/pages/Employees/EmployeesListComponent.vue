@@ -33,6 +33,7 @@ import {
 import A from '@/components/ui/a/A.vue';
 import TableActions from '@/components/ui/table/TableActions.vue';
 import employeesRoute from '@/routes/hr/employees';
+import employeesAcitvityRoute from '@/routes/hr/employees/activity';
 import { strLimit } from '@/utils/strLimit';
 import { useSearchTable } from '@/composables/useSearchTable';
 import { useToast } from '@/composables/useToast';
@@ -196,7 +197,14 @@ const deleteEmployee = () => {
                                 <TableActions class="text-center flex justify-center" canShow="employee_show"
                                     :show="employeesRoute.show(employee.id).url" canEdit="employee_edit"
                                     :edit="employeesRoute.edit(employee.id).url" canDelete="employee_delete"
-                                    :delete="() => toggleShowDeleteModal(employee)" />
+                                    :delete="() => toggleShowDeleteModal(employee)">
+                                    <Can :permissions="'employee_edit'">
+                                        <A size="sm" :href="employeesAcitvityRoute.bonuses(employee.id).url"
+                                            class="ms-2 bg-green-500 cursor-pointer text-white hover:bg-green-600">
+                                            <i class="ri ri-home-gear-line"></i>
+                                        </A>
+                                    </Can>
+                                </TableActions>
                             </TableCell>
                         </TableRow>
                     </TableBody>

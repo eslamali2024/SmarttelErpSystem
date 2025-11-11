@@ -4,6 +4,7 @@
 /public/build
 /public/hot
 /public/storage
+/public/imports
 /storage/*.key
 /storage/pail
 /resources/js/actions
@@ -28,3 +29,4 @@ yarn-error.log
 /.zed
 composer.lock
 package-lock.json
+

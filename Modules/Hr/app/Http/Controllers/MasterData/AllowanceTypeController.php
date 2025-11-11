@@ -8,6 +8,7 @@ use Modules\Hr\Models\AllowanceType;
 use Modules\Hr\Enums\AllowancesTypeEnum;
 use Modules\Hr\Enums\AllowancesTaxableEnum;
 use App\Http\Controllers\TransactionController;
+use App\Http\Requests\ImportFileRequest;
 use Modules\Hr\Services\MasterData\AllowanceTypeService;
 use Modules\Hr\Http\Requests\MasterData\AllowanceTypeRequest;
 
@@ -68,5 +69,30 @@ class AllowanceTypeController extends TransactionController
             $this->allowanceTypeService->destroy($allowanceType);
             return redirect()->route('hr.master-data.allowance-types.index');
         });
+    }
+
+
+    /**
+     * Import Allowance Types from an Excel file.
+     *
+     * @param ImportFileRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function import(ImportFileRequest $request)
+    {
+        return $this->withTransaction(function () use ($request) {
+            $this->allowanceTypeService->import($request->file('import_file'));
+            return redirect()->route('hr.master-data.allowance-types.index');
+        });
+    }
+
+    /**
+     * Download a Allowance Type template in Excel format.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function downloadTemplate()
+    {
+        return response()->download(public_path('assets/imports/allowance_types_template.xlsx'));
     }
 }

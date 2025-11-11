@@ -15,7 +15,7 @@ export function numberFormat(
 ) {
     const numberValue = Number(value);
 
-    if (isNaN(numberValue)) return '';
+    if (isNaN(numberValue)) return '-';
 
     // Format the number
     let formatted = numberValue.toLocaleString('en-US', {

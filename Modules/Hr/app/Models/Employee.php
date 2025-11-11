@@ -132,4 +132,24 @@ class Employee extends Model implements HasMedia
     {
         return $this->getFirstMediaUrl('avatar');
     }
+
+    /**
+     * Get all bonuses of the employee.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Bonus>
+     */
+    public function bonuses(): HasMany
+    {
+        return $this->hasMany(Bonus::class, 'employee_id');
+    }
+
+    /**
+     * Get all deductions of the employee.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Deduction>
+     */
+    public function deductions(): HasMany
+    {
+        return $this->hasMany(Deduction::class, 'employee_id');
+    }
 }

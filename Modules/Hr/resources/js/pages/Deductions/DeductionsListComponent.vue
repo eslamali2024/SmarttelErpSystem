@@ -129,15 +129,15 @@ const { search } = useSearchTable(deductionsRoute.index().url, {
         value: '',
         operator: '='
     },
-    start: '25/11/2025',
-    end: '28/11/2025',
+    start: '',
+    end: '',
     column_date_range: 'date'
 });
 
 // Date Range
 const dateRange = ref<{ start: string | null; end: string | null }>({
-    start: null,
-    end: null,
+    start: search.start ?? null,
+    end: search.end ?? null,
 })
 
 watch(

@@ -6,12 +6,6 @@ import { Head } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import employeesRoute from '@/routes/hr/employees';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar } from '@/components/ui/avatar';
-import AvatarImage from '@/components/ui/avatar/AvatarImage.vue';
-import AvatarFallback from '@/components/ui/avatar/AvatarFallback.vue';
-import { strLimit } from '@/utils/strLimit';
-import EmployeePhotoDialog from './EmployeePhotoDialog.vue';
-import { ref } from 'vue';
 import InputGroup from '@/components/ui/input-group/InputGroup.vue';
 import {
     Tabs,
@@ -20,11 +14,11 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs"
 import TextareaGroup from '@/components/ui/textarea-group/TextareaGroup.vue';
-import A from '@/components/ui/a/A.vue';
-import Can from '@/components/ui/Auth/Can.vue';
+import employeeActivityRoute from '@/routes/hr/employees/activity';
+
 
 interface Props {
-    employee?: any,
+    contract?: any,
     canEditAvataer?: boolean
 }
 
@@ -34,100 +28,80 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
     { title: t('hr'), href: null },
     { title: t('employees'), href: employeesRoute.index().url },
-    { title: t('show_employee'), href: null },
+    { title: t('employee'), href: employeesRoute.show(props.contract?.employee?.id ?? 'show').url },
+    { title: t('contracts'), href: employeeActivityRoute.contracts(props.contract?.employee?.id ?? 'show').url },
+    { title: t('show_contract'), href: null },
 ];
 
-// Show Photo Dialog
-const showPhoto = ref(false)
-const togglePhotoDialog = () => {
-    showPhoto.value = !showPhoto.value
-}
 </script>
 
 <template>
 
-    <Head :title="$t('show_employee')" />
+    <Head :title="$t('show_contract')" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <Card class="p">
             <CardHeader>
-                <div class="w-full bg-gray-600/50 rounded-lg h-[200px] flex justify-between items-center">
-                    <span></span>
-                    <Avatar class="w-24 h-24 border-2 border-white cursor-pointer hover:opacity-75 duration-200"
-                        @click="togglePhotoDialog">
-                        <AvatarImage :src="props.employee.avatar ?? '#'" alt="@unovue" />
-                        <AvatarFallback class="text-black dark:text-white text-4xl">
-                            {{ strLimit(props.employee?.name, 2, '-', '') }}
-                        </AvatarFallback>
-                    </Avatar>
-
-                    <Can permissions="employee_edit">
-                        <span class="self-baseline p-4">
-                            <A :href="employeesRoute.edit(props.employee.id).url"
-                                class="bg-yellow-600 hover:bg-yellow-500 duration-200 text-white text-md">
-                                <i class="ri ri-edit-line"></i>
-                            </A>
-                        </span>
-                    </Can>
-                </div>
+                <CardTitle>{{ $t('show_contract') }}</CardTitle>
             </CardHeader>
             <CardContent>
-                <Tabs default-value="basic-data" class="w-full">
+                <Tabs default-value="contract" class="w-full">
                     <TabsList class="grid w-full grid-cols-2">
-                        <TabsTrigger value="basic-data" class="cursor-pointer">
-                            {{ $t('basic_data') }}
+                        <TabsTrigger value="employee" class="cursor-pointer">
+                            {{ $t('employee') }}
                         </TabsTrigger>
                         <TabsTrigger value="contract" class="cursor-pointer">
                             {{ $t('contract') }}
                         </TabsTrigger>
                     </TabsList>
-                    <TabsContent value="basic-data">
+                    <TabsContent value="employee">
                         <Card>
                             <CardHeader>
-                                <CardTitle>{{ $t('basic_data') }}</CardTitle>
+                                <CardTitle>{{ $t('employee') }}</CardTitle>
                             </CardHeader>
                             <CardContent class="space-y-2">
                                 <div class="grid grid-cols-2 gap-3 py-4">
-                                    <InputGroup :disabled="true" :modelValue="props.employee.code"
+                                    <InputGroup :disabled="true" :modelValue="props.contract.employee.code"
                                         :label="$t('employee_code')" :placeholder="$t('please_enter_a_employee_code')"
                                         type="text" class="col-span-2" />
 
-                                    <InputGroup :disabled="true" :modelValue="props.employee.name" :label="$t('name')"
-                                        :placeholder="$t('please_enter_a_name')" type="text" />
+                                    <InputGroup :disabled="true" :modelValue="props.contract.employee.name"
+                                        :label="$t('name')" :placeholder="$t('please_enter_a_name')" type="text" />
 
-                                    <InputGroup :disabled="true" :modelValue="props.employee.name_ar"
+                                    <InputGroup :disabled="true" :modelValue="props.contract.employee.name_ar"
                                         :label="$t('name_ar')" :placeholder="$t('please_enter_a_name_ar')"
                                         type="text" />
 
-                                    <InputGroup :disabled="true" :modelValue="props.employee.email" :label="$t('email')"
-                                        :placeholder="$t('please_enter_a_email')" type="email" />
+                                    <InputGroup :disabled="true" :modelValue="props.contract.employee.email"
+                                        :label="$t('email')" :placeholder="$t('please_enter_a_email')" type="email" />
 
-                                    <InputGroup :disabled="true" :modelValue="props.employee.phone" :label="$t('phone')"
-                                        :placeholder="$t('please_enter_a_phone')" type="text" />
+                                    <InputGroup :disabled="true" :modelValue="props.contract.employee.phone"
+                                        :label="$t('phone')" :placeholder="$t('please_enter_a_phone')" type="text" />
 
-                                    <InputGroup :disabled="true" :modelValue="props.employee.gender_label"
+                                    <InputGroup :disabled="true" :modelValue="props.contract.employee.gender_label"
                                         :label="$t('gender')" :placeholder="$t('please_select_a_department')" />
 
-                                    <InputGroup :disabled="true" :modelValue="props.employee.marital_status_label"
+                                    <InputGroup :disabled="true"
+                                        :modelValue="props.contract.employee.marital_status_label"
                                         :label="$t('marital_status')"
                                         :placeholder="$t('please_select_a_marital_status')" />
 
-                                    <InputGroup :disabled="true" :modelValue="props.employee.national_id"
+                                    <InputGroup :disabled="true" :modelValue="props.contract.employee.national_id"
                                         :label="$t('national_id')" :placeholder="$t('please_enter_a_national_id')"
                                         type="text" />
 
-                                    <InputGroup :disabled="true" :modelValue="props.employee.joining_date"
+                                    <InputGroup :disabled="true" :modelValue="props.contract.employee.joining_date"
                                         :label="$t('joining_date')" :placeholder="$t('please_enter_a_joining_date')"
                                         type="date" />
 
-                                    <InputGroup :disabled="true" :modelValue="props.employee.dob" :label="$t('dob')"
-                                        :placeholder="$t('please_enter_a_dob')" type="date" />
+                                    <InputGroup :disabled="true" :modelValue="props.contract.employee.dob"
+                                        :label="$t('dob')" :placeholder="$t('please_enter_a_dob')" type="date" />
 
-                                    <TextareaGroup :modelValue="props.employee.address" :label="$t('address')"
+                                    <TextareaGroup :modelValue="props.contract.employee.address" :label="$t('address')"
                                         :disabled="true" :placeholder="$t('please_enter_a_address')"
                                         :placeholder_message="$t('please_enter_a_address')" class="col-span-2" />
 
-                                    <TextareaGroup :modelValue="props.employee.notes" :label="$t('notes')"
+                                    <TextareaGroup :modelValue="props.contract.employee.notes" :label="$t('notes')"
                                         :disabled="true" :placeholder="$t('please_enter_a_notes')"
                                         :placeholder_message="$t('please_enter_a_notes')" class="col-span-2" />
                                 </div>
@@ -141,35 +115,35 @@ const togglePhotoDialog = () => {
                             </CardHeader>
                             <CardContent class="space-y-2">
                                 <div class="grid grid-cols-2 gap-3 py-4">
-                                    <InputGroup :modelValue="props.employee.contract.start_date"
+                                    <InputGroup :modelValue="props.contract.contract.start_date"
                                         :label="$t('start_date')" :placeholder="$t('please_enter_a_start_date')"
                                         type="date" :disabled="true" />
 
-                                    <InputGroup :modelValue="props.employee.contract.end_date" :disabled="true"
+                                    <InputGroup :modelValue="props.contract.contract.end_date" :disabled="true"
                                         :label="$t('end_date')" :placeholder="$t('please_enter_a_end_date')"
                                         type="date" />
 
-                                    <InputGroup :modelValue="props.employee.contract.division" :disabled="true"
+                                    <InputGroup :modelValue="props.contract.contract.division" :disabled="true"
                                         :label="$t('division')" :placeholder="$t('please_select_a_division')" />
 
-                                    <InputGroup :modelValue="props.employee.contract.department" :disabled="true"
+                                    <InputGroup :modelValue="props.contract.contract.department" :disabled="true"
                                         :label="$t('department')" :placeholder="$t('please_select_a_department')" />
 
-                                    <InputGroup :modelValue="props.employee.contract.section" :disabled="true"
+                                    <InputGroup :modelValue="props.contract.contract.section" :disabled="true"
                                         :label="$t('section')" :placeholder="$t('please_select_a_section')" />
 
-                                    <InputGroup :modelValue="props.employee.contract.position" :disabled="true"
+                                    <InputGroup :modelValue="props.contract.contract.position" :disabled="true"
                                         :label="$t('position')" :placeholder="$t('please_select_a_position')" />
 
-                                    <InputGroup :modelValue="props.employee.contract.work_schedule"
+                                    <InputGroup :modelValue="props.contract.contract.work_schedule"
                                         :label="$t('work_schedule')" :disabled="true"
                                         :placeholder="$t('please_select_a_work_schedule')" />
 
-                                    <InputGroup :modelValue="props.employee.contract.time_management"
+                                    <InputGroup :modelValue="props.contract.contract.time_management"
                                         :label="$t('time_management')" :disabled="true"
                                         :placeholder="$t('please_select_a_time_management')" />
 
-                                    <TextareaGroup :modelValue="props.employee.contract.notes" :label="$t('notes')"
+                                    <TextareaGroup :modelValue="props.contract.contract.notes" :label="$t('notes')"
                                         :disabled="true" :placeholder="$t('please_enter_a_notes')"
                                         :placeholder_message="$t('please_enter_a_notes')" class="col-span-2" />
                                 </div>
@@ -180,6 +154,4 @@ const togglePhotoDialog = () => {
             </CardContent>
         </Card>
     </AppLayout>
-
-    <EmployeePhotoDialog :item="props.employee" v-model:show="showPhoto" :canEdit="props.canEditAvataer" />
 </template>

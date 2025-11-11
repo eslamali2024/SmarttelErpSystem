@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use Modules\Hr\Models\WorkSchedule;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\TransactionController;
+use App\Http\Requests\ImportFileRequest;
 use Modules\Hr\Transformers\WorkScheduleFormResource;
 use Modules\Hr\Services\MasterData\WorkScheduleService;
 use Modules\Hr\Http\Requests\MasterData\WorkScheduleRequest;
@@ -108,5 +109,29 @@ class WorkScheduleController extends TransactionController
             $this->workScheduleService->destroy($workSchedule);
             return redirect()->route('hr.master-data.work-schedules.index');
         });
+    }
+
+    /**
+     * Import Work Schedules from an Excel file.
+     *
+     * @param ImportFileRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function import(ImportFileRequest $request)
+    {
+        return $this->withTransaction(function () use ($request) {
+            $this->workScheduleService->import($request->file('import_file'));
+            return redirect()->route('hr.master-data.work-schedules.index');
+        });
+    }
+
+    /**
+     * Download a Work Schedule template in Excel format.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function downloadTemplate()
+    {
+        return response()->download(public_path('assets/imports/work_schedules_template.xlsx'));
     }
 }
