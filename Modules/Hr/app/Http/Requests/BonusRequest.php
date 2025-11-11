@@ -18,6 +18,7 @@ class BonusRequest extends FormRequest
             'date'                 => ['required', 'date'],
             'notes'                => ['nullable', 'string', 'max:2000'],
             'reason'               => ['nullable', 'string', 'max:255'],
+            'redirect_url'         => ['nullable', 'url'],
         ];
     }
 

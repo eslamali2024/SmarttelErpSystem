@@ -2,7 +2,10 @@
 
 namespace Modules\Hr\Services\MasterData;
 
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 use Modules\Hr\Models\AllowanceType;
+use Modules\Hr\Imports\AllowanceTypeImport;
 
 class AllowanceTypeService
 {
@@ -40,5 +43,19 @@ class AllowanceTypeService
     public function destroy(AllowanceType $allowanceType): void
     {
         $allowanceType->delete();
+    }
+
+    /**
+     * Import Allowance Types from an Excel file.
+     *
+     * @param \Illuminate\Http\UploadedFile $file
+     * @return void
+     */
+    public function import($file): void
+    {
+        $fileName = Str::random(10) . '.' . $file->getClientOriginalExtension();
+        $file->move('imports', $fileName);
+        Excel::import(new AllowanceTypeImport, 'imports/' . $fileName);
+        unlink('imports/' . $fileName);
     }
 }

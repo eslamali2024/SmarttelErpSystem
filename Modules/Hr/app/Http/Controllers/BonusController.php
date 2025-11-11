@@ -56,7 +56,7 @@ class BonusController extends TransactionController
 
         return $this->withTransaction(function () use ($request) {
             $this->bonusService->store($request->validated());
-            return redirect()->route('hr.bonuses.index');
+            return $request->redirect_url ? redirect($request->redirect_url) : redirect()->route('hr.bonuses.index');
         });
     }
 
@@ -86,7 +86,7 @@ class BonusController extends TransactionController
 
         return $this->withTransaction(function () use ($request, $bonus) {
             $this->bonusService->update($bonus, $request->validated());
-            return redirect()->route('hr.bonuses.index');
+            return $request->redirect_url ? redirect($request->redirect_url) : redirect()->route('hr.bonuses.index');
         });
     }
 
@@ -99,7 +99,7 @@ class BonusController extends TransactionController
 
         return $this->withTransaction(function () use ($bonus) {
             $this->bonusService->destroy($bonus);
-            return redirect()->route('hr.bonuses.index');
+            return request()->redirect_url ? redirect(request()->redirect_url) : redirect()->route('hr.bonuses.index');
         });
     }
 }

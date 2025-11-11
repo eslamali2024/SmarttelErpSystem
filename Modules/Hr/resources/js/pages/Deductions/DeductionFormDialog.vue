@@ -18,7 +18,9 @@ const props = defineProps<{
         employees: any[],
         deduction_types: any[],
     } | null,
-    loading?: boolean
+    loading?: boolean,
+    employee_id?: number,
+    redirect_url?: any
 }>();
 
 const emit = defineEmits(['update:show']);
@@ -28,12 +30,13 @@ const { showToast } = useToast();
 // Vuelidate
 const formSchema = (props: any) => ({
     formStructure: {
-        employee_id: props.item?.employee_id ?? '',
+        employee_id: props.item?.employee_id ?? props.employee_id ?? '',
         deduction_type_id: props.item?.deduction_type_id ?? '',
         date: props.item?.date ?? '',
         amount: props.item?.amount ?? '',
         reason: props.item?.reason ?? '',
         notes: props.item?.notes ?? '',
+        redirect_url: props.redirect_url ?? ''
     },
     validationRules: {
         reason: { required, minLength: minLength(5), maxLength: maxLength(255) },
@@ -91,7 +94,7 @@ const submitForm = () => {
                     <SelectGroup v-model="form.employee_id" :modelValueError="form.errors.employee_id"
                         class="col-span-12 md:col-span-6 lg:col-span-4" :label="$t('employee')"
                         :options="props.data?.employees" :placeholder="$t('please_select_a_employee')" type="text"
-                        :vue-error="$v?.employee_id" />
+                        :vue-error="$v?.employee_id" :disabled="props.employee_id ? true : false" />
 
                     <SelectGroup v-model="form.deduction_type_id" :modelValueError="form.errors.deduction_type_id"
                         class="col-span-12 md:col-span-6 lg:col-span-4" :label="$t('deduction_type')"

@@ -56,7 +56,7 @@ class DeductionController extends TransactionController
 
         return $this->withTransaction(function () use ($request) {
             $this->deductionService->store($request->validated());
-            return redirect()->route('hr.deductions.index');
+            return $request->redirect_url ? redirect($request->redirect_url) : redirect()->route('hr.deductions.index');
         });
     }
 
@@ -86,7 +86,7 @@ class DeductionController extends TransactionController
 
         return $this->withTransaction(function () use ($request, $deduction) {
             $this->deductionService->update($deduction, $request->validated());
-            return redirect()->route('hr.deductions.index');
+            return $request->redirect_url ? redirect($request->redirect_url) : redirect()->route('hr.deductions.index');
         });
     }
 
@@ -99,7 +99,7 @@ class DeductionController extends TransactionController
 
         return $this->withTransaction(function () use ($deduction) {
             $this->deductionService->destroy($deduction);
-            return redirect()->route('hr.deductions.index');
+            return request()->redirect_url ? redirect(request()->redirect_url) : redirect()->route('hr.deductions.index');
         });
     }
 }

@@ -37,11 +37,13 @@ import {
 import { strLimit } from '@/utils/strLimit';
 import { useSearchTable } from '@/composables/useSearchTable';
 import { useToast } from '@/composables/useToast';
-import { DropdownMenu } from '@/components/ui/dropdown-menu';
-import DropdownMenuTrigger from '@/components/ui/dropdown-menu/DropdownMenuTrigger.vue';
-import DropdownMenuContent from '@/components/ui/dropdown-menu/DropdownMenuContent.vue';
-import DropdownMenuItem from '@/components/ui/dropdown-menu/DropdownMenuItem.vue';
-import DropdownMenuSeparator from '@/components/ui/dropdown-menu/DropdownMenuSeparator.vue';
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator
+} from '@/components/ui/dropdown-menu';
 import ImportDialog from '@/components/ImportDialog.vue';
 
 // Master Data

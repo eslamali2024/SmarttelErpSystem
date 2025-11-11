@@ -2,10 +2,13 @@
 
 namespace Modules\Hr\Services\MasterData;
 
+use Illuminate\Support\Str;
 use Modules\Hr\Models\WorkSchedule;
+use Maatwebsite\Excel\Facades\Excel;
 use Modules\Hr\Enums\DaysInWeekEnum;
-use Modules\Hr\Enums\WorkScheduleHolidayStatusEnum;
 use Modules\Hr\Models\WorkScheduleRule;
+use Modules\Hr\Imports\WorkScheduleImport;
+use Modules\Hr\Enums\WorkScheduleHolidayStatusEnum;
 
 class WorkScheduleService
 {
@@ -118,5 +121,19 @@ class WorkScheduleService
                 'status'    => true
             ];
         });
+    }
+
+    /**
+     * Import Public Holidays from an Excel file.
+     *
+     * @param \Illuminate\Http\UploadedFile $file
+     * @return void
+     */
+    public function import($file): void
+    {
+        $fileName = Str::random(10) . '.' . $file->getClientOriginalExtension();
+        $file->move('imports', $fileName);
+        Excel::import(new WorkScheduleImport, 'imports/' . $fileName);
+        unlink('imports/' . $fileName);
     }
 }

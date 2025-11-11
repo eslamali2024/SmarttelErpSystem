@@ -234,5 +234,17 @@ export default {
     show_deduction: 'Show Deduction',
     deduction_deleted_successfully: 'Deduction Deleted Successfully',
     deduction_deleted_failed: 'Deduction Deleted Failed',
-   
+    import_work_schedules: 'Import Work Schedules',
+    import_allowance_types: 'Import Allowance Types',
+    employee_activity: 'Employee Activity',
+    contracts: 'Contracts',
+    contract_deleted_successfully: 'Contract Deleted Successfully',
+    contract_deleted_failed: 'Contract Deleted Failed',
+    add_contract: 'Add Contract',
+    update_contract: 'Update Contract',
+    show_contract: 'Show Contract',
+    edit_contract: 'Edit Contract',
+    change_status: 'Change Status',
+    employee_contract_status_updated_failed: 'Employee Contract Status Updated Failed',
+    employee_contract_status_updated_successfully: 'Employee Contract Status Updated Successfully',
 }

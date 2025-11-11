@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from "vue"
+import { type HTMLAttributes } from "vue"
 import { cn } from "@/lib/utils"
 import ScrollArea from "../scroll-area/ScrollArea.vue";
 import ScrollBar from "../scroll-area/ScrollBar.vue";
@@ -7,9 +7,12 @@ import ScrollBar from "../scroll-area/ScrollBar.vue";
 const props = defineProps<{
     class?: HTMLAttributes["class"]
 }>()
+
 </script>
 
 <template>
+
+
     <ScrollArea class="pb-4">
         <div class="relative">
             <table

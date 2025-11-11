@@ -29,8 +29,12 @@ class EmployeeContract extends Model
 
     protected $casts = [
         'status'     => ContractStatusEnum::class,
-        'start_date' => 'date',
-        'end_date'   => 'date',
+        'start_date' => 'date:Y-m-d',
+        'end_date'   => 'date:Y-m-d',
+    ];
+
+    protected $appends = [
+        'status_label',
     ];
 
     /**
@@ -109,5 +113,18 @@ class EmployeeContract extends Model
     public function timeManagement(): HasOne
     {
         return $this->hasOne(TimeManagement::class, 'id', 'time_management_id');
+    }
+
+    /**
+     * Get the label of the status of the employee contract.
+     *
+     * This function returns the label of the status of the employee contract.
+     * The status label is retrieved from the status enum.
+     *
+     * @return string
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        return $this->status->label();
     }
 }

@@ -162,6 +162,13 @@ return [
                 'Delete'                    => 'employee_delete',
                 'List'                      => 'employee_access',
             ],
+            'Employee Contracts' => [
+                'Create'                    => 'employee_contract_create',
+                'Edit'                      => 'employee_contract_edit',
+                'Show'                      => 'employee_contract_show',
+                'Delete'                    => 'employee_contract_delete',
+                'List'                      => 'employee_contract_access',
+            ],
             'Bonuses' => [
                 'Create'                    => 'bonuse_create',
                 'Edit'                      => 'bonuse_edit',

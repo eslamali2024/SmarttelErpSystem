@@ -98,6 +98,6 @@ export default {
     cancel_rejection_successfully: 'Cancel rejection successfully',
     cancel_rejection_failed: 'Cancel rejection failed',
     deductions: 'Deductions',
-
-
+    date_range: 'Date Range',
+    please_select_item: 'Please select item',
 }

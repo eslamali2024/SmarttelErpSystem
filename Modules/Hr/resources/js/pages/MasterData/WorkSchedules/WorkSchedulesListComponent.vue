@@ -32,14 +32,25 @@ import {
 } from '@/components/ui/card';
 import { useSearchTable } from '@/composables/useSearchTable';
 import TableActions from '@/components/ui/table/TableActions.vue';
-import A from '@/components/ui/a/A.vue';
 import { strLimit } from '@/utils/strLimit';
 import { useToast } from '@/composables/useToast';
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator
+} from '@/components/ui/dropdown-menu';
+import ImportDialog from '@/components/ImportDialog.vue';
+import Button from '@/components/ui/button/Button.vue';
 
 // Master Data
 const { t } = useI18n();
 const currentItem = ref<any>(null)
+const showImportDialog = ref(false)
 const { showToast } = useToast();
+const method_type = ref("post");
+const action = ref(workSchedulesRoute.import().url);
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: t('dashboard'), href: dashboard().url },
@@ -95,6 +106,16 @@ const deleteTimeMaangement = () => {
         }
     })
 }
+
+/**
+ * Toggle the import dialog for importing public holidays
+ */
+const toggleImportialog = () => {
+    showImportDialog.value = true;
+
+    action.value = workSchedulesRoute.import().url
+    method_type.value = "post"
+}
 </script>
 
 <template>
@@ -106,10 +127,34 @@ const deleteTimeMaangement = () => {
             <CardHeader class="flex justify-between items-center">
                 <CardTitle>{{ $t('work_schedules') }}</CardTitle>
                 <Can permissions="work_schedule_create">
-                    <A :href="workSchedulesRoute.create().url"
-                        class="bg-green-500 cursor-pointer hover:bg-green-600 text-white" size="sm">
-                        <i class="ri ri-add-line"></i> {{ $t("add_work_schedule") }}
-                    </A>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <Button
+                                class="cursor-pointer bg-gray-600/70 hover:bg-gray-600/80 dark:bg-gray-50/70 dark:hover:bg-gray-50/80 ">
+                                <i class="ri ri-settings-3-line"></i>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem>
+                                <a :href="workSchedulesRoute.create().url" class="btn btn-outline-primary">
+                                    <i class="ri ri-add-line"></i> {{ $t("add_work_schedule") }}
+                                </a>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                                <a :href="workSchedulesRoute.downloadTemplate().url" rel="noopener"
+                                    class="btn btn-outline-primary">
+                                    <i class="ri ri-download-2-line me-2"></i>
+                                    {{ $t('download_sample') }}
+                                </a>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <button v-on:click="toggleImportialog()" class="cursor-pointer">
+                                    <i class="ri ri-file-excel-2-line"></i> {{ $t("import_work_schedules") }}
+                                </button>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </Can>
             </CardHeader>
 
@@ -187,5 +232,9 @@ const deleteTimeMaangement = () => {
     <Can permissions="work_schedule_delete">
         <DeleteModal v-model:show="showDeleteModal" :item="currentItem" @confirm="deleteTimeMaangement"
             :loading="isDeleting" />
+    </Can>
+
+    <Can :permissions="['public_holiday_create', 'public_holiday_edit']">
+        <ImportDialog v-model:show="showImportDialog" :action="action" :item="currentItem" />
     </Can>
 </template>
