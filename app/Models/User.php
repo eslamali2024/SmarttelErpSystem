@@ -5,16 +5,19 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Traits\ScopeFilter;
+use Modules\Hr\Models\Employee;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles, ScopeFilter;
+    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles, ScopeFilter, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -39,6 +42,8 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = ['avatar'];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -51,5 +56,15 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
         ];
+    }
+
+    public function employee(): HasOne
+    {
+        return $this->hasOne(Employee::class, 'user_id');
+    }
+
+    public function getAvatarAttribute(): string
+    {
+        return $this->employee?->avatar ?? '';
     }
 }

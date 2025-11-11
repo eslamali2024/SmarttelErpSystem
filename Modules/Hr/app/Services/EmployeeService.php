@@ -33,13 +33,13 @@ class EmployeeService
      */
     public function store(array $data): Employee
     {
-        $employee = Employee::create($data['step_1']);
-
-        User::create([
+        $user = User::create([
             'name'      => $data['step_1']['name'] ?? '',
             'email'     => $data['step_1']['email'] ?? '',
             'password'  => Hash::make('123456789'),
         ]);
+        
+        $employee = Employee::create(array_merge($data['step_1'], ['user_id' => $user->id]));
 
         $contract = $employee->contracts()->create($data['step_2'] ?? []);
         $contract->contractPositions()->create($data['step_2'] ?? []);

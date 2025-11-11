@@ -20,6 +20,7 @@ class ApprovalRequestAction extends Model
 
     protected $casts = [
         'action_type' => ApprovalStatusEnum::class,
+        'created_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     public function approvalFlow()

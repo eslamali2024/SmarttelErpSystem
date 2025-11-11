@@ -30,7 +30,7 @@ const props = defineProps<{
         roles?: any[],
         permissions?: any[]
     },
-    roles?: string[],
+    roles: any[] | null,
     permissions?: any,
     loading?: boolean
 }>();

@@ -3,14 +3,12 @@
 namespace App\Traits\Approval;
 
 use App\Models\User;
+use Modules\Hr\Models\Section;
+use Modules\Hr\Models\Division;
+use Modules\Hr\Models\Department;
 use App\Enums\Approval\ApprovalTypeEnum;
 use App\Models\Approval\ApprovalRequest;
-use Modules\Management\App\Enums\StatusType;
-use Modules\Hr\App\Models\Organization\Sector;
-use Modules\Hr\App\Models\Organization\Section;
-use Modules\Hr\App\Events\SendNotificationEvent;
-use Modules\Hr\App\Models\Organization\Division;
-use Modules\Hr\App\Models\Organization\Department;
+use App\Enums\Approval\ApprovalStatusEnum;
 use App\Notifications\Approval\NewApprovalRequestNotification;
 use App\Notifications\Approval\HappenRejectOnRequestNotification;
 use App\Notifications\Approval\FinishedApprovalRequestNotification;
@@ -35,10 +33,10 @@ trait ApprovalModelTrait
                 if (isset($item)) {
                     $user->notify(new NewApprovalRequestNotification($item, $request, $user));
 
-                    broadcast(new SendNotificationEvent([
-                        'title' => 'New Approval Request',
-                        'message' => 'You have a new approval request',
-                    ], $user->id))->toOthers();
+                    // broadcast(new SendNotificationEvent([
+                    //     'title' => 'New Approval Request',
+                    //     'message' => 'You have a new approval request',
+                    // ], $user->id))->toOthers();
                 }
             }
         }
@@ -53,7 +51,7 @@ trait ApprovalModelTrait
     public function onCompletedFirstApprove(ApprovalRequest $request, User $user): void
     {
         $request->approvable()->update([
-            'status' => StatusType::IN_PROGRESS
+            'status' => ApprovalStatusEnum::IN_PROGRESS
         ]);
 
         $item = $request->approvable()->first();
@@ -64,10 +62,10 @@ trait ApprovalModelTrait
                 foreach ($users as $user) {
                     $user->notify(new NewApprovalRequestNotification($item, $request, $user));
 
-                    broadcast(new SendNotificationEvent([
-                        'title' => 'New Approval Request',
-                        'message' => 'You have a new approval request',
-                    ], $user->id))->toOthers();
+                    // broadcast(new SendNotificationEvent([
+                    //     'title' => 'New Approval Request',
+                    //     'message' => 'You have a new approval request',
+                    // ], $user->id))->toOthers();
                 }
             }
         }
@@ -82,7 +80,7 @@ trait ApprovalModelTrait
     public function onCompletedApprove(ApprovalRequest $request, User $user): void
     {
         $request->approvable()->update([
-            'status' => StatusType::APPROVED
+            'status' => ApprovalStatusEnum::APPROVED
         ]);
 
         $item = $request->approvable()->first();
@@ -91,10 +89,10 @@ trait ApprovalModelTrait
                 $user = $item->employee?->user;
                 $user?->notify(new FinishedApprovalRequestNotification($item, $request, $user));
 
-                broadcast(new SendNotificationEvent([
-                    'title' => 'Finished Approval Request',
-                    'message' => 'Your approval request has been finished',
-                ], $user?->id))->toOthers();
+                // broadcast(new SendNotificationEvent([
+                //     'title' => 'Finished Approval Request',
+                //     'message' => 'Your approval request has been finished',
+                // ], $user?->id))->toOthers();
             }
         }
     }
@@ -108,7 +106,7 @@ trait ApprovalModelTrait
     public function onCancelCompletedApprove(ApprovalRequest $request, User $user): void
     {
         $request->approvable()->update([
-            'status' => StatusType::IN_PROGRESS
+            'status' => ApprovalStatusEnum::IN_PROGRESS
         ]);
     }
 
@@ -122,7 +120,7 @@ trait ApprovalModelTrait
     public function onCancelApprove(ApprovalRequest $request, User $user): void
     {
         $request->approvable()->update([
-            'status' => StatusType::IN_PROGRESS
+            'status' => ApprovalStatusEnum::IN_PROGRESS
         ]);
     }
 
@@ -135,7 +133,7 @@ trait ApprovalModelTrait
     public function onHappenReject(ApprovalRequest $request, User $user): void
     {
         $request->approvable()->update([
-            'status' => StatusType::REJECTED
+            'status' => ApprovalStatusEnum::REJECTED
         ]);
         $item = $request->approvable()->first();
         if (isset($item)) {
@@ -143,10 +141,10 @@ trait ApprovalModelTrait
             if ($user) {
                 $user?->notify(new HappenRejectOnRequestNotification($item, $request, $user));
 
-                broadcast(new SendNotificationEvent([
-                    'title' => 'Rejected Approval Request',
-                    'message' => 'Your approval request has been rejected',
-                ], $user?->id))->toOthers();
+                // broadcast(new SendNotificationEvent([
+                //     'title' => 'Rejected Approval Request',
+                //     'message' => 'Your approval request has been rejected',
+                // ], $user?->id))->toOthers();
             }
         }
     }
@@ -194,10 +192,6 @@ trait ApprovalModelTrait
                 'id',
                 Section::where('id', $employeePosition?->section_id)->first()?->{$step->manager_column}
             )->get(),
-            ApprovalTypeEnum::SECTOR    => User::where(
-                'id',
-                Sector::where('id', $employeePosition?->sector_id)->first()?->{$step->manager_column}
-            )->get(),
             ApprovalTypeEnum::DIVISION    => User::where(
                 'id',
                 Division::where('id', $employeePosition?->division_id)->first()?->{$step->manager_column}
@@ -212,5 +206,26 @@ trait ApprovalModelTrait
             )->get(),
             default => []
         };
+    }
+
+    /*
+     * Retrieves the approval status for the given model.
+     *
+     * An array containing the following:
+     * - approval: A boolean indicating if the current user is authorized to approve the given model.
+     * - cancel_approval: A boolean indicating if the current user is authorized to cancel the approval of the given model.
+     * - last_request_action_approval: An array containing the last approval step and action, along with the associated approval request.
+     * - approval_steps: An array containing the approval flow steps for the given model, along with the associated approval request actions, and user counts.
+     *
+     * @return array
+     */
+    public function getApproval(): array
+    {
+        return [
+            'approval'                      => $this->allowApproval(),
+            'cancel_approval'               => $this->allowCancelApproval(),
+            'approval_steps'                => $this->getApprovalStepsWithActions(loadApprover: true),
+            'last_request_action_approval'  => $this->lastRequestAction(),
+        ];
     }
 }

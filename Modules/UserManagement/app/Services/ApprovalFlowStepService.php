@@ -3,6 +3,7 @@
 namespace Modules\UserManagement\Services;
 
 use App\Models\User;
+use App\Models\Approval\ApprovalFlow;
 use Modules\UserManagement\Models\Role;
 use App\Enums\Approval\ApprovalTypeEnum;
 use Spatie\Permission\Models\Permission;
@@ -15,10 +16,11 @@ class ApprovalFlowStepService
      *
      * @param array<string, mixed>  $data
      * @return ApprovalFlowStep
+     * @return ApprovalFlowStep
      */
-    public function store(array $data): ApprovalFlowStep
+    public function store(ApprovalFlow $flow, array $data): ApprovalFlowStep
     {
-        return ApprovalFlowStep::create($data);
+        return $flow->approvalFlowSteps()->create($data);
     }
 
     /**
@@ -66,8 +68,8 @@ class ApprovalFlowStepService
     {
         return [
             'approver_types' => ApprovalTypeEnum::items(),
-            'roles'          => Role::pluck('name', 'id'),
-            'permissions'    => Permission::pluck('name', 'id'),
+            'roles'          => Role::pluck('name')->map(fn($name) => ['value' => $name, 'label' => $name]),
+            'permissions'    => Permission::pluck('name')->map(fn($name) => ['value' => $name, 'label' => $name]),
             'users'          => User::pluck('name', 'id'),
         ];
     }

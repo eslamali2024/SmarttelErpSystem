@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AppDataController;
+use App\Http\Controllers\Approval\ApprovalController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -28,6 +29,14 @@ Route::get('dashboard', function () {
 
 Route::prefix('api')->name('api.')->group(function () {
     Route::get('app-data', AppDataController::class)->name('app-data');
+});
+
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::post('approvals/{approval_request}/approve',           [ApprovalController::class, 'approve'])->name('approvals.approve');
+    Route::post('approvals/{approval_request}/reject',            [ApprovalController::class, 'reject'])->name('approvals.reject');
+    Route::post('approvals/{approval_request}/cancel-approval',   [ApprovalController::class, 'cancelApproval'])->name('approvals.cancel-approval');
 });
 
 require __DIR__ . '/settings.php';

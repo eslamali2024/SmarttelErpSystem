@@ -85,5 +85,12 @@ return [
     'actual_end_date'           => 'Actual End Date',
     'days'                      => 'Days',
     'import_file'               => 'Import File',
+    'employee'                  => 'Employee',
+    'bonus_type'                => 'Bonus Type',
+    'amount'                    => 'Amount',
+    'date'                      => 'Date',
+    'notes'                     => 'Notes',
+    'reason'                    => 'Reason',
+    'deduction_type'            => 'Deduction Type',
 
 ];

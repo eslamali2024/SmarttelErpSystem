@@ -3,7 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Hr\Http\Controllers\{
     HrController,
-    EmployeeController
+    EmployeeController,
+    BonusController,
+    DeductionController
 };
 use Modules\Hr\Http\Controllers\Organization\{
     DivisionController,
@@ -54,6 +56,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('deduction-types-download-template',   [DeductionTypeController::class, 'downloadTemplate'])->name('deduction-types.downloadTemplate');
         });
 
+        Route::resource('bonuses',                      BonusController::class)->except(['edit']);
+        Route::resource('deductions',                   DeductionController::class)->except(['edit']);
+
+        // Employee
         Route::resource('employees',                           EmployeeController::class);
         Route::post('employees/{employee}/update-avatar',     [EmployeeController::class, 'updateAvatar'])->name('employees.update-avatar');
         Route::post('gross-up', [EmployeeController::class, 'getGrossUp'])->name('employees.gross-up');

@@ -39,7 +39,7 @@ class ApprovalFlowService
      */
     public function destroy(ApprovalFlow $approval_flow): bool
     {
-        $approval_flow->steps()->delete();
+        $approval_flow->approvalFlowSteps()->delete();
         return $approval_flow->delete();
     }
 

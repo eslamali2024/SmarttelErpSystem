@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\UserManagement\Http\Requests;
+namespace Modules\usermanagement\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -24,5 +24,14 @@ class ApprovalFlowRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    public function attributes(): array
+    {
+        return [
+            "name"                                  => __('usermanagement.name'),
+            'redirect_route'                        => __('usermanagement.redirect_route'),
+            "approvable_type"                       => __('usermanagement.approvable_type'),
+        ];
     }
 }

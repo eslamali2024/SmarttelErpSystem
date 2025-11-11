@@ -17,12 +17,12 @@ import PaginationUse from '@/components/ui/pagination-use/PaginationUse.vue';
 import TableEmpty from '@/components/ui/table/TableEmpty.vue';
 import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import approvalFlowsRoute from '@/routes/user-management/approval-flows';
 import approvalFlowStepsRoute from '@/routes/user-management/approval-flow-steps';
 import Button from '@/components/ui/button/Button.vue';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
-import ApprovalFlowDialog from './ApprovalFlowStepDialog.vue';
+import ApprovalFlowStepFormDialog from './ApprovalFlowStepFormDialog.vue';
 import { router } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import axios from 'axios'
@@ -40,6 +40,7 @@ import { useSearchTable } from '@/composables/useSearchTable';
 import { useToast } from '@/composables/useToast';
 import { strLimit } from '@/utils/strLimit';
 import A from '@/components/ui/a/A.vue';
+import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
 
 const { t } = useI18n();
 const { showToast } = useToast();
@@ -52,6 +53,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const props = defineProps<{
     approvalFlow: any,
+    approver_types: object,
     approval_flow_steps?: {
         data?: any[],
         links?: any[],
@@ -62,8 +64,12 @@ const props = defineProps<{
 }>()
 
 const approvalFlow = props.approvalFlow ?? null
-const { search } = useSearchTable(approvalFlowStepsRoute.index(approvalFlow?.id).url);
-
+const { search } = useSearchTable(approvalFlowStepsRoute.index(approvalFlow?.id).url, {
+    approver_type: {
+        value: '',
+        operator: '='
+    }
+});
 
 // Form Data
 const showLoading = ref(false)
@@ -108,7 +114,10 @@ const toggleFormDialog = async (item?: any, actionType?: string) => {
 
     if (item) {
         method_type.value = actionType ?? "put"
-        action.value = approvalFlowStepsRoute.update(approvalFlow?.id, item.id).url
+        action.value = approvalFlowStepsRoute.update({
+            approvalFlow: approvalFlow.id,
+            step: item.id
+        }).url;
     } else {
         method_type.value = "post"
         action.value = approvalFlowStepsRoute.store(approvalFlow?.id).url
@@ -116,6 +125,17 @@ const toggleFormDialog = async (item?: any, actionType?: string) => {
 
     showLoading.value = false
 }
+
+
+// Watch for changes in showFormDialog and reset currentItem when it is closed
+watch(
+    () => showFormDialog.value,
+    (value) => {
+        if (value === false) {
+            currentItem.value = null
+        }
+    }
+)
 
 // Delete Modal
 const showDeleteModal = ref(false)
@@ -130,7 +150,10 @@ const deleteRole = () => {
     if (!currentItem.value) return
     isDeleting.value = true
 
-    router.delete(approvalFlowStepsRoute.destroy(approvalFlow?.id, currentItem.value.id).url, {
+    router.delete(approvalFlowStepsRoute.destroy({
+        approvalFlow: approvalFlow.id,
+        step: currentItem.value?.id
+    }).url, {
         onFinish: () => {
             showDeleteModal.value = false
             currentItem.value = null
@@ -190,7 +213,9 @@ const deleteRole = () => {
                                 <Input :placeholder="$t('approval_flow')" v-model="search.approval_flow" />
                             </TableHead>
                             <TableHead class="p-2">
-                                <Input :placeholder="$t('approvable_type')" v-model="search.approvable_type" />
+                                <SelectGroup v-model="search.approver_type.value"
+                                    :placeholder="$t('please_select_a_approver_type')"
+                                    :options="props.approver_types || []" />
                             </TableHead>
                             <TableHead class="p-2">
                                 <Input :placeholder="$t('order')" v-model="search.order" />
@@ -207,10 +232,10 @@ const deleteRole = () => {
                             </TableCell>
                             <TableCell class="text-center">{{ strLimit(approval_flow_step.name, 15) }}</TableCell>
                             <TableCell class="text-center">
-                                {{ strLimit(approval_flow_step.approval_flow, 15) }}
+                                {{ strLimit(approval_flow_step.approval_flow?.name, 15) }}
                             </TableCell>
                             <TableCell class="text-center">
-                                {{ strLimit(approval_flow_step.approvable_type, 15) }}
+                                {{ strLimit(approval_flow_step.approver_type_label, 15) }}
                             </TableCell>
                             <TableCell class="text-center">
                                 {{ approval_flow_step.order }}
@@ -255,7 +280,7 @@ const deleteRole = () => {
     </Can>
 
     <Can :permissions="['approval_flow_step_create', 'approval_flow_step_show', 'approval_flow_step_edit']">
-        <ApprovalFlowDialog v-model:show="showFormDialog" :method_type="method_type" :action="action" :data="dataCache"
-            :item="currentItem" :loading="showLoading" />
+        <ApprovalFlowStepFormDialog v-model:show="showFormDialog" :method_type="method_type" :action="action"
+            :data="dataCache" :item="currentItem" :loading="showLoading" />
     </Can>
 </template>

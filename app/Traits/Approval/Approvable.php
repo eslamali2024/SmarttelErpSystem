@@ -3,8 +3,9 @@
 namespace App\Traits\Approval;
 
 use App\Models\User;
+use Modules\Hr\Models\Employee;
+use Modules\Hr\Models\Department;
 use Illuminate\Support\Collection;
-use Modules\Hr\App\Models\Employee;
 use App\Models\Approval\ApprovalFlow;
 use App\Events\Approval\CancelApproval;
 use App\Events\Approval\RejectApproval;
@@ -17,7 +18,6 @@ use App\Events\Approval\CreateNewApproval;
 use App\Events\Approval\FirstApprovalCompleted;
 use App\Events\Approval\CancelApprovalCompleted;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Modules\Hr\App\Models\Organization\Department;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /*
@@ -33,7 +33,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     * It provides methods to retrieve approval flow steps, approval request actions,
     * and to determine if the current user can approve or cancel an approval request.
     * The trait also includes methods to check if the current user is authorized to approve a step
-    * based on their role, permissions, manager sector, division, department, section, department request, department approval Or User...
+    * based on their role, permissions, division, department, section, department request, department approval Or User...
 
     * Created by: Thomas Emad
     * Position: Junior Software Developer
@@ -142,7 +142,7 @@ trait Approvable
     public function getEmployee($id)
     {
         if (is_null($this->cachedEmployee)) {
-            $this->cachedEmployee = Employee::with('current_company_position')->find($id);
+            $this->cachedEmployee = Employee::with('currentPosition')->find($id);
         }
         return $this->cachedEmployee;
     }
@@ -165,6 +165,7 @@ trait Approvable
     public function getApprovalRequestSteps($loadApprover = false)
     {
         if (is_null($this->cachedApprovalRequestSteps)) {
+            $this->approvalRequest?->approvalRequestActions->load('approver');
             $actions = $this->approvalRequest?->approvalRequestActions;
             if ($loadApprover) {
                 $this->cachedApprovalRequestSteps = $this->loadUsersForActions($actions);
@@ -486,7 +487,6 @@ trait Approvable
      * - User: Check if the current user is the same as the user specified in the step.
      * - Role: Check if the current user has any of the roles specified in the step.
      * - Permissions: Check if the current user has any of the permissions specified in the step.
-     * - Sector: Check if the current user is the sector manager of the employee associated with the step.
      * - Division: Check if the current user is the division manager of the employee associated with the step.
      * - Department: Check if the current user is the department manager of the employee associated with the step.
      * - Section: Check if the current user is the section manager of the employee associated with the step.
@@ -504,18 +504,6 @@ trait Approvable
         if ($currentUser->hasAnyRole('super-admin', 'general-manager', 'hr-manager')) {
             return true; // Super admin can approve any step
         }
-        // return match ($step?->approver_type) {
-        //     ApprovalTypeEnum::USER                   => $this->isHeThisUser($currentUser, $step?->user_id),
-        //     ApprovalTypeEnum::ROLE                   => $this->isHasRoles($currentUser, $step?->roles),
-        //     ApprovalTypeEnum::PERMISSIONS            => $this->isHasPermissions($currentUser, $step?->permissions),
-        //     ApprovalTypeEnum::SECTOR                 => $this->isHeSectorManager($currentUser, $employee, $step?->manager_column),
-        //     ApprovalTypeEnum::DIVISION               => $this->isHeDivisionManager($currentUser, $employee, $step?->manager_column),
-        //     ApprovalTypeEnum::DEPARTMENT             => $this->isHeDepartmentManager($currentUser, $employee, $step?->manager_column),
-        //     ApprovalTypeEnum::SECTION                => $this->isHeSectionManager($currentUser, $employee, $step?->manager_column),
-        //     ApprovalTypeEnum::DEPARTMENT_REQUEST     => $this->isHeManagerDepartmentRequest($currentUser, $request->approvable, $step?->manager_column, $step?->approver_column),
-        //     ApprovalTypeEnum::DEPARTMENT_APPROVAL    => $this->isHeManagerDepartmentApproval($currentUser, $request->approvable, $step?->manager_column, $step?->approver_column),
-        //     default       => false,
-        // };
 
         $item = $request?->approvable;
 
@@ -523,7 +511,6 @@ trait Approvable
             ApprovalTypeEnum::USER                   => $this->isHeThisUser($currentUser, $step?->user_id),
             ApprovalTypeEnum::ROLE                   => $this->isHasRoles($currentUser, $step?->roles),
             ApprovalTypeEnum::PERMISSIONS            => $this->isHasPermissions($currentUser, $step?->permissions),
-            ApprovalTypeEnum::SECTOR                 => $this->isHeManagerFromLevelAndAbove($item, $currentUser, $employee, $step?->manager_column, 'sector'),
             ApprovalTypeEnum::DIVISION               => $this->isHeManagerFromLevelAndAbove($item, $currentUser, $employee, $step?->manager_column, 'division'),
             ApprovalTypeEnum::DEPARTMENT             => $this->isHeManagerFromLevelAndAbove($item, $currentUser, $employee, $step?->manager_column, 'department'),
             ApprovalTypeEnum::SECTION                => $this->isHeManagerFromLevelAndAbove($item, $currentUser, $employee, $step?->manager_column, 'section'),
@@ -554,7 +541,7 @@ trait Approvable
             return false;
         }
 
-        $position = $employee?->current_company_position ?? null;
+        $position = $employee?->currentPosition ?? null;
         if (!$position && is_null($item)) return false;
 
         // get hierarchy
@@ -562,8 +549,6 @@ trait Approvable
             'section'    => $position?->section ?? $item->section ?? null,
             'department' => $position?->department ?? $item->department ?? null,
             'division'   => $position?->division ?? $item->division ?? null,
-            'sector'     => $position?->sector ?? $item->sector ?? null,
-            // 'company'    => $position?->company ?? null,
         ];
 
         $startChecking = false;
@@ -613,7 +598,7 @@ trait Approvable
      */
     private function isHasRoles(User $currentUser, array $roles): bool
     {
-        return $currentUser?->roles?->whereIn('id', $roles)?->count() > 0;
+        return $currentUser?->roles?->whereIn('name', $roles)?->count() > 0;
     }
 
     /**
@@ -631,88 +616,7 @@ trait Approvable
      */
     private function isHasPermissions(User $currentUser, array $permissions): bool
     {
-        return $currentUser?->permissions()?->whereIn('id', $permissions)?->exists();
-    }
-
-    /**
-     * Checks if the current user is a sector manager for the given employee.
-     *
-     * This method determines whether the specified user is the manager of the sector
-     * associated with the employee's current company position. The check is performed
-     * based on the manager column provided.
-     *
-     * @param User $currentUser The current user.
-     * @param Employee $employee The employee whose sector is being checked.
-     * @param string|null $manager_column The column name representing the manager ID.
-     * @return bool True if the user is the sector manager, otherwise false.
-     */
-    private function isHeSectorManager(User $currentUser, Employee $employee, string|null $manager_column): bool
-    {
-        if (!$currentUser || !$employee || is_null($manager_column)) {
-            return false;
-        }
-        $sector = $employee?->current_company_position?->sector;
-        return $sector && $sector->{$manager_column} === $currentUser->id;
-    }
-
-    /**
-     * Checks if the current user is a division manager for the given employee.
-     *
-     * This method determines whether the specified user is the manager of the division
-     * associated with the employee's current company position. The check is performed
-     * based on the manager column provided.
-     *
-     * @param User $currentUser The current user.
-     * @param Employee $employee The employee whose division is being checked.
-     * @param string|null $manager_column The column name representing the manager ID.
-     * @return bool True if the user is the division manager, otherwise false.
-     */
-    private function isHeDivisionManager(User $currentUser, Employee $employee, string|null $manager_column): bool
-    {
-        if (!$currentUser || !$employee || is_null($manager_column)) {
-            return false;
-        }
-        $division = $employee?->current_company_position?->division;
-        return $division && $division->{$manager_column} === $currentUser->id;
-    }
-
-    /**
-     * Checks if the current user is a department manager for the given employee.
-     *
-     * This method determines whether the specified user is the manager of the department
-     * associated with the employee's current company position. The check is performed
-     * based on the manager column provided.
-     *
-     * @param User $currentUser The current user.
-     * @param Employee $employee The employee whose department is being checked.
-     * @param string|null $manager_column The column name representing the manager ID.
-     * @return bool True if the user is the department manager, otherwise false.
-     */
-    private function isHeDepartmentManager(User $currentUser, Employee $employee, string|null $manager_column): bool
-    {
-        $department = $employee?->current_company_position?->department;
-        return $department && $department->{$manager_column} === $currentUser->id;
-    }
-
-    /**
-     * Checks if the current user is a section manager for the given employee.
-     *
-     * This method determines whether the specified user is the manager of the section
-     * associated with the employee's current company position. The check is performed
-     * based on the manager column provided.
-     *
-     * @param User $currentUser The current user.
-     * @param Employee $employee The employee whose section is being checked.
-     * @param string|null $manager_column The column name representing the manager ID.
-     * @return bool True if the user is the section manager, otherwise false.
-     */
-    private function isHeSectionManager(User $currentUser, Employee $employee, string|null $manager_column): bool
-    {
-        if (!$currentUser || !$employee || is_null($manager_column)) {
-            return false;
-        }
-        $section = $employee?->current_company_position?->section;
-        return $section && $section->{$manager_column} === $currentUser->id;
+        return $currentUser?->permissions()?->whereIn('name', $permissions)?->exists();
     }
 
     /**
