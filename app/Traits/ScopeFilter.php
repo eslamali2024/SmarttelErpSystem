@@ -21,7 +21,7 @@ trait ScopeFilter
     {
         $flatFilters = $this->flattenFilters($filters);
 
-        collect($flatFilters)->except('start', 'end', 'column', 'start_date', 'end_date', 'page', 'perPage')->each(function ($filter, $column) use ($query) {
+        collect($flatFilters)->except('start', 'end', 'column_date_range', 'start_date', 'end_date', 'page', 'perPage', 'dateRange')->each(function ($filter, $column) use ($query) {
             $query->when($filter, function ($query) use ($filter, $column) {
                 if (str_contains($column, '.')) {
                     $segments       = explode('.', $column);
@@ -41,15 +41,14 @@ trait ScopeFilter
         });
 
         if (isset($flatFilters['start']) && isset($flatFilters['end'])) {
-            $query->whereBetween($flatFilters['column'] ?? 'start_date', [
+            $query->whereBetween($flatFilters['column_date_range'] ?? 'start_date', [
                 $flatFilters['start'],
-                Carbon::parse($flatFilters['end'])->endOfDay(),
+                Carbon::createFromFormat('d/m/Y', $flatFilters['end'])->endOfDay(),
             ]);
         } elseif (isset($flatFilters['start_date']) && isset($flatFilters['end_date'])) {
             $query->whereDate('start_date', '>=', $flatFilters['start_date'])
                 ->whereDate('end_date', '<=', $flatFilters['end_date']);
         }
-
         return $query;
     }
 

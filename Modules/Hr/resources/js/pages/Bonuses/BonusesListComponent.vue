@@ -16,7 +16,7 @@ import PaginationUse from '@/components/ui/pagination-use/PaginationUse.vue';
 import TableEmpty from '@/components/ui/table/TableEmpty.vue';
 import TableFooter from '@/components/ui/table/TableFooter.vue';
 import Input from '@/components/ui/input/Input.vue';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import bonusesRoute from '@/routes/hr/bonuses';
 import DeleteModal from '@/components/ui/Modal/DeleteModal.vue';
@@ -41,6 +41,7 @@ import { numberFormat } from '@/utils/numberFormat';
 import TableBadge from '@/components/ui/table/TableBadge.vue';
 import A from '@/components/ui/a/A.vue';
 import SelectGroup from '@/components/ui/select-group/SelectGroup.vue';
+import DataRange from '@/components/ui/date-range/DataRange.vue';
 
 // Master Data
 const { t } = useI18n();
@@ -127,9 +128,27 @@ const { search } = useSearchTable(bonusesRoute.index().url, {
     status: {
         value: '',
         operator: '='
-    }
+    },
+    start: '25/11/2025',
+    end: '28/11/2025',
+    column_date_range: 'date'
 });
 
+// Date Range
+const dateRange = ref<{ start: string | null; end: string | null }>({
+    start: null,
+    end: null,
+})
+
+watch(
+    () => dateRange.value,
+    (newVal) => {
+        search.start = newVal.start
+        search.end = newVal.end
+        search.column_date_range = 'date'
+    },
+    { deep: true }
+)
 // Delete Modal
 const showDeleteModal = ref(false)
 const isDeleting = ref(false)
@@ -183,6 +202,8 @@ const deleteBonuse = () => {
             </CardHeader>
 
             <CardContent>
+                <DataRange :label="$t('date_range')" class="mb-4" v-model="dateRange" />
+
                 <Table>
                     <TableCaption>{{ $t('bonuses') }}</TableCaption>
                     <TableHeader>
@@ -247,7 +268,7 @@ const deleteBonuse = () => {
                                     <template #before>
                                         <Can permissions="bonus_show">
                                             <A size="sm" :href="bonusesRoute.show(bonus.id).url"
-                                                class="ms-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
+                                                class="me-2 bg-blue-500 cursor-pointer text-white hover:bg-blue-600">
                                                 <i class="ri ri-eye-line"></i>
                                             </A>
                                         </Can>

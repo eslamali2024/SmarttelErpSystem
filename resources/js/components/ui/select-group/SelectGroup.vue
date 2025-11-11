@@ -57,6 +57,14 @@ const selectedValue = computed({
 
             <ScrollArea class="max-h-[300px] w-full">
                 <ComboboxGroup class=" w-full">
+                    <ComboboxItem key="null-option" :value="null">
+                        {{ $t('please_select_item')  }}
+
+                        <ComboboxItemIndicator>
+                            <Check class="ml-auto h-4 w-4" />
+                        </ComboboxItemIndicator>
+                    </ComboboxItem>
+
                     <ComboboxItem v-for="option in optionsArray" :key="option.value" :value="option">
                         {{ option.label }}
 
