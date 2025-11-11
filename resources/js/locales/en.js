@@ -100,4 +100,6 @@ export default {
     deductions: 'Deductions',
     date_range: 'Date Range',
     please_select_item: 'Please select item',
+    leave_types: 'Leave Types',
+
 }

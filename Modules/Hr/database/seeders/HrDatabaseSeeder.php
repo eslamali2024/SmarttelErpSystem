@@ -24,7 +24,8 @@ class HrDatabaseSeeder extends Seeder
             WorkScheduleSeeder::class,
             PublicHolidaySeeder::class,
             BonusTypeSeeder::class,
-            DeductionTypeSeeder::class
+            DeductionTypeSeeder::class,
+            LeaveTypeSeeder::class
         ]);
     }
 }

@@ -21,6 +21,7 @@ use Modules\Hr\Http\Controllers\MasterData\{
     BonusTypeController,
     DeductionTypeController,
     InsuranceCompanyController,
+    LeaveTypeController,
     PublicHolidayController,
     WorkScheduleController
 };
@@ -65,6 +66,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('deduction-types',                  DeductionTypeController::class)->except(['show', 'edit', 'create']);
             Route::post('deduction-types-import',               [DeductionTypeController::class, 'import'])->name('deduction-types.import');
             Route::get('deduction-types-download-template',     [DeductionTypeController::class, 'downloadTemplate'])->name('deduction-types.downloadTemplate');
+
+            // Leave Type
+            Route::resource('leave-types',                      LeaveTypeController::class)->except(['show', 'edit', 'create']);
+            Route::post('leave-types-import',                   [LeaveTypeController::class, 'import'])->name('leave-types.import');
+            Route::get('leave-types-download-template',         [LeaveTypeController::class, 'downloadTemplate'])->name('leave-types.downloadTemplate');
         });
 
         Route::resource('bonuses',                              BonusController::class)->except(['edit']);
