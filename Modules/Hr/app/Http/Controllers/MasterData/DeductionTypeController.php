@@ -68,7 +68,7 @@ class DeductionTypeController extends TransactionController
     }
 
     /**
-     * Import Public Holidays from an Excel file.
+     * Import  Deduction Type from an Excel file.
      *
      * @param ImportFileRequest $request
      * @return \Illuminate\Http\RedirectResponse
@@ -82,7 +82,7 @@ class DeductionTypeController extends TransactionController
     }
 
     /**
-     * Download a public holiday template in Excel format.
+     * Download a Deduction Type template in Excel format.
      *
      * @return \Illuminate\Http\Response
      */

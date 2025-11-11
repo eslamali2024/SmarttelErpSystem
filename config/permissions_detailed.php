@@ -153,6 +153,13 @@ return [
                         'Delete'                    => 'deduction_type_delete',
                         'List'                      => 'deduction_type_access',
                     ],
+                    'Leave Types' => [
+                        'Create'                    => 'leave_type_create',
+                        'Edit'                      => 'leave_type_edit',
+                        'Show'                      => 'leave_type_show',
+                        'Delete'                    => 'leave_type_delete',
+                        'List'                      => 'leave_type_access',
+                    ],
                 ]
             ],
             'Employees' => [

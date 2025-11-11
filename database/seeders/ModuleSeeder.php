@@ -209,6 +209,14 @@ class ModuleSeeder extends Seeder
                 'parent_key'        => 'master-data',
             ],
             [
+                'name'              => 'leave_types',
+                'icon'              => 'ri-door-open-fill',
+                'path'              => 'hr/master-data/leave-types',
+                'permission_title'  => 'leave_type_access',
+                'status'            => true,
+                'parent_key'        => 'master-data',
+            ],
+            [
                 'name'              => 'employees',
                 'icon'              => 'ri-user-fill',
                 'path'              => 'hr/employees',

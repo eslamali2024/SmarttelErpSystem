@@ -92,5 +92,9 @@ return [
     'notes'                     => 'Notes',
     'reason'                    => 'Reason',
     'deduction_type'            => 'Deduction Type',
+    'hours'                     => 'Hours',
+    'fixed'                     => 'Fixed',
+    'static_hour_half_morning'  => 'Static Hour Half Morning',
+    'static_hour_half_night'    => 'Static Hour Half Night',
 
 ];

@@ -137,6 +137,13 @@ class PermissionsTableSeeder extends Seeder
             'deduction_type_delete',
             'deduction_type_show',
 
+            // Leave Types
+            'leave_type_access',
+            'leave_type_create',
+            'leave_type_edit',
+            'leave_type_delete',
+            'leave_type_show',
+
             // Employees
             'employee_access',
             'employee_create',
